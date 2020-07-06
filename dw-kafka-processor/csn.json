@@ -1,0 +1,2838 @@
+{
+  "namespace": "uni_li_wue.dw",
+  "definitions": {
+    "Country": {
+      "kind": "type",
+      "@description": "{i18n>CountryCode.Description}",
+      "@title": "{i18n>Country}",
+      "type": "cds.Association",
+      "target": "sap.common.Countries",
+      "keys": [
+        {
+          "ref": [
+            "code"
+          ]
+        }
+      ]
+    },
+    "Currency": {
+      "kind": "type",
+      "@description": "{i18n>CurrencyCode.Description}",
+      "@title": "{i18n>Currency}",
+      "type": "cds.Association",
+      "target": "sap.common.Currencies",
+      "keys": [
+        {
+          "ref": [
+            "code"
+          ]
+        }
+      ]
+    },
+    "Language": {
+      "kind": "type",
+      "@description": "{i18n>LanguageCode.Description}",
+      "@title": "{i18n>Language}",
+      "type": "cds.Association",
+      "target": "sap.common.Languages",
+      "keys": [
+        {
+          "ref": [
+            "code"
+          ]
+        }
+      ]
+    },
+    "User": {
+      "kind": "type",
+      "@description": "{i18n>UserID.Description}",
+      "@title": "{i18n>UserID}",
+      "type": "cds.String",
+      "length": 255
+    },
+    "cuid": {
+      "kind": "entity",
+      "abstract": true,
+      "elements": {
+        "ID": {
+          "key": true,
+          "type": "cds.UUID"
+        }
+      }
+    },
+    "localized.sap.common.Countries": {
+      "kind": "entity",
+      "@UI.Identification": [
+        {
+          "Value": {
+            "=": "name"
+          }
+        }
+      ],
+      "@cds.autoexpose": true,
+      "@cds.odata.valuelist": true,
+      "@cds.persistence.skip": "if-unused",
+      "@odata.draft.enabled": false,
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "sap.common.Countries"
+            ],
+            "as": "L"
+          },
+          "columns": [
+            "*",
+            {
+              "func": "coalesce",
+              "args": [
+                {
+                  "ref": [
+                    "L",
+                    "localized",
+                    "name"
+                  ]
+                },
+                {
+                  "ref": [
+                    "L",
+                    "name"
+                  ]
+                }
+              ],
+              "as": "name"
+            },
+            {
+              "func": "coalesce",
+              "args": [
+                {
+                  "ref": [
+                    "L",
+                    "localized",
+                    "descr"
+                  ]
+                },
+                {
+                  "ref": [
+                    "L",
+                    "descr"
+                  ]
+                }
+              ],
+              "as": "descr"
+            }
+          ]
+        }
+      },
+      "elements": {
+        "name": {
+          "@Core.Computed": true,
+          "@title": "{i18n>Name}",
+          "localized": true,
+          "type": "cds.String",
+          "length": 255
+        },
+        "descr": {
+          "@Core.Computed": true,
+          "@title": "{i18n>Description}",
+          "localized": true,
+          "type": "cds.String",
+          "length": 1000
+        },
+        "code": {
+          "@title": "{i18n>CountryCode}",
+          "key": true,
+          "type": "cds.String",
+          "length": 3
+        },
+        "texts": {
+          "type": "cds.Composition",
+          "cardinality": {
+            "max": "*"
+          },
+          "target": "sap.common.Countries_texts",
+          "on": [
+            {
+              "ref": [
+                "texts",
+                "code"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "code"
+              ]
+            }
+          ]
+        },
+        "localized": {
+          "type": "cds.Association",
+          "target": "sap.common.Countries_texts",
+          "on": [
+            {
+              "ref": [
+                "localized",
+                "code"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "code"
+              ]
+            },
+            "and",
+            {
+              "ref": [
+                "localized",
+                "locale"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "$user",
+                "locale"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "localized.sap.common.Currencies": {
+      "kind": "entity",
+      "@UI.Identification": [
+        {
+          "Value": {
+            "=": "name"
+          }
+        }
+      ],
+      "@cds.autoexpose": true,
+      "@cds.odata.valuelist": true,
+      "@cds.persistence.skip": "if-unused",
+      "@odata.draft.enabled": false,
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "sap.common.Currencies"
+            ],
+            "as": "L"
+          },
+          "columns": [
+            "*",
+            {
+              "func": "coalesce",
+              "args": [
+                {
+                  "ref": [
+                    "L",
+                    "localized",
+                    "name"
+                  ]
+                },
+                {
+                  "ref": [
+                    "L",
+                    "name"
+                  ]
+                }
+              ],
+              "as": "name"
+            },
+            {
+              "func": "coalesce",
+              "args": [
+                {
+                  "ref": [
+                    "L",
+                    "localized",
+                    "descr"
+                  ]
+                },
+                {
+                  "ref": [
+                    "L",
+                    "descr"
+                  ]
+                }
+              ],
+              "as": "descr"
+            }
+          ]
+        }
+      },
+      "elements": {
+        "name": {
+          "@Core.Computed": true,
+          "@title": "{i18n>Name}",
+          "localized": true,
+          "type": "cds.String",
+          "length": 255
+        },
+        "descr": {
+          "@Core.Computed": true,
+          "@title": "{i18n>Description}",
+          "localized": true,
+          "type": "cds.String",
+          "length": 1000
+        },
+        "code": {
+          "@title": "{i18n>CurrencyCode}",
+          "key": true,
+          "type": "cds.String",
+          "length": 3
+        },
+        "symbol": {
+          "@title": "{i18n>CurrencySymbol}",
+          "type": "cds.String",
+          "length": 5
+        },
+        "texts": {
+          "type": "cds.Composition",
+          "cardinality": {
+            "max": "*"
+          },
+          "target": "sap.common.Currencies_texts",
+          "on": [
+            {
+              "ref": [
+                "texts",
+                "code"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "code"
+              ]
+            }
+          ]
+        },
+        "localized": {
+          "type": "cds.Association",
+          "target": "sap.common.Currencies_texts",
+          "on": [
+            {
+              "ref": [
+                "localized",
+                "code"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "code"
+              ]
+            },
+            "and",
+            {
+              "ref": [
+                "localized",
+                "locale"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "$user",
+                "locale"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "localized.sap.common.Languages": {
+      "kind": "entity",
+      "@UI.Identification": [
+        {
+          "Value": {
+            "=": "name"
+          }
+        }
+      ],
+      "@cds.autoexpose": true,
+      "@cds.odata.valuelist": true,
+      "@cds.persistence.skip": "if-unused",
+      "@odata.draft.enabled": false,
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "sap.common.Languages"
+            ],
+            "as": "L"
+          },
+          "columns": [
+            "*",
+            {
+              "func": "coalesce",
+              "args": [
+                {
+                  "ref": [
+                    "L",
+                    "localized",
+                    "name"
+                  ]
+                },
+                {
+                  "ref": [
+                    "L",
+                    "name"
+                  ]
+                }
+              ],
+              "as": "name"
+            },
+            {
+              "func": "coalesce",
+              "args": [
+                {
+                  "ref": [
+                    "L",
+                    "localized",
+                    "descr"
+                  ]
+                },
+                {
+                  "ref": [
+                    "L",
+                    "descr"
+                  ]
+                }
+              ],
+              "as": "descr"
+            }
+          ]
+        }
+      },
+      "elements": {
+        "name": {
+          "@Core.Computed": true,
+          "@title": "{i18n>Name}",
+          "localized": true,
+          "type": "cds.String",
+          "length": 255
+        },
+        "descr": {
+          "@Core.Computed": true,
+          "@title": "{i18n>Description}",
+          "localized": true,
+          "type": "cds.String",
+          "length": 1000
+        },
+        "code": {
+          "@title": "{i18n>LanguageCode}",
+          "key": true,
+          "type": "cds.String",
+          "length": 14
+        },
+        "texts": {
+          "type": "cds.Composition",
+          "cardinality": {
+            "max": "*"
+          },
+          "target": "sap.common.Languages_texts",
+          "on": [
+            {
+              "ref": [
+                "texts",
+                "code"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "code"
+              ]
+            }
+          ]
+        },
+        "localized": {
+          "type": "cds.Association",
+          "target": "sap.common.Languages_texts",
+          "on": [
+            {
+              "ref": [
+                "localized",
+                "code"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "code"
+              ]
+            },
+            "and",
+            {
+              "ref": [
+                "localized",
+                "locale"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "$user",
+                "locale"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "managed": {
+      "kind": "type",
+      "elements": {
+        "createdAt": {
+          "@Core.Immutable": true,
+          "@UI.HiddenFilter": true,
+          "@cds.on.insert": {
+            "=": "$now"
+          },
+          "@odata.on.insert": {
+            "#": "now"
+          },
+          "@readonly": true,
+          "@title": "{i18n>CreatedAt}",
+          "type": "cds.Timestamp"
+        },
+        "createdBy": {
+          "@Core.Immutable": true,
+          "@UI.HiddenFilter": true,
+          "@cds.on.insert": {
+            "=": "$user"
+          },
+          "@description": "{i18n>UserID.Description}",
+          "@odata.on.insert": {
+            "#": "user"
+          },
+          "@readonly": true,
+          "@title": "{i18n>CreatedBy}",
+          "type": "User",
+          "length": 255
+        },
+        "modifiedAt": {
+          "@UI.HiddenFilter": true,
+          "@cds.on.insert": {
+            "=": "$now"
+          },
+          "@cds.on.update": {
+            "=": "$now"
+          },
+          "@odata.on.update": {
+            "#": "now"
+          },
+          "@readonly": true,
+          "@title": "{i18n>ChangedAt}",
+          "type": "cds.Timestamp"
+        },
+        "modifiedBy": {
+          "@UI.HiddenFilter": true,
+          "@cds.on.insert": {
+            "=": "$user"
+          },
+          "@cds.on.update": {
+            "=": "$user"
+          },
+          "@description": "{i18n>UserID.Description}",
+          "@odata.on.update": {
+            "#": "user"
+          },
+          "@readonly": true,
+          "@title": "{i18n>ChangedBy}",
+          "type": "User",
+          "length": 255
+        }
+      },
+      "$syntax": "aspect"
+    },
+    "sap.common": {
+      "kind": "context"
+    },
+    "sap.common.CodeList": {
+      "kind": "type",
+      "@UI.Identification": [
+        {
+          "Value": {
+            "=": "name"
+          }
+        }
+      ],
+      "@cds.autoexpose": true,
+      "@cds.odata.valuelist": true,
+      "@cds.persistence.skip": "if-unused",
+      "elements": {
+        "name": {
+          "@title": "{i18n>Name}",
+          "localized": true,
+          "type": "cds.String",
+          "length": 255
+        },
+        "descr": {
+          "@title": "{i18n>Description}",
+          "localized": true,
+          "type": "cds.String",
+          "length": 1000
+        }
+      },
+      "$syntax": "aspect"
+    },
+    "sap.common.Countries": {
+      "kind": "entity",
+      "@UI.Identification": [
+        {
+          "Value": {
+            "=": "name"
+          }
+        }
+      ],
+      "@cds.autoexpose": true,
+      "@cds.odata.valuelist": true,
+      "@cds.persistence.skip": "if-unused",
+      "includes": [
+        "sap.common.CodeList"
+      ],
+      "elements": {
+        "name": {
+          "@title": "{i18n>Name}",
+          "localized": true,
+          "type": "cds.String",
+          "length": 255
+        },
+        "descr": {
+          "@title": "{i18n>Description}",
+          "localized": true,
+          "type": "cds.String",
+          "length": 1000
+        },
+        "code": {
+          "@title": "{i18n>CountryCode}",
+          "key": true,
+          "type": "cds.String",
+          "length": 3
+        },
+        "texts": {
+          "type": "cds.Composition",
+          "cardinality": {
+            "max": "*"
+          },
+          "target": "sap.common.Countries_texts",
+          "on": [
+            {
+              "ref": [
+                "texts",
+                "code"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "code"
+              ]
+            }
+          ]
+        },
+        "localized": {
+          "type": "cds.Association",
+          "target": "sap.common.Countries_texts",
+          "on": [
+            {
+              "ref": [
+                "localized",
+                "code"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "code"
+              ]
+            },
+            "and",
+            {
+              "ref": [
+                "localized",
+                "locale"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "$user",
+                "locale"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "sap.common.Countries_texts": {
+      "kind": "entity",
+      "@cds.autoexpose": true,
+      "@odata.draft.enabled": false,
+      "elements": {
+        "locale": {
+          "key": true,
+          "type": "cds.String",
+          "length": 14
+        },
+        "name": {
+          "@title": "{i18n>Name}",
+          "localized": false,
+          "type": "cds.String",
+          "length": 255
+        },
+        "descr": {
+          "@title": "{i18n>Description}",
+          "localized": false,
+          "type": "cds.String",
+          "length": 1000
+        },
+        "code": {
+          "@odata.containment.ignore": true,
+          "@title": "{i18n>CountryCode}",
+          "key": true,
+          "type": "cds.String",
+          "length": 3
+        }
+      }
+    },
+    "sap.common.Currencies": {
+      "kind": "entity",
+      "@UI.Identification": [
+        {
+          "Value": {
+            "=": "name"
+          }
+        }
+      ],
+      "@cds.autoexpose": true,
+      "@cds.odata.valuelist": true,
+      "@cds.persistence.skip": "if-unused",
+      "includes": [
+        "sap.common.CodeList"
+      ],
+      "elements": {
+        "name": {
+          "@title": "{i18n>Name}",
+          "localized": true,
+          "type": "cds.String",
+          "length": 255
+        },
+        "descr": {
+          "@title": "{i18n>Description}",
+          "localized": true,
+          "type": "cds.String",
+          "length": 1000
+        },
+        "code": {
+          "@title": "{i18n>CurrencyCode}",
+          "key": true,
+          "type": "cds.String",
+          "length": 3
+        },
+        "symbol": {
+          "@title": "{i18n>CurrencySymbol}",
+          "type": "cds.String",
+          "length": 5
+        },
+        "texts": {
+          "type": "cds.Composition",
+          "cardinality": {
+            "max": "*"
+          },
+          "target": "sap.common.Currencies_texts",
+          "on": [
+            {
+              "ref": [
+                "texts",
+                "code"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "code"
+              ]
+            }
+          ]
+        },
+        "localized": {
+          "type": "cds.Association",
+          "target": "sap.common.Currencies_texts",
+          "on": [
+            {
+              "ref": [
+                "localized",
+                "code"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "code"
+              ]
+            },
+            "and",
+            {
+              "ref": [
+                "localized",
+                "locale"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "$user",
+                "locale"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "sap.common.Currencies_texts": {
+      "kind": "entity",
+      "@cds.autoexpose": true,
+      "@odata.draft.enabled": false,
+      "elements": {
+        "locale": {
+          "key": true,
+          "type": "cds.String",
+          "length": 14
+        },
+        "name": {
+          "@title": "{i18n>Name}",
+          "localized": false,
+          "type": "cds.String",
+          "length": 255
+        },
+        "descr": {
+          "@title": "{i18n>Description}",
+          "localized": false,
+          "type": "cds.String",
+          "length": 1000
+        },
+        "code": {
+          "@odata.containment.ignore": true,
+          "@title": "{i18n>CurrencyCode}",
+          "key": true,
+          "type": "cds.String",
+          "length": 3
+        }
+      }
+    },
+    "sap.common.Languages": {
+      "kind": "entity",
+      "@UI.Identification": [
+        {
+          "Value": {
+            "=": "name"
+          }
+        }
+      ],
+      "@cds.autoexpose": true,
+      "@cds.odata.valuelist": true,
+      "@cds.persistence.skip": "if-unused",
+      "includes": [
+        "sap.common.CodeList"
+      ],
+      "elements": {
+        "name": {
+          "@title": "{i18n>Name}",
+          "localized": true,
+          "type": "cds.String",
+          "length": 255
+        },
+        "descr": {
+          "@title": "{i18n>Description}",
+          "localized": true,
+          "type": "cds.String",
+          "length": 1000
+        },
+        "code": {
+          "@title": "{i18n>LanguageCode}",
+          "key": true,
+          "type": "cds.String",
+          "length": 14
+        },
+        "texts": {
+          "type": "cds.Composition",
+          "cardinality": {
+            "max": "*"
+          },
+          "target": "sap.common.Languages_texts",
+          "on": [
+            {
+              "ref": [
+                "texts",
+                "code"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "code"
+              ]
+            }
+          ]
+        },
+        "localized": {
+          "type": "cds.Association",
+          "target": "sap.common.Languages_texts",
+          "on": [
+            {
+              "ref": [
+                "localized",
+                "code"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "code"
+              ]
+            },
+            "and",
+            {
+              "ref": [
+                "localized",
+                "locale"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "$user",
+                "locale"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "sap.common.Languages_texts": {
+      "kind": "entity",
+      "@cds.autoexpose": true,
+      "@odata.draft.enabled": false,
+      "elements": {
+        "locale": {
+          "key": true,
+          "type": "cds.String",
+          "length": 14
+        },
+        "name": {
+          "@title": "{i18n>Name}",
+          "localized": false,
+          "type": "cds.String",
+          "length": 255
+        },
+        "descr": {
+          "@title": "{i18n>Description}",
+          "localized": false,
+          "type": "cds.String",
+          "length": 1000
+        },
+        "code": {
+          "@odata.containment.ignore": true,
+          "@title": "{i18n>LanguageCode}",
+          "key": true,
+          "type": "cds.String",
+          "length": 14
+        }
+      }
+    },
+    "temporal": {
+      "kind": "type",
+      "elements": {
+        "validFrom": {
+          "@cds.valid.from": true,
+          "type": "cds.Timestamp"
+        },
+        "validTo": {
+          "@cds.valid.to": true,
+          "type": "cds.Timestamp"
+        }
+      },
+      "$syntax": "aspect"
+    },
+    "uni_li_wue.dw.KPI_B_SPECIAL_EVT": {
+      "kind": "entity",
+      "elements": {
+        "timestamp": {
+          "key": true,
+          "type": "cds.Timestamp"
+        },
+        "event": {
+          "type": "cds.Association",
+          "target": "uni_li_wue.dw.KPI_ENUM_EVENTS",
+          "keys": [
+            {
+              "ref": [
+                "name"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "uni_li_wue.dw.KPI_ENUM_COINS": {
+      "kind": "entity",
+      "elements": {
+        "shortName": {
+          "key": true,
+          "type": "cds.String",
+          "length": 3
+        },
+        "longName": {
+          "type": "cds.String"
+        },
+        "description": {
+          "type": "cds.String"
+        }
+      }
+    },
+    "uni_li_wue.dw.KPI_ENUM_EVENTS": {
+      "kind": "entity",
+      "elements": {
+        "name": {
+          "key": true,
+          "type": "cds.String"
+        },
+        "description": {
+          "type": "cds.String"
+        }
+      }
+    },
+    "uni_li_wue.dw.KPI_ENUM_SEMANTICS": {
+      "kind": "entity",
+      "elements": {
+        "scoreName": {
+          "key": true,
+          "type": "cds.String"
+        },
+        "pointScore": {
+          "type": "cds.Integer"
+        },
+        "description": {
+          "type": "cds.String"
+        }
+      }
+    },
+    "uni_li_wue.dw.KPI_ENUM_STOCK_MARKETS": {
+      "kind": "entity",
+      "elements": {
+        "shortName": {
+          "key": true,
+          "type": "cds.String",
+          "length": 3
+        },
+        "longName": {
+          "type": "cds.String"
+        },
+        "url": {
+          "type": "cds.String"
+        }
+      }
+    },
+    "uni_li_wue.dw.KPI_ENUM_STREAM_ENTRY": {
+      "kind": "entity",
+      "elements": {
+        "topic": {
+          "key": true,
+          "type": "cds.String"
+        },
+        "timeCfg": {
+          "type": "cds.Association",
+          "target": "uni_li_wue.dw.KPI_TIME_CONFIG",
+          "keys": [
+            {
+              "ref": [
+                "topic"
+              ]
+            }
+          ]
+        },
+        "refreshCfg": {
+          "type": "cds.Association",
+          "target": "uni_li_wue.dw.KPI_REFRESH_CONFIG",
+          "keys": [
+            {
+              "ref": [
+                "topic"
+              ]
+            }
+          ]
+        },
+        "notificationCfg": {
+          "type": "cds.Association",
+          "target": "uni_li_wue.dw.KPI_NOTIFICATION_CONFIG",
+          "keys": [
+            {
+              "ref": [
+                "topic"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "uni_li_wue.dw.KPI_E_SMART_EXEC": {
+      "kind": "entity",
+      "elements": {
+        "timestamp": {
+          "key": true,
+          "type": "cds.Timestamp"
+        },
+        "contractAddress": {
+          "type": "cds.String"
+        },
+        "count": {
+          "type": "cds.Integer"
+        }
+      }
+    },
+    "uni_li_wue.dw.KPI_G_CREDITS": {
+      "kind": "entity",
+      "elements": {
+        "timestamp": {
+          "key": true,
+          "type": "cds.Timestamp"
+        },
+        "coin": {
+          "key": true,
+          "type": "cds.Association",
+          "target": "uni_li_wue.dw.KPI_ENUM_COINS",
+          "keys": [
+            {
+              "ref": [
+                "shortName"
+              ]
+            }
+          ]
+        },
+        "noOfCredits": {
+          "type": "cds.Integer"
+        },
+        "noOfTransactions": {
+          "type": "cds.Integer"
+        }
+      }
+    },
+    "uni_li_wue.dw.KPI_G_NEWS": {
+      "kind": "entity",
+      "elements": {
+        "timestamp": {
+          "key": true,
+          "type": "cds.Timestamp"
+        },
+        "coin": {
+          "key": true,
+          "type": "cds.Association",
+          "target": "uni_li_wue.dw.KPI_ENUM_COINS",
+          "keys": [
+            {
+              "ref": [
+                "shortName"
+              ]
+            }
+          ]
+        },
+        "url": {
+          "type": "cds.String"
+        },
+        "sentiment": {
+          "type": "cds.Association",
+          "target": "uni_li_wue.dw.KPI_ENUM_SEMANTICS",
+          "keys": [
+            {
+              "ref": [
+                "scoreName"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "uni_li_wue.dw.KPI_G_N_PER_TIME": {
+      "kind": "entity",
+      "elements": {
+        "timestamp": {
+          "key": true,
+          "type": "cds.Timestamp"
+        },
+        "coin": {
+          "key": true,
+          "type": "cds.Association",
+          "target": "uni_li_wue.dw.KPI_ENUM_COINS",
+          "keys": [
+            {
+              "ref": [
+                "shortName"
+              ]
+            }
+          ]
+        },
+        "numOfNodes": {
+          "type": "cds.Integer"
+        }
+      }
+    },
+    "uni_li_wue.dw.KPI_G_PRICES": {
+      "kind": "entity",
+      "elements": {
+        "timestamp": {
+          "key": true,
+          "type": "cds.Timestamp"
+        },
+        "coin": {
+          "key": true,
+          "type": "cds.Association",
+          "target": "uni_li_wue.dw.KPI_ENUM_COINS",
+          "keys": [
+            {
+              "ref": [
+                "shortName"
+              ]
+            }
+          ]
+        },
+        "stockMarket": {
+          "key": true,
+          "type": "cds.Association",
+          "target": "uni_li_wue.dw.KPI_ENUM_STOCK_MARKETS",
+          "keys": [
+            {
+              "ref": [
+                "shortName"
+              ]
+            }
+          ]
+        },
+        "price": {
+          "type": "cds.Double"
+        }
+      }
+    },
+    "uni_li_wue.dw.KPI_G_PRICE_VOLA": {
+      "kind": "entity",
+      "elements": {
+        "timestamp": {
+          "key": true,
+          "type": "cds.Timestamp"
+        },
+        "coin": {
+          "key": true,
+          "type": "cds.Association",
+          "target": "uni_li_wue.dw.KPI_ENUM_COINS",
+          "keys": [
+            {
+              "ref": [
+                "shortName"
+              ]
+            }
+          ]
+        },
+        "priceVolatility": {
+          "type": "cds.Double"
+        }
+      }
+    },
+    "uni_li_wue.dw.KPI_G_RECOMM": {
+      "kind": "entity",
+      "elements": {
+        "timestamp": {
+          "key": true,
+          "type": "cds.Timestamp"
+        },
+        "token": {
+          "type": "cds.String"
+        },
+        "score": {
+          "type": "cds.Decimal"
+        },
+        "price": {
+          "type": "cds.Decimal"
+        }
+      }
+    },
+    "uni_li_wue.dw.KPI_G_RICH_ACC": {
+      "kind": "entity",
+      "elements": {
+        "timestamp": {
+          "key": true,
+          "type": "cds.Timestamp"
+        },
+        "coin": {
+          "key": true,
+          "type": "cds.Association",
+          "target": "uni_li_wue.dw.KPI_ENUM_COINS",
+          "keys": [
+            {
+              "ref": [
+                "shortName"
+              ]
+            }
+          ]
+        },
+        "accountAddress": {
+          "type": "cds.String"
+        },
+        "balance": {
+          "type": "cds.Double"
+        }
+      }
+    },
+    "uni_li_wue.dw.KPI_G_TRANSACT_INF": {
+      "kind": "entity",
+      "elements": {
+        "timestamp": {
+          "key": true,
+          "type": "cds.Timestamp"
+        },
+        "coin": {
+          "key": true,
+          "type": "cds.Association",
+          "target": "uni_li_wue.dw.KPI_ENUM_COINS",
+          "keys": [
+            {
+              "ref": [
+                "shortName"
+              ]
+            }
+          ]
+        },
+        "totalTransactionFees": {
+          "type": "cds.Double"
+        },
+        "numOfTransactions": {
+          "type": "cds.Integer"
+        },
+        "totalTransactionVolume": {
+          "type": "cds.Double"
+        }
+      }
+    },
+    "uni_li_wue.dw.KPI_G_T_PER_TIME": {
+      "kind": "entity",
+      "elements": {
+        "timestamp": {
+          "key": true,
+          "type": "cds.Timestamp"
+        },
+        "coin": {
+          "key": true,
+          "type": "cds.Association",
+          "target": "uni_li_wue.dw.KPI_ENUM_COINS",
+          "keys": [
+            {
+              "ref": [
+                "shortName"
+              ]
+            }
+          ]
+        },
+        "senderAddress": {
+          "type": "cds.String"
+        },
+        "recieverAddress": {
+          "type": "cds.String"
+        },
+        "units": {
+          "type": "cds.Decimal"
+        },
+        "transactionHash": {
+          "type": "cds.String",
+          "length": 64
+        }
+      }
+    },
+    "uni_li_wue.dw.KPI_NOTIFICATION_CONFIG": {
+      "kind": "entity",
+      "elements": {
+        "topic": {
+          "key": true,
+          "type": "cds.Association",
+          "target": "uni_li_wue.dw.KPI_ENUM_STREAM_ENTRY",
+          "keys": [
+            {
+              "ref": [
+                "topic"
+              ]
+            }
+          ]
+        },
+        "statisticalType": {
+          "type": "cds.String"
+        },
+        "lowerTreshold": {
+          "type": "cds.Double"
+        },
+        "upperTreshold": {
+          "type": "cds.Double"
+        }
+      }
+    },
+    "uni_li_wue.dw.KPI_REFRESH_CONFIG": {
+      "kind": "entity",
+      "elements": {
+        "topic": {
+          "key": true,
+          "type": "cds.Association",
+          "target": "uni_li_wue.dw.KPI_ENUM_STREAM_ENTRY",
+          "keys": [
+            {
+              "ref": [
+                "topic"
+              ]
+            }
+          ]
+        },
+        "fetchInterval": {
+          "type": "cds.Integer"
+        }
+      }
+    },
+    "uni_li_wue.dw.KPI_TIME_CONFIG": {
+      "kind": "entity",
+      "elements": {
+        "topic": {
+          "key": true,
+          "type": "cds.Association",
+          "target": "uni_li_wue.dw.KPI_ENUM_STREAM_ENTRY",
+          "keys": [
+            {
+              "ref": [
+                "topic"
+              ]
+            }
+          ]
+        },
+        "viewInterval": {
+          "type": "cds.Integer"
+        }
+      }
+    },
+    "uni_li_wue.dw.LOG_FETCH_ERROR": {
+      "kind": "entity",
+      "elements": {
+        "api": {
+          "key": true,
+          "type": "cds.String"
+        },
+        "message": {
+          "type": "cds.String"
+        },
+        "timestamp": {
+          "type": "cds.Timestamp"
+        }
+      }
+    },
+    "uni_li_wue.dw.LOG_HEALTH_CHECK": {
+      "kind": "entity",
+      "elements": {
+        "api": {
+          "key": true,
+          "type": "cds.String"
+        },
+        "timestamp": {
+          "type": "cds.Timestamp"
+        }
+      }
+    },
+    "uni_li_wue.dw.service.KafkaPublishService": {
+      "@source": "srv/kafka-publish-service.cds",
+      "kind": "service"
+    },
+    "uni_li_wue.dw.service.KafkaPublishService.KPI_B_SPECIAL_EVT": {
+      "kind": "entity",
+      "@insertonly": true,
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "uni_li_wue.dw.KPI_B_SPECIAL_EVT"
+            ]
+          }
+        }
+      },
+      "elements": {
+        "timestamp": {
+          "key": true,
+          "type": "cds.Timestamp"
+        },
+        "event": {
+          "type": "cds.Association",
+          "target": "uni_li_wue.dw.service.KafkaPublishService.KPI_ENUM_EVENTS",
+          "keys": [
+            {
+              "ref": [
+                "name"
+              ]
+            }
+          ]
+        }
+      },
+      "$syntax": "projection"
+    },
+    "uni_li_wue.dw.service.KafkaPublishService.KPI_ENUM_COINS": {
+      "kind": "entity",
+      "@readonly": true,
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "uni_li_wue.dw.KPI_ENUM_COINS"
+            ]
+          }
+        }
+      },
+      "elements": {
+        "shortName": {
+          "key": true,
+          "type": "cds.String",
+          "length": 3
+        },
+        "longName": {
+          "type": "cds.String"
+        },
+        "description": {
+          "type": "cds.String"
+        }
+      },
+      "$syntax": "projection"
+    },
+    "uni_li_wue.dw.service.KafkaPublishService.KPI_ENUM_EVENTS": {
+      "kind": "entity",
+      "@readonly": true,
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "uni_li_wue.dw.KPI_ENUM_EVENTS"
+            ]
+          }
+        }
+      },
+      "elements": {
+        "name": {
+          "key": true,
+          "type": "cds.String"
+        },
+        "description": {
+          "type": "cds.String"
+        }
+      },
+      "$syntax": "projection"
+    },
+    "uni_li_wue.dw.service.KafkaPublishService.KPI_ENUM_SEMANTICS": {
+      "kind": "entity",
+      "@readonly": true,
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "uni_li_wue.dw.KPI_ENUM_SEMANTICS"
+            ]
+          }
+        }
+      },
+      "elements": {
+        "scoreName": {
+          "key": true,
+          "type": "cds.String"
+        },
+        "pointScore": {
+          "type": "cds.Integer"
+        },
+        "description": {
+          "type": "cds.String"
+        }
+      },
+      "$syntax": "projection"
+    },
+    "uni_li_wue.dw.service.KafkaPublishService.KPI_ENUM_STOCK_MARKETS": {
+      "kind": "entity",
+      "@readonly": true,
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "uni_li_wue.dw.KPI_ENUM_STOCK_MARKETS"
+            ]
+          }
+        }
+      },
+      "elements": {
+        "shortName": {
+          "key": true,
+          "type": "cds.String",
+          "length": 3
+        },
+        "longName": {
+          "type": "cds.String"
+        },
+        "url": {
+          "type": "cds.String"
+        }
+      },
+      "$syntax": "projection"
+    },
+    "uni_li_wue.dw.service.KafkaPublishService.KPI_ENUM_STREAM_ENTRY": {
+      "kind": "entity",
+      "@readonly": true,
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "uni_li_wue.dw.KPI_ENUM_STREAM_ENTRY"
+            ]
+          }
+        }
+      },
+      "elements": {
+        "topic": {
+          "key": true,
+          "type": "cds.String"
+        },
+        "timeCfg": {
+          "type": "cds.Association",
+          "target": "uni_li_wue.dw.service.KafkaPublishService.KPI_TIME_CONFIG",
+          "keys": [
+            {
+              "ref": [
+                "topic"
+              ]
+            }
+          ]
+        },
+        "refreshCfg": {
+          "type": "cds.Association",
+          "target": "uni_li_wue.dw.service.KafkaPublishService.KPI_REFRESH_CONFIG",
+          "keys": [
+            {
+              "ref": [
+                "topic"
+              ]
+            }
+          ]
+        },
+        "notificationCfg": {
+          "type": "cds.Association",
+          "target": "uni_li_wue.dw.service.KafkaPublishService.KPI_NOTIFICATION_CONFIG",
+          "keys": [
+            {
+              "ref": [
+                "topic"
+              ]
+            }
+          ]
+        }
+      },
+      "$syntax": "projection"
+    },
+    "uni_li_wue.dw.service.KafkaPublishService.KPI_E_SMART_EXEC": {
+      "kind": "entity",
+      "@insertonly": true,
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "uni_li_wue.dw.KPI_E_SMART_EXEC"
+            ]
+          }
+        }
+      },
+      "elements": {
+        "timestamp": {
+          "key": true,
+          "type": "cds.Timestamp"
+        },
+        "contractAddress": {
+          "type": "cds.String"
+        },
+        "count": {
+          "type": "cds.Integer"
+        }
+      },
+      "$syntax": "projection"
+    },
+    "uni_li_wue.dw.service.KafkaPublishService.KPI_G_CREDITS": {
+      "kind": "entity",
+      "@insertonly": true,
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "uni_li_wue.dw.KPI_G_CREDITS"
+            ]
+          }
+        }
+      },
+      "elements": {
+        "timestamp": {
+          "key": true,
+          "type": "cds.Timestamp"
+        },
+        "coin": {
+          "key": true,
+          "type": "cds.Association",
+          "target": "uni_li_wue.dw.service.KafkaPublishService.KPI_ENUM_COINS",
+          "keys": [
+            {
+              "ref": [
+                "shortName"
+              ]
+            }
+          ]
+        },
+        "noOfCredits": {
+          "type": "cds.Integer"
+        },
+        "noOfTransactions": {
+          "type": "cds.Integer"
+        }
+      },
+      "$syntax": "projection"
+    },
+    "uni_li_wue.dw.service.KafkaPublishService.KPI_G_NEWS": {
+      "kind": "entity",
+      "@insertonly": true,
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "uni_li_wue.dw.KPI_G_NEWS"
+            ]
+          }
+        }
+      },
+      "elements": {
+        "timestamp": {
+          "key": true,
+          "type": "cds.Timestamp"
+        },
+        "coin": {
+          "key": true,
+          "type": "cds.Association",
+          "target": "uni_li_wue.dw.service.KafkaPublishService.KPI_ENUM_COINS",
+          "keys": [
+            {
+              "ref": [
+                "shortName"
+              ]
+            }
+          ]
+        },
+        "url": {
+          "type": "cds.String"
+        },
+        "sentiment": {
+          "type": "cds.Association",
+          "target": "uni_li_wue.dw.service.KafkaPublishService.KPI_ENUM_SEMANTICS",
+          "keys": [
+            {
+              "ref": [
+                "scoreName"
+              ]
+            }
+          ]
+        }
+      },
+      "$syntax": "projection"
+    },
+    "uni_li_wue.dw.service.KafkaPublishService.KPI_G_N_PER_TIME": {
+      "kind": "entity",
+      "@insertonly": true,
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "uni_li_wue.dw.KPI_G_N_PER_TIME"
+            ]
+          }
+        }
+      },
+      "elements": {
+        "timestamp": {
+          "key": true,
+          "type": "cds.Timestamp"
+        },
+        "coin": {
+          "key": true,
+          "type": "cds.Association",
+          "target": "uni_li_wue.dw.service.KafkaPublishService.KPI_ENUM_COINS",
+          "keys": [
+            {
+              "ref": [
+                "shortName"
+              ]
+            }
+          ]
+        },
+        "numOfNodes": {
+          "type": "cds.Integer"
+        }
+      },
+      "$syntax": "projection"
+    },
+    "uni_li_wue.dw.service.KafkaPublishService.KPI_G_PRICES": {
+      "kind": "entity",
+      "@insertonly": true,
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "uni_li_wue.dw.KPI_G_PRICES"
+            ]
+          }
+        }
+      },
+      "elements": {
+        "timestamp": {
+          "key": true,
+          "type": "cds.Timestamp"
+        },
+        "coin": {
+          "key": true,
+          "type": "cds.Association",
+          "target": "uni_li_wue.dw.service.KafkaPublishService.KPI_ENUM_COINS",
+          "keys": [
+            {
+              "ref": [
+                "shortName"
+              ]
+            }
+          ]
+        },
+        "stockMarket": {
+          "key": true,
+          "type": "cds.Association",
+          "target": "uni_li_wue.dw.service.KafkaPublishService.KPI_ENUM_STOCK_MARKETS",
+          "keys": [
+            {
+              "ref": [
+                "shortName"
+              ]
+            }
+          ]
+        },
+        "price": {
+          "type": "cds.Double"
+        }
+      },
+      "$syntax": "projection"
+    },
+    "uni_li_wue.dw.service.KafkaPublishService.KPI_G_PRICE_VOLA": {
+      "kind": "entity",
+      "@insertonly": true,
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "uni_li_wue.dw.KPI_G_PRICE_VOLA"
+            ]
+          }
+        }
+      },
+      "elements": {
+        "timestamp": {
+          "key": true,
+          "type": "cds.Timestamp"
+        },
+        "coin": {
+          "key": true,
+          "type": "cds.Association",
+          "target": "uni_li_wue.dw.service.KafkaPublishService.KPI_ENUM_COINS",
+          "keys": [
+            {
+              "ref": [
+                "shortName"
+              ]
+            }
+          ]
+        },
+        "priceVolatility": {
+          "type": "cds.Double"
+        }
+      },
+      "$syntax": "projection"
+    },
+    "uni_li_wue.dw.service.KafkaPublishService.KPI_G_RECOMM": {
+      "kind": "entity",
+      "@insertonly": true,
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "uni_li_wue.dw.KPI_G_RECOMM"
+            ]
+          }
+        }
+      },
+      "elements": {
+        "timestamp": {
+          "key": true,
+          "type": "cds.Timestamp"
+        },
+        "token": {
+          "type": "cds.String"
+        },
+        "score": {
+          "type": "cds.Decimal"
+        },
+        "price": {
+          "type": "cds.Decimal"
+        }
+      },
+      "$syntax": "projection"
+    },
+    "uni_li_wue.dw.service.KafkaPublishService.KPI_G_RICH_ACC": {
+      "kind": "entity",
+      "@insertonly": true,
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "uni_li_wue.dw.KPI_G_RICH_ACC"
+            ]
+          }
+        }
+      },
+      "elements": {
+        "timestamp": {
+          "key": true,
+          "type": "cds.Timestamp"
+        },
+        "coin": {
+          "key": true,
+          "type": "cds.Association",
+          "target": "uni_li_wue.dw.service.KafkaPublishService.KPI_ENUM_COINS",
+          "keys": [
+            {
+              "ref": [
+                "shortName"
+              ]
+            }
+          ]
+        },
+        "accountAddress": {
+          "type": "cds.String"
+        },
+        "balance": {
+          "type": "cds.Double"
+        }
+      },
+      "$syntax": "projection"
+    },
+    "uni_li_wue.dw.service.KafkaPublishService.KPI_G_TRANSACT_INF": {
+      "kind": "entity",
+      "@insertonly": true,
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "uni_li_wue.dw.KPI_G_TRANSACT_INF"
+            ]
+          }
+        }
+      },
+      "elements": {
+        "timestamp": {
+          "key": true,
+          "type": "cds.Timestamp"
+        },
+        "coin": {
+          "key": true,
+          "type": "cds.Association",
+          "target": "uni_li_wue.dw.service.KafkaPublishService.KPI_ENUM_COINS",
+          "keys": [
+            {
+              "ref": [
+                "shortName"
+              ]
+            }
+          ]
+        },
+        "totalTransactionFees": {
+          "type": "cds.Double"
+        },
+        "numOfTransactions": {
+          "type": "cds.Integer"
+        },
+        "totalTransactionVolume": {
+          "type": "cds.Double"
+        }
+      },
+      "$syntax": "projection"
+    },
+    "uni_li_wue.dw.service.KafkaPublishService.KPI_G_T_PER_TIME": {
+      "kind": "entity",
+      "@insertonly": true,
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "uni_li_wue.dw.KPI_G_T_PER_TIME"
+            ]
+          }
+        }
+      },
+      "elements": {
+        "timestamp": {
+          "key": true,
+          "type": "cds.Timestamp"
+        },
+        "coin": {
+          "key": true,
+          "type": "cds.Association",
+          "target": "uni_li_wue.dw.service.KafkaPublishService.KPI_ENUM_COINS",
+          "keys": [
+            {
+              "ref": [
+                "shortName"
+              ]
+            }
+          ]
+        },
+        "senderAddress": {
+          "type": "cds.String"
+        },
+        "recieverAddress": {
+          "type": "cds.String"
+        },
+        "units": {
+          "type": "cds.Decimal"
+        },
+        "transactionHash": {
+          "type": "cds.String",
+          "length": 64
+        }
+      },
+      "$syntax": "projection"
+    },
+    "uni_li_wue.dw.service.KafkaPublishService.KPI_NOTIFICATION_CONFIG": {
+      "kind": "entity",
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "uni_li_wue.dw.KPI_NOTIFICATION_CONFIG"
+            ]
+          }
+        }
+      },
+      "elements": {
+        "topic": {
+          "key": true,
+          "type": "cds.Association",
+          "target": "uni_li_wue.dw.service.KafkaPublishService.KPI_ENUM_STREAM_ENTRY",
+          "keys": [
+            {
+              "ref": [
+                "topic"
+              ]
+            }
+          ]
+        },
+        "statisticalType": {
+          "type": "cds.String"
+        },
+        "lowerTreshold": {
+          "type": "cds.Double"
+        },
+        "upperTreshold": {
+          "type": "cds.Double"
+        }
+      },
+      "$syntax": "projection"
+    },
+    "uni_li_wue.dw.service.KafkaPublishService.KPI_REFRESH_CONFIG": {
+      "kind": "entity",
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "uni_li_wue.dw.KPI_REFRESH_CONFIG"
+            ]
+          }
+        }
+      },
+      "elements": {
+        "topic": {
+          "key": true,
+          "type": "cds.Association",
+          "target": "uni_li_wue.dw.service.KafkaPublishService.KPI_ENUM_STREAM_ENTRY",
+          "keys": [
+            {
+              "ref": [
+                "topic"
+              ]
+            }
+          ]
+        },
+        "fetchInterval": {
+          "type": "cds.Integer"
+        }
+      },
+      "$syntax": "projection"
+    },
+    "uni_li_wue.dw.service.KafkaPublishService.KPI_TIME_CONFIG": {
+      "kind": "entity",
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "uni_li_wue.dw.KPI_TIME_CONFIG"
+            ]
+          }
+        }
+      },
+      "elements": {
+        "topic": {
+          "key": true,
+          "type": "cds.Association",
+          "target": "uni_li_wue.dw.service.KafkaPublishService.KPI_ENUM_STREAM_ENTRY",
+          "keys": [
+            {
+              "ref": [
+                "topic"
+              ]
+            }
+          ]
+        },
+        "viewInterval": {
+          "type": "cds.Integer"
+        }
+      },
+      "$syntax": "projection"
+    },
+    "uni_li_wue.dw.service.KafkaPublishService.LOG_FETCH_ERROR": {
+      "kind": "entity",
+      "@insertonly": true,
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "uni_li_wue.dw.LOG_FETCH_ERROR"
+            ]
+          }
+        }
+      },
+      "elements": {
+        "api": {
+          "key": true,
+          "type": "cds.String"
+        },
+        "message": {
+          "type": "cds.String"
+        },
+        "timestamp": {
+          "type": "cds.Timestamp"
+        }
+      },
+      "$syntax": "projection"
+    },
+    "uni_li_wue.dw.service.KafkaPublishService.LOG_HEALTH_CHECK": {
+      "kind": "entity",
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "uni_li_wue.dw.LOG_HEALTH_CHECK"
+            ]
+          }
+        }
+      },
+      "elements": {
+        "api": {
+          "key": true,
+          "type": "cds.String"
+        },
+        "timestamp": {
+          "type": "cds.Timestamp"
+        }
+      },
+      "$syntax": "projection"
+    },
+    "uni_li_wue.dw.service.SACSlowLayerDataService": {
+      "@source": "srv/sac-consume-service.cds",
+      "kind": "service"
+    },
+    "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_B_SPECIAL_EVT": {
+      "kind": "entity",
+      "@readonly": true,
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "uni_li_wue.dw.KPI_B_SPECIAL_EVT"
+            ]
+          }
+        }
+      },
+      "elements": {
+        "timestamp": {
+          "key": true,
+          "type": "cds.Timestamp"
+        },
+        "event": {
+          "type": "cds.Association",
+          "target": "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_ENUM_EVENTS",
+          "keys": [
+            {
+              "ref": [
+                "name"
+              ]
+            }
+          ]
+        }
+      },
+      "$syntax": "projection"
+    },
+    "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_ENUM_COINS": {
+      "kind": "entity",
+      "@readonly": true,
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "uni_li_wue.dw.KPI_ENUM_COINS"
+            ]
+          }
+        }
+      },
+      "elements": {
+        "shortName": {
+          "key": true,
+          "type": "cds.String",
+          "length": 3
+        },
+        "longName": {
+          "type": "cds.String"
+        },
+        "description": {
+          "type": "cds.String"
+        }
+      },
+      "$syntax": "projection"
+    },
+    "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_ENUM_EVENTS": {
+      "kind": "entity",
+      "@readonly": true,
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "uni_li_wue.dw.KPI_ENUM_EVENTS"
+            ]
+          }
+        }
+      },
+      "elements": {
+        "name": {
+          "key": true,
+          "type": "cds.String"
+        },
+        "description": {
+          "type": "cds.String"
+        }
+      },
+      "$syntax": "projection"
+    },
+    "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_ENUM_SEMANTICS": {
+      "kind": "entity",
+      "@readonly": true,
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "uni_li_wue.dw.KPI_ENUM_SEMANTICS"
+            ]
+          }
+        }
+      },
+      "elements": {
+        "scoreName": {
+          "key": true,
+          "type": "cds.String"
+        },
+        "pointScore": {
+          "type": "cds.Integer"
+        },
+        "description": {
+          "type": "cds.String"
+        }
+      },
+      "$syntax": "projection"
+    },
+    "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_ENUM_STOCK_MARKETS": {
+      "kind": "entity",
+      "@readonly": true,
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "uni_li_wue.dw.KPI_ENUM_STOCK_MARKETS"
+            ]
+          }
+        }
+      },
+      "elements": {
+        "shortName": {
+          "key": true,
+          "type": "cds.String",
+          "length": 3
+        },
+        "longName": {
+          "type": "cds.String"
+        },
+        "url": {
+          "type": "cds.String"
+        }
+      },
+      "$syntax": "projection"
+    },
+    "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_ENUM_STREAM_ENTRY": {
+      "kind": "entity",
+      "@readonly": true,
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "uni_li_wue.dw.KPI_ENUM_STREAM_ENTRY"
+            ]
+          }
+        }
+      },
+      "elements": {
+        "topic": {
+          "key": true,
+          "type": "cds.String"
+        },
+        "timeCfg": {
+          "type": "cds.Association",
+          "target": "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_TIME_CONFIG",
+          "keys": [
+            {
+              "ref": [
+                "topic"
+              ]
+            }
+          ]
+        },
+        "refreshCfg": {
+          "type": "cds.Association",
+          "target": "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_REFRESH_CONFIG",
+          "keys": [
+            {
+              "ref": [
+                "topic"
+              ]
+            }
+          ]
+        },
+        "notificationCfg": {
+          "type": "cds.Association",
+          "target": "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_NOTIFICATION_CONFIG",
+          "keys": [
+            {
+              "ref": [
+                "topic"
+              ]
+            }
+          ]
+        }
+      },
+      "$syntax": "projection"
+    },
+    "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_E_SMART_EXEC": {
+      "kind": "entity",
+      "@readonly": true,
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "uni_li_wue.dw.KPI_E_SMART_EXEC"
+            ]
+          }
+        }
+      },
+      "elements": {
+        "timestamp": {
+          "key": true,
+          "type": "cds.Timestamp"
+        },
+        "contractAddress": {
+          "type": "cds.String"
+        },
+        "count": {
+          "type": "cds.Integer"
+        }
+      },
+      "$syntax": "projection"
+    },
+    "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_G_CREDITS": {
+      "kind": "entity",
+      "@readonly": true,
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "uni_li_wue.dw.KPI_G_CREDITS"
+            ]
+          }
+        }
+      },
+      "elements": {
+        "timestamp": {
+          "key": true,
+          "type": "cds.Timestamp"
+        },
+        "coin": {
+          "key": true,
+          "type": "cds.Association",
+          "target": "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_ENUM_COINS",
+          "keys": [
+            {
+              "ref": [
+                "shortName"
+              ]
+            }
+          ]
+        },
+        "noOfCredits": {
+          "type": "cds.Integer"
+        },
+        "noOfTransactions": {
+          "type": "cds.Integer"
+        }
+      },
+      "$syntax": "projection"
+    },
+    "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_G_NEWS": {
+      "kind": "entity",
+      "@readonly": true,
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "uni_li_wue.dw.KPI_G_NEWS"
+            ]
+          }
+        }
+      },
+      "elements": {
+        "timestamp": {
+          "key": true,
+          "type": "cds.Timestamp"
+        },
+        "coin": {
+          "key": true,
+          "type": "cds.Association",
+          "target": "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_ENUM_COINS",
+          "keys": [
+            {
+              "ref": [
+                "shortName"
+              ]
+            }
+          ]
+        },
+        "url": {
+          "type": "cds.String"
+        },
+        "sentiment": {
+          "type": "cds.Association",
+          "target": "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_ENUM_SEMANTICS",
+          "keys": [
+            {
+              "ref": [
+                "scoreName"
+              ]
+            }
+          ]
+        }
+      },
+      "$syntax": "projection"
+    },
+    "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_G_N_PER_TIME": {
+      "kind": "entity",
+      "@readonly": true,
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "uni_li_wue.dw.KPI_G_N_PER_TIME"
+            ]
+          }
+        }
+      },
+      "elements": {
+        "timestamp": {
+          "key": true,
+          "type": "cds.Timestamp"
+        },
+        "coin": {
+          "key": true,
+          "type": "cds.Association",
+          "target": "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_ENUM_COINS",
+          "keys": [
+            {
+              "ref": [
+                "shortName"
+              ]
+            }
+          ]
+        },
+        "numOfNodes": {
+          "type": "cds.Integer"
+        }
+      },
+      "$syntax": "projection"
+    },
+    "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_G_PRICES": {
+      "kind": "entity",
+      "@readonly": true,
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "uni_li_wue.dw.KPI_G_PRICES"
+            ]
+          }
+        }
+      },
+      "elements": {
+        "timestamp": {
+          "key": true,
+          "type": "cds.Timestamp"
+        },
+        "coin": {
+          "key": true,
+          "type": "cds.Association",
+          "target": "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_ENUM_COINS",
+          "keys": [
+            {
+              "ref": [
+                "shortName"
+              ]
+            }
+          ]
+        },
+        "stockMarket": {
+          "key": true,
+          "type": "cds.Association",
+          "target": "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_ENUM_STOCK_MARKETS",
+          "keys": [
+            {
+              "ref": [
+                "shortName"
+              ]
+            }
+          ]
+        },
+        "price": {
+          "type": "cds.Double"
+        }
+      },
+      "$syntax": "projection"
+    },
+    "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_G_PRICE_VOLA": {
+      "kind": "entity",
+      "@readonly": true,
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "uni_li_wue.dw.KPI_G_PRICE_VOLA"
+            ]
+          }
+        }
+      },
+      "elements": {
+        "timestamp": {
+          "key": true,
+          "type": "cds.Timestamp"
+        },
+        "coin": {
+          "key": true,
+          "type": "cds.Association",
+          "target": "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_ENUM_COINS",
+          "keys": [
+            {
+              "ref": [
+                "shortName"
+              ]
+            }
+          ]
+        },
+        "priceVolatility": {
+          "type": "cds.Double"
+        }
+      },
+      "$syntax": "projection"
+    },
+    "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_G_RECOMM": {
+      "kind": "entity",
+      "@readonly": true,
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "uni_li_wue.dw.KPI_G_RECOMM"
+            ]
+          }
+        }
+      },
+      "elements": {
+        "timestamp": {
+          "key": true,
+          "type": "cds.Timestamp"
+        },
+        "token": {
+          "type": "cds.String"
+        },
+        "score": {
+          "type": "cds.Decimal"
+        },
+        "price": {
+          "type": "cds.Decimal"
+        }
+      },
+      "$syntax": "projection"
+    },
+    "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_G_RICH_ACC": {
+      "kind": "entity",
+      "@readonly": true,
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "uni_li_wue.dw.KPI_G_RICH_ACC"
+            ]
+          }
+        }
+      },
+      "elements": {
+        "timestamp": {
+          "key": true,
+          "type": "cds.Timestamp"
+        },
+        "coin": {
+          "key": true,
+          "type": "cds.Association",
+          "target": "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_ENUM_COINS",
+          "keys": [
+            {
+              "ref": [
+                "shortName"
+              ]
+            }
+          ]
+        },
+        "accountAddress": {
+          "type": "cds.String"
+        },
+        "balance": {
+          "type": "cds.Double"
+        }
+      },
+      "$syntax": "projection"
+    },
+    "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_G_TRANSACT_INF": {
+      "kind": "entity",
+      "@readonly": true,
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "uni_li_wue.dw.KPI_G_TRANSACT_INF"
+            ]
+          }
+        }
+      },
+      "elements": {
+        "timestamp": {
+          "key": true,
+          "type": "cds.Timestamp"
+        },
+        "coin": {
+          "key": true,
+          "type": "cds.Association",
+          "target": "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_ENUM_COINS",
+          "keys": [
+            {
+              "ref": [
+                "shortName"
+              ]
+            }
+          ]
+        },
+        "totalTransactionFees": {
+          "type": "cds.Double"
+        },
+        "numOfTransactions": {
+          "type": "cds.Integer"
+        },
+        "totalTransactionVolume": {
+          "type": "cds.Double"
+        }
+      },
+      "$syntax": "projection"
+    },
+    "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_G_T_PER_TIME": {
+      "kind": "entity",
+      "@readonly": true,
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "uni_li_wue.dw.KPI_G_T_PER_TIME"
+            ]
+          }
+        }
+      },
+      "elements": {
+        "timestamp": {
+          "key": true,
+          "type": "cds.Timestamp"
+        },
+        "coin": {
+          "key": true,
+          "type": "cds.Association",
+          "target": "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_ENUM_COINS",
+          "keys": [
+            {
+              "ref": [
+                "shortName"
+              ]
+            }
+          ]
+        },
+        "senderAddress": {
+          "type": "cds.String"
+        },
+        "recieverAddress": {
+          "type": "cds.String"
+        },
+        "units": {
+          "type": "cds.Decimal"
+        },
+        "transactionHash": {
+          "type": "cds.String",
+          "length": 64
+        }
+      },
+      "$syntax": "projection"
+    },
+    "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_NOTIFICATION_CONFIG": {
+      "kind": "entity",
+      "@readonly": true,
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "uni_li_wue.dw.KPI_NOTIFICATION_CONFIG"
+            ]
+          }
+        }
+      },
+      "elements": {
+        "topic": {
+          "key": true,
+          "type": "cds.Association",
+          "target": "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_ENUM_STREAM_ENTRY",
+          "keys": [
+            {
+              "ref": [
+                "topic"
+              ]
+            }
+          ]
+        },
+        "statisticalType": {
+          "type": "cds.String"
+        },
+        "lowerTreshold": {
+          "type": "cds.Double"
+        },
+        "upperTreshold": {
+          "type": "cds.Double"
+        }
+      },
+      "$syntax": "projection"
+    },
+    "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_REFRESH_CONFIG": {
+      "kind": "entity",
+      "@readonly": true,
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "uni_li_wue.dw.KPI_REFRESH_CONFIG"
+            ]
+          }
+        }
+      },
+      "elements": {
+        "topic": {
+          "key": true,
+          "type": "cds.Association",
+          "target": "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_ENUM_STREAM_ENTRY",
+          "keys": [
+            {
+              "ref": [
+                "topic"
+              ]
+            }
+          ]
+        },
+        "fetchInterval": {
+          "type": "cds.Integer"
+        }
+      },
+      "$syntax": "projection"
+    },
+    "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_TIME_CONFIG": {
+      "kind": "entity",
+      "@readonly": true,
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "uni_li_wue.dw.KPI_TIME_CONFIG"
+            ]
+          }
+        }
+      },
+      "elements": {
+        "topic": {
+          "key": true,
+          "type": "cds.Association",
+          "target": "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_ENUM_STREAM_ENTRY",
+          "keys": [
+            {
+              "ref": [
+                "topic"
+              ]
+            }
+          ]
+        },
+        "viewInterval": {
+          "type": "cds.Integer"
+        }
+      },
+      "$syntax": "projection"
+    }
+  },
+  "meta": {
+    "creator": "CDS Compiler v1.26.2"
+  },
+  "$version": "1.0"
+}

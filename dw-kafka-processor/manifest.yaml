@@ -1,0 +1,16 @@
+applications:
+    - name: uni-li-wue-dw-kafka-processor
+      disk_quota: 512M
+      env:
+        destinations: |
+          [
+            {"name":"DWODataService","url":"https://cf-dts-eim-ch-sac-blockchain-uni-li-wue-dw-cloud-srv.cfapps.eu10.hana.ondemand.com/kafka-publish","forwardAuthToken":false}
+          ]
+      buildpacks:
+        - nodejs_buildpack
+      instances: 1
+      memory: 512M
+      services:
+        - uni-li-wue-dw-connectivity
+        - uni-li-wue-dw-destinations
+        - uni-li-wue-dw-xsuaa
