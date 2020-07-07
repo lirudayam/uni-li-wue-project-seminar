@@ -15,6 +15,8 @@ Prinzip vor einem Commit:
 - git commit -a -m "message"
 - git push
 
+In PyCharm: https://www.jetbrains.com/help/pycharm/set-up-a-git-repository.html
+
 ## Architektur
 
 ### Gesamt
