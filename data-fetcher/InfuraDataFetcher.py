@@ -2,9 +2,9 @@ import asyncio
 import logging
 import os
 import threading
-import time
 
 from DWConfigs import DWConfigs
+from GeneralUtils import catch_request_error, get_unix_timestamp
 from KafkaConnector import KafkaConnector
 
 os.environ["WEB3_INFURA_PROJECT_ID"] = "37e2249c8d5e41488a9fa7b67b7335b3"
@@ -13,18 +13,10 @@ from web3 import Web3
 from web3.auto.infura import w3
 
 
-def get_unix_timestamp():
-    return int(time.time())
-
-
-def catch_request_error(error):
-    logging.error('Error while fetching', exc_info=error)
-    KafkaConnector.forward_error(error)
-
-
 class InfuraDataFetcher:
     latest_identifier = 0
     fetcher_name = "INFURA API"
+    kafka_topic = "RAW_G_LATEST_BLOCK"
 
     def __init__(self):
         self.url = "wss://mainnet.infura.io/ws/v3/37e2249c8d5e41488a9fa7b67b7335b3"
@@ -38,9 +30,10 @@ class InfuraDataFetcher:
     # Supporting methods
     def send_health_pings(self):
         KafkaConnector().send_health_ping(self.fetcher_name)
+        self.trigger_health_pings()
 
     def trigger_health_pings(self):
-        s = threading.Timer(DWConfigs().get_health_ping_interval(), self.send_health_pings, [], {})
+        s = threading.Timer(DWConfigs().get_health_ping_interval(self.kafka_topic), self.send_health_pings, [], {})
         s.start()
 
     def get_connection(self):
@@ -76,7 +69,7 @@ class InfuraDataFetcher:
         latest_block = dict(w3.eth.getBlock("latest"))
 
         if self.latest_identifier != latest_block['number']:
-            KafkaConnector().send_to_kafka("RAW_G_LATEST_BLOCK", {
+            KafkaConnector().send_to_kafka(self.kafka_topic, {
                 "timestamp": get_unix_timestamp(),
                 "currency": "ETH",
                 "identifier": latest_block['number'],

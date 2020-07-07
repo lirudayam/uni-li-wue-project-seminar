@@ -1,7 +1,10 @@
 import json
-import logging
+import os
 
+from GeneralUtils import on_send_success, on_send_error
 from kafka import KafkaProducer
+
+os.environ["KAFKA_BOOTSTRAP_SERVER"] = '132.187.226.20:9092'
 
 
 # Singleton class for handling any connection and sending to Kafka
@@ -11,7 +14,7 @@ from kafka import KafkaProducer
 class KafkaConnector:
     class __KafkaConnector:
         def __init__(self):
-            self.producer = KafkaProducer(bootstrap_servers=['132.187.226.20:9092'],
+            self.producer = KafkaProducer(bootstrap_servers=[os.getenv('KAFKA_BOOTSTRAP_SERVER', 'localhost:9092')],
                                           value_serializer=lambda m: json.dumps(m).encode('ascii'))
 
     instance = None
@@ -35,14 +38,6 @@ class KafkaConnector:
         self.producer.send('RAW_HEALTH_CHECKS', fetcher_name).add_callback(on_send_success).add_errback(on_send_error)
         self.producer.flush()
 
-
-def on_send_success(record_metadata):
-    logging.info('Successful sending to Kafka (' + record_metadata.topic + ')')
-
-
-def on_send_error(exception):
-    logging.error('Error while sending to Kafka', exc_info=exception)
-    KafkaConnector().forward_error(exception)
 
 # Sample how to use it
 # KafkaConnector().send_to_kafka("my-test-kafka", {"abc": "def"})
