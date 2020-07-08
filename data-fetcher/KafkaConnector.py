@@ -1,7 +1,8 @@
 import json
+import logging
 import os
+from datetime import time
 
-from GeneralUtils import on_send_success, on_send_error
 from kafka import KafkaProducer
 
 os.environ["KAFKA_BOOTSTRAP_SERVER"] = '132.187.226.20:9092'
@@ -38,6 +39,23 @@ class KafkaConnector:
         self.producer.send('RAW_HEALTH_CHECKS', fetcher_name).add_callback(on_send_success).add_errback(on_send_error)
         self.producer.flush()
 
+
+def get_unix_timestamp():
+    return int(time.time())
+
+
+def catch_request_error(error):
+    logging.error('Error while fetching', exc_info=error)
+    KafkaConnector().forward_error(error)
+
+
+def on_send_success(record_metadata):
+    logging.info('Successful sending to Kafka (' + record_metadata.topic + ')')
+
+
+def on_send_error(exception):
+    logging.error('Error while sending to Kafka', exc_info=exception)
+    KafkaConnector().forward_error(exception)
 
 # Sample how to use it
 # KafkaConnector().send_to_kafka("my-test-kafka", {"abc": "def"})
