@@ -1,0 +1,12 @@
+{
+	"name": "haa-entry",
+	"engines": {
+		"node": "<=12"
+	},
+	"dependencies": {
+		"@sap/approuter": "^6"
+	},
+	"scripts": {
+		"start": "node node_modules/@sap/approuter/approuter.js"
+	}
+}

@@ -102,3 +102,15 @@ dist
 
 # TernJS port file
 .tern-port
+
+data-fetcher/.idea
+data-fetcher/__pycache__
+
+dw-sac-middleware/gen
+dw-sac-middleware/mta_archives
+dw-sac-middleware/default-env.json
+dw-sac-middleware/approuter/uimodule
+dw-sac-middleware/Makefile*
+workspace.code-workspace
+
+*.DS_Store

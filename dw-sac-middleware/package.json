@@ -1,0 +1,58 @@
+{
+  "name": "uni-li-wue-dw-cloud",
+  "version": "1.0.0",
+  "description": "Uni Liechtenstein Team Project @ Würzburg CAP Data Warehouse",
+  "repository": "<Add your repository here>",
+  "license": "UNLICENSED",
+  "private": true,
+  "dependencies": {
+    "@sap/cds": "^3.34.2",
+    "@sap/hana-client": "^2.5.86",
+    "express": "^4",
+    "hdb": "^0.18.0"
+  },
+  "scripts": {
+    "start": "npx cds run",
+    "start:ui": "ui5 serve --config=uimodule/ui5.yaml  --open index.html",
+    "build:ui": "run-s  build:uimodule",
+    "test": "run-s lint karma",
+    "karma-ci": "karma start karma-ci.conf.js",
+    "clearCoverage": "shx rm -rf coverage",
+    "karma": "run-s clearCoverage karma-ci",
+    "lint": "eslint .",
+    "build:mta": "mbt build",
+    "deploy:cf": "cross-var cf deploy mta_archives/dwconfig_$npm_package_version.mtar",
+    "deploy": "run-s build:mta deploy:cf",
+    "serve:uimodule": "ui5 serve --config=uimodule/ui5.yaml",
+    "build:uimodule": "ui5 build --config=uimodule/ui5.yaml --clean-dest --dest approuter/uimodule/webapp"
+  },
+  "devDependencies": {
+    "shx": "^0.3.2",
+    "@ui5/cli": "^2.2.5",
+    "ui5-middleware-livereload": "^0.3.0",
+    "karma": "^5.0.9",
+    "karma-chrome-launcher": "^3.1.0",
+    "karma-coverage": "^2.0.2",
+    "karma-ui5": "^2.1.2",
+    "npm-run-all": "^4.1.5",
+    "eslint": "^7.1.0",
+    "ui5-middleware-cfdestination": "^0.2.0",
+    "ui5-task-zipper": "^0.3.0",
+    "cross-var": "^1.1.0",
+    "mbt": "^1.0.14"
+  },
+  "ui5": {
+    "dependencies": [
+      "ui5-middleware-livereload",
+      "ui5-middleware-cfdestination",
+      "ui5-task-zipper"
+    ]
+  },
+  "cds": {
+    "requires": {
+      "db": {
+        "kind": "hana"
+      }
+    }
+  }
+}

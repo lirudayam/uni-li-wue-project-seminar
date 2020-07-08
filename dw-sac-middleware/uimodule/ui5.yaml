@@ -1,0 +1,43 @@
+specVersion: "2.0"
+metadata:
+  name: dwconfig_uimodule
+type: application
+resources:
+  configuration:
+    paths:
+      webapp: uimodule/webapp
+framework:
+  name: SAPUI5
+  version: 1.77.0
+  libraries:
+    - name: sap.ui.core
+    - name: sap.m
+    - name: sap.ui.layout
+    - name: themelib_sap_fiori_3
+server:
+  customMiddleware:
+    - name: ui5-middleware-livereload
+      afterMiddleware: compression
+      configuration:
+        port: 35729
+        path: uimodule/webapp
+    - name: ui5-middleware-cfdestination
+      afterMiddleware: compression
+      configuration:
+        debug: true
+        port: 1091
+        xsappJson: approuter/xs-app.json
+        destinations: []
+    - name: ui5-middleware-simpleproxy
+      mountPath: /ConfigurationService/
+      afterMiddleware: compression
+      configuration:
+        baseUri: http://localhost:4004/ConfigurationService/
+builder:
+  customTasks:
+    -  name: "ui5-task-zipper"
+       afterTask: "uglify"
+       configuration:
+         archiveName: "uimodule"
+         additionalFiles:
+          - approuter/xs-app.json

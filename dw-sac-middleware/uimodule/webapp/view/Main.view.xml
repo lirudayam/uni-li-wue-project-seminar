@@ -1,0 +1,53 @@
+<mvc:View controllerName="uni.li.wue.project.dwconfig.controller.Main" displayBlock="true" 
+  xmlns="sap.m" 
+  xmlns:mvc="sap.ui.core.mvc">
+  <App id="idAppControl">
+    <pages>
+      <Page title="{i18n>title}">
+        <content>
+          <HBox width="100%">
+            <items>
+              <VBox width="100%" direction="Column" class="sapUiSmallPadding">
+                <items>
+                  <Title text="Health Checks" />
+                  <Text text="abc" id="text2"/>
+                  <Table noDataText="Drop column list items here and columns in the area above" items="{configuration>/HEALTH_STATUS}">
+                    <items>
+                      <ColumnListItem type="Active">
+                        <cells>
+                          <Text text="{configuration>api}"/>
+                          <Text text="{configuration>last_ping}"/>
+                          <Text text="{configuration>status}"/>
+                        </cells>
+                      </ColumnListItem>
+                    </items>
+                    <columns>
+                      <Column id="column0">
+                        <header>
+                          <Label text="API" id="label0"/>
+                        </header>
+                      </Column>
+                      <Column id="column1">
+                        <header>
+                          <Label text="Last Active" id="label1"/>
+                        </header>
+                      </Column>
+                      <Column id="column2">
+                        <header>
+                          <Label text="Status" id="label2"/>
+                        </header>
+                      </Column>
+                    </columns>
+                  </Table>
+                </items>
+              </VBox>
+              <VBox width="100%" direction="Column" class="sapUiSmallPadding">
+              
+              </VBox>
+            </items>
+          </HBox>
+        </content>
+      </Page>
+    </pages>
+  </App>
+</mvc:View>
