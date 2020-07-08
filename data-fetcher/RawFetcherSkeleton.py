@@ -4,10 +4,15 @@ import threading
 from DWConfigs import DWConfigs
 from KafkaConnector import catch_request_error, get_unix_timestamp, KafkaConnector
 
+from requests import Session, Request
+from requests.exceptions import ConnectionError, Timeout, TooManyRedirects
+import json
 
-class RawFetcherSkeleton:
-    fetcher_name = "Raw Fetcher Skeleton"
-    kafka_topic = "RAW_G_SAMPLE_FETCHER"
+
+
+class CoinMarketCap_DataFetcher:
+    fetcher_name = "CoinMarketCap Data Fetcher"
+    kafka_topic = "RAW_G_PRICES"
 
     def __init__(self):
         self.trigger_health_pings()
