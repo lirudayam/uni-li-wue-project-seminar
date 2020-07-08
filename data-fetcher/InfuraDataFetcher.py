@@ -4,8 +4,7 @@ import os
 import threading
 
 from DWConfigs import DWConfigs
-from GeneralUtils import catch_request_error, get_unix_timestamp
-from KafkaConnector import KafkaConnector
+from KafkaConnector import KafkaConnector, catch_request_error, get_unix_timestamp
 
 os.environ["WEB3_INFURA_PROJECT_ID"] = "37e2249c8d5e41488a9fa7b67b7335b3"
 

@@ -2,8 +2,7 @@ import logging
 import threading
 
 from DWConfigs import DWConfigs
-from GeneralUtils import catch_request_error, get_unix_timestamp
-from KafkaConnector import KafkaConnector
+from KafkaConnector import catch_request_error, get_unix_timestamp, KafkaConnector
 
 
 class RawFetcherSkeleton:

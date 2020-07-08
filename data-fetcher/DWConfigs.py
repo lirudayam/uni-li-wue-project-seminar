@@ -21,5 +21,5 @@ class DWConfigs:
     def get_aggregation_interval(self, topic):
         return self.aggregation_interval
 
-    def get_health_ping_interval(self):
+    def get_health_ping_interval(self, topic):
         return self.health_ping_interval
