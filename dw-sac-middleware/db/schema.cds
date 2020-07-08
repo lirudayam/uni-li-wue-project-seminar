@@ -99,8 +99,10 @@ entity KPI_G_PRICE_VOLA {
 entity KPI_G_PRICES {
 	key timestamp	: Timestamp;
 	key coin		: Association to KPI_ENUM_COIN;
-	key stockMarket	: Association to KPI_ENUM_STOCK_MARKET;
 	price			: Double;
+	marketCap		: Double;
+	volume24h		: Double;
+	change24h 		: Double;
 }
 
 entity KPI_B_SPECIAL_EVT {
