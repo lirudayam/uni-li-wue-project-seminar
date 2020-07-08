@@ -75,7 +75,8 @@ class InfuraDataFetcher:
                 "size": latest_block['size'],
                 "difficulty": latest_block['difficulty'],
                 "gasLimit": latest_block['gasLimit'],
-                "gasUsed": latest_block['gasUsed']
+                "gasUsed": latest_block['gasUsed'],
+                "transactioncount": len(latest_block["transactions"])
             })
             print({
                 "timestamp": get_unix_timestamp(),
@@ -84,9 +85,9 @@ class InfuraDataFetcher:
                 "size": latest_block['size'],
                 "difficulty": latest_block['difficulty'],
                 "gasLimit": latest_block['gasLimit'],
-                "gasUsed": latest_block['gasUsed']
+                "gasUsed": latest_block['gasUsed'],
+                "transactioncount": len(latest_block["transactions"])
             })
             self.latest_identifier = latest_block['number']
-
 
 InfuraDataFetcher()
