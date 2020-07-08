@@ -72,13 +72,19 @@ class InfuraDataFetcher:
                 "timestamp": get_unix_timestamp(),
                 "currency": "ETH",
                 "identifier": latest_block['number'],
-                "size": latest_block['size']
+                "size": latest_block['size'],
+                "difficulty": latest_block['difficulty'],
+                "gasLimit": latest_block['gasLimit'],
+                "gasUsed": latest_block['gasUsed']
             })
             print({
                 "timestamp": get_unix_timestamp(),
                 "currency": "ETH",
                 "identifier": latest_block['number'],
-                "size": latest_block['size']
+                "size": latest_block['size'],
+                "difficulty": latest_block['difficulty'],
+                "gasLimit": latest_block['gasLimit'],
+                "gasUsed": latest_block['gasUsed']
             })
             self.latest_identifier = latest_block['number']
 
