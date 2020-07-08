@@ -23,3 +23,5 @@ File / Folder | Purpose
 ## Learn more...
 
 Learn more at https://cap.cloud.sap/docs/get-started/
+
+bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --delete --group dw-consumer

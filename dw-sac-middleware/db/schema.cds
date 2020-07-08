@@ -56,14 +56,18 @@ entity LOG_FETCH_ERROR {
 /* KPI Entites */
 entity KPI_G_RICH_ACC {
 	key timestamp	: Timestamp;
-	key coin		: Association to KPI_ENUM_COIN;
+	key coin		: String(3);
+	coinInfo		: Association to one KPI_ENUM_COIN 
+						on coin = coinInfo.shortName;
 	accountAddress	: String;
 	balance			: Double;
 }
 
 entity KPI_G_T_PER_TIME {
 	key timestamp	: Timestamp;
-	key coin		: Association to KPI_ENUM_COIN;
+	key coin		: String(3);
+	coinInfo		: Association to one KPI_ENUM_COIN 
+						on coin = coinInfo.shortName;
 	senderAddress	: String;
 	recieverAddress	: String;
 	units			: Decimal;
@@ -78,31 +82,46 @@ entity KPI_E_SMART_EXEC {
 
 entity KPI_G_N_PER_TIME {
 	key timestamp	: Timestamp;
-	key coin		: Association to KPI_ENUM_COIN;
+	key coin		: String(3);
+	coinInfo		: Association to one KPI_ENUM_COIN 
+						on coin = coinInfo.shortName;
 	numOfNodes		: Integer;
 }
 
 entity KPI_G_TRANSACT_INF {
 	key timestamp			: Timestamp;
-	key coin				: Association to KPI_ENUM_COIN;
+	key coin				: String(3);
+	coinInfo				: Association to one KPI_ENUM_COIN 
+								on coin = coinInfo.shortName;
 	totalTransactionFees	: Double;
 	numOfTransactions		: Integer;
 	totalTransactionVolume	: Double;
 }
 
 entity KPI_G_PRICE_VOLA {
-	key timestamp			: Timestamp;
-	key coin				: Association to KPI_ENUM_COIN;
-	priceVolatility			: Double;
+	key timestamp		: Timestamp;
+	key coin			: String(3);
+	coinInfo			: Association to one KPI_ENUM_COIN 
+							on coin = coinInfo.shortName;
+	priceVolatility		: Double;
 }
 
 entity KPI_G_PRICES {
 	key timestamp	: Timestamp;
-	key coin		: Association to KPI_ENUM_COIN;
+	key coin		: String(3);
+	coinInfo		: Association to one KPI_ENUM_COIN 
+						on coin = coinInfo.shortName;
 	price			: Double;
 	marketCap		: Double;
 	volume24h		: Double;
 	change24h 		: Double;
+}
+
+entity KPI_E_GASSTATION {
+	key timestamp	: Timestamp;
+	safeGasPrice	: Double;
+	blockNumber		: Double;
+	blockTime 		: Double;
 }
 
 entity KPI_B_SPECIAL_EVT {
@@ -112,7 +131,9 @@ entity KPI_B_SPECIAL_EVT {
 
 entity KPI_G_NEWS {
 	key timestamp	: Timestamp;
-	key coin		: Association to KPI_ENUM_COIN;
+	key coin		: String(3);
+	coinInfo		: Association to one KPI_ENUM_COIN 
+						on coin = coinInfo.shortName;
 	url				: String;
 	sentiment		: Association to KPI_ENUM_SEMANTICS;
 }
@@ -126,7 +147,9 @@ entity KPI_G_RECOMM {
 
 entity KPI_G_CREDITS {
 	key timestamp	: Timestamp;
-	key coin		: Association to KPI_ENUM_COIN;
+	key coin		: String(3);
+	coinInfo		: Association to one KPI_ENUM_COIN 
+						on coin = coinInfo.shortName;
 	noOfCredits		: Integer;
 	noOfTransactions: Integer;
 }

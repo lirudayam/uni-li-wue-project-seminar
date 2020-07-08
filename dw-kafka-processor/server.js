@@ -63,7 +63,7 @@ const asyncf = async () => {
     RAW_G_TRANSACT_INF: KPI_G_TRANSACT_INF,
 
     RAW_G_PRICE_VOLA: KPI_G_PRICE_VOLA,
-    RAW_G_PRICE_DIFF: KPI_G_PRICES,
+    RAW_G_PRICES: KPI_G_PRICES,
     RAW_B_SPECIAL_EVT: KPI_B_SPECIAL_EVT,
 
     RAW_G_NEWS: KPI_G_NEWS,
@@ -225,15 +225,18 @@ const asyncf = async () => {
           eachMessage: async ({ topic, partition, message }) => {
             if (oSimpleTopicMaps.hasOwnProperty(topic)) {
               try {
-                let entry = JSON.parse(message.value);
+                let entry = JSON.parse(message.value.toString());
                 if (entry.timestamp) {
-                  entry.timestamp = moment(entry.timestamp).format();
+                  entry.timestamp = moment(entry.timestamp * 1000).format();
                 }
+                console.log("ADD entry");
+                console.log(entry);
+                console.log(topic);
                 await srv.run(
                   INSERT.into(oSimpleTopicMaps[topic]).entries([entry])
                 );
               } catch (e) {
-                console.error("Error has occurred", e);
+                //console.error("Error has occurred", e);
               }
             } else if (topic === "RAW_HEALTH_CHECKS") {
               try {
@@ -277,11 +280,6 @@ const asyncf = async () => {
                 console.error("Error has occurred", e);
               }
             }
-            console.dir({
-              partition,
-              offset: message.offset,
-              value: message.value,
-            });
           },
         });
 

@@ -961,6 +961,18 @@
       },
       "$syntax": "aspect"
     },
+    "uni_li_wue.dw.API_CONFIG": {
+      "kind": "entity",
+      "elements": {
+        "name": {
+          "key": true,
+          "type": "cds.String"
+        },
+        "value": {
+          "type": "cds.String"
+        }
+      }
+    },
     "uni_li_wue.dw.KPI_B_SPECIAL_EVT": {
       "kind": "entity",
       "elements": {
@@ -970,7 +982,7 @@
         },
         "event": {
           "type": "cds.Association",
-          "target": "uni_li_wue.dw.KPI_ENUM_EVENTS",
+          "target": "uni_li_wue.dw.KPI_ENUM_EVENT",
           "keys": [
             {
               "ref": [
@@ -981,7 +993,7 @@
         }
       }
     },
-    "uni_li_wue.dw.KPI_ENUM_COINS": {
+    "uni_li_wue.dw.KPI_ENUM_COIN": {
       "kind": "entity",
       "elements": {
         "shortName": {
@@ -997,7 +1009,7 @@
         }
       }
     },
-    "uni_li_wue.dw.KPI_ENUM_EVENTS": {
+    "uni_li_wue.dw.KPI_ENUM_EVENT": {
       "kind": "entity",
       "elements": {
         "name": {
@@ -1024,7 +1036,7 @@
         }
       }
     },
-    "uni_li_wue.dw.KPI_ENUM_STOCK_MARKETS": {
+    "uni_li_wue.dw.KPI_ENUM_STOCK_MARKET": {
       "kind": "entity",
       "elements": {
         "shortName": {
@@ -1040,45 +1052,21 @@
         }
       }
     },
-    "uni_li_wue.dw.KPI_ENUM_STREAM_ENTRY": {
+    "uni_li_wue.dw.KPI_E_GASSTATION": {
       "kind": "entity",
       "elements": {
-        "topic": {
+        "timestamp": {
           "key": true,
-          "type": "cds.String"
+          "type": "cds.Timestamp"
         },
-        "timeCfg": {
-          "type": "cds.Association",
-          "target": "uni_li_wue.dw.KPI_TIME_CONFIG",
-          "keys": [
-            {
-              "ref": [
-                "topic"
-              ]
-            }
-          ]
+        "safeGasPrice": {
+          "type": "cds.Double"
         },
-        "refreshCfg": {
-          "type": "cds.Association",
-          "target": "uni_li_wue.dw.KPI_REFRESH_CONFIG",
-          "keys": [
-            {
-              "ref": [
-                "topic"
-              ]
-            }
-          ]
+        "blockNumber": {
+          "type": "cds.Double"
         },
-        "notificationCfg": {
-          "type": "cds.Association",
-          "target": "uni_li_wue.dw.KPI_NOTIFICATION_CONFIG",
-          "keys": [
-            {
-              "ref": [
-                "topic"
-              ]
-            }
-          ]
+        "blockTime": {
+          "type": "cds.Double"
         }
       }
     },
@@ -1106,11 +1094,25 @@
         },
         "coin": {
           "key": true,
+          "type": "cds.String",
+          "length": 3
+        },
+        "coinInfo": {
           "type": "cds.Association",
-          "target": "uni_li_wue.dw.KPI_ENUM_COINS",
-          "keys": [
+          "cardinality": {
+            "max": 1
+          },
+          "target": "uni_li_wue.dw.KPI_ENUM_COIN",
+          "on": [
             {
               "ref": [
+                "coin"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "coinInfo",
                 "shortName"
               ]
             }
@@ -1133,11 +1135,25 @@
         },
         "coin": {
           "key": true,
+          "type": "cds.String",
+          "length": 3
+        },
+        "coinInfo": {
           "type": "cds.Association",
-          "target": "uni_li_wue.dw.KPI_ENUM_COINS",
-          "keys": [
+          "cardinality": {
+            "max": 1
+          },
+          "target": "uni_li_wue.dw.KPI_ENUM_COIN",
+          "on": [
             {
               "ref": [
+                "coin"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "coinInfo",
                 "shortName"
               ]
             }
@@ -1168,11 +1184,25 @@
         },
         "coin": {
           "key": true,
+          "type": "cds.String",
+          "length": 3
+        },
+        "coinInfo": {
           "type": "cds.Association",
-          "target": "uni_li_wue.dw.KPI_ENUM_COINS",
-          "keys": [
+          "cardinality": {
+            "max": 1
+          },
+          "target": "uni_li_wue.dw.KPI_ENUM_COIN",
+          "on": [
             {
               "ref": [
+                "coin"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "coinInfo",
                 "shortName"
               ]
             }
@@ -1192,29 +1222,40 @@
         },
         "coin": {
           "key": true,
-          "type": "cds.Association",
-          "target": "uni_li_wue.dw.KPI_ENUM_COINS",
-          "keys": [
-            {
-              "ref": [
-                "shortName"
-              ]
-            }
-          ]
+          "type": "cds.String",
+          "length": 3
         },
-        "stockMarket": {
-          "key": true,
+        "coinInfo": {
           "type": "cds.Association",
-          "target": "uni_li_wue.dw.KPI_ENUM_STOCK_MARKETS",
-          "keys": [
+          "cardinality": {
+            "max": 1
+          },
+          "target": "uni_li_wue.dw.KPI_ENUM_COIN",
+          "on": [
             {
               "ref": [
+                "coin"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "coinInfo",
                 "shortName"
               ]
             }
           ]
         },
         "price": {
+          "type": "cds.Double"
+        },
+        "marketCap": {
+          "type": "cds.Double"
+        },
+        "volume24h": {
+          "type": "cds.Double"
+        },
+        "change24h": {
           "type": "cds.Double"
         }
       }
@@ -1228,11 +1269,25 @@
         },
         "coin": {
           "key": true,
+          "type": "cds.String",
+          "length": 3
+        },
+        "coinInfo": {
           "type": "cds.Association",
-          "target": "uni_li_wue.dw.KPI_ENUM_COINS",
-          "keys": [
+          "cardinality": {
+            "max": 1
+          },
+          "target": "uni_li_wue.dw.KPI_ENUM_COIN",
+          "on": [
             {
               "ref": [
+                "coin"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "coinInfo",
                 "shortName"
               ]
             }
@@ -1270,11 +1325,25 @@
         },
         "coin": {
           "key": true,
+          "type": "cds.String",
+          "length": 3
+        },
+        "coinInfo": {
           "type": "cds.Association",
-          "target": "uni_li_wue.dw.KPI_ENUM_COINS",
-          "keys": [
+          "cardinality": {
+            "max": 1
+          },
+          "target": "uni_li_wue.dw.KPI_ENUM_COIN",
+          "on": [
             {
               "ref": [
+                "coin"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "coinInfo",
                 "shortName"
               ]
             }
@@ -1297,11 +1366,25 @@
         },
         "coin": {
           "key": true,
+          "type": "cds.String",
+          "length": 3
+        },
+        "coinInfo": {
           "type": "cds.Association",
-          "target": "uni_li_wue.dw.KPI_ENUM_COINS",
-          "keys": [
+          "cardinality": {
+            "max": 1
+          },
+          "target": "uni_li_wue.dw.KPI_ENUM_COIN",
+          "on": [
             {
               "ref": [
+                "coin"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "coinInfo",
                 "shortName"
               ]
             }
@@ -1327,11 +1410,25 @@
         },
         "coin": {
           "key": true,
+          "type": "cds.String",
+          "length": 3
+        },
+        "coinInfo": {
           "type": "cds.Association",
-          "target": "uni_li_wue.dw.KPI_ENUM_COINS",
-          "keys": [
+          "cardinality": {
+            "max": 1
+          },
+          "target": "uni_li_wue.dw.KPI_ENUM_COIN",
+          "on": [
             {
               "ref": [
+                "coin"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "coinInfo",
                 "shortName"
               ]
             }
@@ -1352,69 +1449,27 @@
         }
       }
     },
-    "uni_li_wue.dw.KPI_NOTIFICATION_CONFIG": {
+    "uni_li_wue.dw.KPI_STREAM_TYPE_CONFIG": {
       "kind": "entity",
       "elements": {
         "topic": {
           "key": true,
-          "type": "cds.Association",
-          "target": "uni_li_wue.dw.KPI_ENUM_STREAM_ENTRY",
-          "keys": [
-            {
-              "ref": [
-                "topic"
-              ]
-            }
-          ]
-        },
-        "statisticalType": {
           "type": "cds.String"
         },
-        "lowerTreshold": {
-          "type": "cds.Double"
-        },
-        "upperTreshold": {
-          "type": "cds.Double"
-        }
-      }
-    },
-    "uni_li_wue.dw.KPI_REFRESH_CONFIG": {
-      "kind": "entity",
-      "elements": {
-        "topic": {
-          "key": true,
-          "type": "cds.Association",
-          "target": "uni_li_wue.dw.KPI_ENUM_STREAM_ENTRY",
-          "keys": [
-            {
-              "ref": [
-                "topic"
-              ]
-            }
-          ]
+        "aggregationInterval": {
+          "type": "cds.Integer"
         },
         "fetchInterval": {
           "type": "cds.Integer"
-        }
-      }
-    },
-    "uni_li_wue.dw.KPI_TIME_CONFIG": {
-      "kind": "entity",
-      "elements": {
-        "topic": {
-          "key": true,
-          "type": "cds.Association",
-          "target": "uni_li_wue.dw.KPI_ENUM_STREAM_ENTRY",
-          "keys": [
-            {
-              "ref": [
-                "topic"
-              ]
-            }
-          ]
         },
-        "viewInterval": {
-          "type": "cds.Integer"
+        "notificationStatisticalType": {
+          "type": "cds.String"
+        },
+        "notificationLowerTreshold": {
+          "type": "cds.Double"
+        },
+        "notificationUpperTreshold": {
+          "type": "cds.Double"
         }
       }
     },
@@ -1445,6 +1500,301 @@
         }
       }
     },
+    "uni_li_wue.dw.service.ConfigurationService": {
+      "@source": "srv/configuration-service.cds",
+      "kind": "service"
+    },
+    "uni_li_wue.dw.service.ConfigurationService.API_CONFIG": {
+      "kind": "entity",
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "uni_li_wue.dw.API_CONFIG"
+            ]
+          }
+        }
+      },
+      "elements": {
+        "name": {
+          "key": true,
+          "type": "cds.String"
+        },
+        "value": {
+          "type": "cds.String"
+        }
+      },
+      "$syntax": "projection"
+    },
+    "uni_li_wue.dw.service.ConfigurationService.HEALTH_STATUS": {
+      "kind": "entity",
+      "@readonly": true,
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "uni_li_wue.dw.LOG_HEALTH_CHECK"
+            ]
+          },
+          "columns": [
+            {
+              "ref": [
+                "api"
+              ]
+            },
+            {
+              "ref": [
+                "timestamp"
+              ],
+              "as": "last_ping"
+            },
+            {
+              "xpr": [
+                "(",
+                "case",
+                "when",
+                {
+                  "func": "SECONDS_BETWEEN",
+                  "args": [
+                    {
+                      "ref": [
+                        "timestamp"
+                      ]
+                    },
+                    {
+                      "ref": [
+                        "$now"
+                      ]
+                    }
+                  ]
+                },
+                ">",
+                {
+                  "SELECT": {
+                    "from": {
+                      "ref": [
+                        "uni_li_wue.dw.API_CONFIG"
+                      ]
+                    },
+                    "columns": [
+                      {
+                        "func": "TO_INT",
+                        "args": [
+                          {
+                            "ref": [
+                              "value"
+                            ]
+                          }
+                        ],
+                        "as": "delta"
+                      }
+                    ],
+                    "where": [
+                      {
+                        "ref": [
+                          "name"
+                        ]
+                      },
+                      "=",
+                      {
+                        "val": "health_ping_interval"
+                      }
+                    ]
+                  }
+                },
+                "then",
+                {
+                  "val": "down"
+                },
+                "else",
+                {
+                  "val": "up"
+                },
+                "end",
+                ")"
+              ],
+              "as": "status",
+              "cast": {
+                "type": "cds.String"
+              }
+            }
+          ]
+        }
+      },
+      "elements": {
+        "api": {
+          "key": true,
+          "type": "cds.String"
+        },
+        "last_ping": {
+          "type": "cds.Timestamp"
+        },
+        "status": {
+          "@Core.Computed": true,
+          "type": "cds.String"
+        }
+      },
+      "$syntax": "entity"
+    },
+    "uni_li_wue.dw.service.ConfigurationService.KPI_CONFIG": {
+      "kind": "entity",
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "uni_li_wue.dw.KPI_STREAM_TYPE_CONFIG"
+            ]
+          }
+        }
+      },
+      "elements": {
+        "topic": {
+          "key": true,
+          "type": "cds.String"
+        },
+        "aggregationInterval": {
+          "type": "cds.Integer"
+        },
+        "fetchInterval": {
+          "type": "cds.Integer"
+        },
+        "notificationStatisticalType": {
+          "type": "cds.String"
+        },
+        "notificationLowerTreshold": {
+          "type": "cds.Double"
+        },
+        "notificationUpperTreshold": {
+          "type": "cds.Double"
+        }
+      },
+      "$syntax": "projection"
+    },
+    "uni_li_wue.dw.service.ConfigurationService.KPI_ENUM_COIN": {
+      "kind": "entity",
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "uni_li_wue.dw.KPI_ENUM_COIN"
+            ]
+          }
+        }
+      },
+      "elements": {
+        "shortName": {
+          "key": true,
+          "type": "cds.String",
+          "length": 3
+        },
+        "longName": {
+          "type": "cds.String"
+        },
+        "description": {
+          "type": "cds.String"
+        }
+      },
+      "$syntax": "projection"
+    },
+    "uni_li_wue.dw.service.ConfigurationService.KPI_ENUM_EVENT": {
+      "kind": "entity",
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "uni_li_wue.dw.KPI_ENUM_EVENT"
+            ]
+          }
+        }
+      },
+      "elements": {
+        "name": {
+          "key": true,
+          "type": "cds.String"
+        },
+        "description": {
+          "type": "cds.String"
+        }
+      },
+      "$syntax": "projection"
+    },
+    "uni_li_wue.dw.service.ConfigurationService.KPI_ENUM_SEMANTICS": {
+      "kind": "entity",
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "uni_li_wue.dw.KPI_ENUM_SEMANTICS"
+            ]
+          }
+        }
+      },
+      "elements": {
+        "scoreName": {
+          "key": true,
+          "type": "cds.String"
+        },
+        "pointScore": {
+          "type": "cds.Integer"
+        },
+        "description": {
+          "type": "cds.String"
+        }
+      },
+      "$syntax": "projection"
+    },
+    "uni_li_wue.dw.service.ConfigurationService.KPI_ENUM_STOCK_MARKET": {
+      "kind": "entity",
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "uni_li_wue.dw.KPI_ENUM_STOCK_MARKET"
+            ]
+          }
+        }
+      },
+      "elements": {
+        "shortName": {
+          "key": true,
+          "type": "cds.String",
+          "length": 3
+        },
+        "longName": {
+          "type": "cds.String"
+        },
+        "url": {
+          "type": "cds.String"
+        }
+      },
+      "$syntax": "projection"
+    },
+    "uni_li_wue.dw.service.ConfigurationService.LOG_FETCH_ERROR": {
+      "kind": "entity",
+      "@readonly": true,
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "uni_li_wue.dw.LOG_FETCH_ERROR"
+            ]
+          }
+        }
+      },
+      "elements": {
+        "api": {
+          "key": true,
+          "type": "cds.String"
+        },
+        "message": {
+          "type": "cds.String"
+        },
+        "timestamp": {
+          "type": "cds.Timestamp"
+        }
+      },
+      "$syntax": "projection"
+    },
     "uni_li_wue.dw.service.KafkaPublishService": {
       "@source": "srv/kafka-publish-service.cds",
       "kind": "service"
@@ -1468,7 +1818,7 @@
         },
         "event": {
           "type": "cds.Association",
-          "target": "uni_li_wue.dw.service.KafkaPublishService.KPI_ENUM_EVENTS",
+          "target": "uni_li_wue.dw.service.KafkaPublishService.KPI_ENUM_EVENT",
           "keys": [
             {
               "ref": [
@@ -1480,14 +1830,48 @@
       },
       "$syntax": "projection"
     },
-    "uni_li_wue.dw.service.KafkaPublishService.KPI_ENUM_COINS": {
+    "uni_li_wue.dw.service.KafkaPublishService.KPI_CONFIG": {
+      "kind": "entity",
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "uni_li_wue.dw.KPI_STREAM_TYPE_CONFIG"
+            ]
+          }
+        }
+      },
+      "elements": {
+        "topic": {
+          "key": true,
+          "type": "cds.String"
+        },
+        "aggregationInterval": {
+          "type": "cds.Integer"
+        },
+        "fetchInterval": {
+          "type": "cds.Integer"
+        },
+        "notificationStatisticalType": {
+          "type": "cds.String"
+        },
+        "notificationLowerTreshold": {
+          "type": "cds.Double"
+        },
+        "notificationUpperTreshold": {
+          "type": "cds.Double"
+        }
+      },
+      "$syntax": "projection"
+    },
+    "uni_li_wue.dw.service.KafkaPublishService.KPI_ENUM_COIN": {
       "kind": "entity",
       "@readonly": true,
       "query": {
         "SELECT": {
           "from": {
             "ref": [
-              "uni_li_wue.dw.KPI_ENUM_COINS"
+              "uni_li_wue.dw.KPI_ENUM_COIN"
             ]
           }
         }
@@ -1507,14 +1891,14 @@
       },
       "$syntax": "projection"
     },
-    "uni_li_wue.dw.service.KafkaPublishService.KPI_ENUM_EVENTS": {
+    "uni_li_wue.dw.service.KafkaPublishService.KPI_ENUM_EVENT": {
       "kind": "entity",
       "@readonly": true,
       "query": {
         "SELECT": {
           "from": {
             "ref": [
-              "uni_li_wue.dw.KPI_ENUM_EVENTS"
+              "uni_li_wue.dw.KPI_ENUM_EVENT"
             ]
           }
         }
@@ -1556,14 +1940,14 @@
       },
       "$syntax": "projection"
     },
-    "uni_li_wue.dw.service.KafkaPublishService.KPI_ENUM_STOCK_MARKETS": {
+    "uni_li_wue.dw.service.KafkaPublishService.KPI_ENUM_STOCK_MARKET": {
       "kind": "entity",
       "@readonly": true,
       "query": {
         "SELECT": {
           "from": {
             "ref": [
-              "uni_li_wue.dw.KPI_ENUM_STOCK_MARKETS"
+              "uni_li_wue.dw.KPI_ENUM_STOCK_MARKET"
             ]
           }
         }
@@ -1583,55 +1967,31 @@
       },
       "$syntax": "projection"
     },
-    "uni_li_wue.dw.service.KafkaPublishService.KPI_ENUM_STREAM_ENTRY": {
+    "uni_li_wue.dw.service.KafkaPublishService.KPI_E_GASSTATION": {
       "kind": "entity",
       "@readonly": true,
       "query": {
         "SELECT": {
           "from": {
             "ref": [
-              "uni_li_wue.dw.KPI_ENUM_STREAM_ENTRY"
+              "uni_li_wue.dw.KPI_E_GASSTATION"
             ]
           }
         }
       },
       "elements": {
-        "topic": {
+        "timestamp": {
           "key": true,
-          "type": "cds.String"
+          "type": "cds.Timestamp"
         },
-        "timeCfg": {
-          "type": "cds.Association",
-          "target": "uni_li_wue.dw.service.KafkaPublishService.KPI_TIME_CONFIG",
-          "keys": [
-            {
-              "ref": [
-                "topic"
-              ]
-            }
-          ]
+        "safeGasPrice": {
+          "type": "cds.Double"
         },
-        "refreshCfg": {
-          "type": "cds.Association",
-          "target": "uni_li_wue.dw.service.KafkaPublishService.KPI_REFRESH_CONFIG",
-          "keys": [
-            {
-              "ref": [
-                "topic"
-              ]
-            }
-          ]
+        "blockNumber": {
+          "type": "cds.Double"
         },
-        "notificationCfg": {
-          "type": "cds.Association",
-          "target": "uni_li_wue.dw.service.KafkaPublishService.KPI_NOTIFICATION_CONFIG",
-          "keys": [
-            {
-              "ref": [
-                "topic"
-              ]
-            }
-          ]
+        "blockTime": {
+          "type": "cds.Double"
         }
       },
       "$syntax": "projection"
@@ -1681,11 +2041,25 @@
         },
         "coin": {
           "key": true,
+          "type": "cds.String",
+          "length": 3
+        },
+        "coinInfo": {
           "type": "cds.Association",
-          "target": "uni_li_wue.dw.service.KafkaPublishService.KPI_ENUM_COINS",
-          "keys": [
+          "cardinality": {
+            "max": 1
+          },
+          "target": "uni_li_wue.dw.service.KafkaPublishService.KPI_ENUM_COIN",
+          "on": [
             {
               "ref": [
+                "coin"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "coinInfo",
                 "shortName"
               ]
             }
@@ -1719,11 +2093,25 @@
         },
         "coin": {
           "key": true,
+          "type": "cds.String",
+          "length": 3
+        },
+        "coinInfo": {
           "type": "cds.Association",
-          "target": "uni_li_wue.dw.service.KafkaPublishService.KPI_ENUM_COINS",
-          "keys": [
+          "cardinality": {
+            "max": 1
+          },
+          "target": "uni_li_wue.dw.service.KafkaPublishService.KPI_ENUM_COIN",
+          "on": [
             {
               "ref": [
+                "coin"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "coinInfo",
                 "shortName"
               ]
             }
@@ -1765,11 +2153,25 @@
         },
         "coin": {
           "key": true,
+          "type": "cds.String",
+          "length": 3
+        },
+        "coinInfo": {
           "type": "cds.Association",
-          "target": "uni_li_wue.dw.service.KafkaPublishService.KPI_ENUM_COINS",
-          "keys": [
+          "cardinality": {
+            "max": 1
+          },
+          "target": "uni_li_wue.dw.service.KafkaPublishService.KPI_ENUM_COIN",
+          "on": [
             {
               "ref": [
+                "coin"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "coinInfo",
                 "shortName"
               ]
             }
@@ -1800,29 +2202,40 @@
         },
         "coin": {
           "key": true,
-          "type": "cds.Association",
-          "target": "uni_li_wue.dw.service.KafkaPublishService.KPI_ENUM_COINS",
-          "keys": [
-            {
-              "ref": [
-                "shortName"
-              ]
-            }
-          ]
+          "type": "cds.String",
+          "length": 3
         },
-        "stockMarket": {
-          "key": true,
+        "coinInfo": {
           "type": "cds.Association",
-          "target": "uni_li_wue.dw.service.KafkaPublishService.KPI_ENUM_STOCK_MARKETS",
-          "keys": [
+          "cardinality": {
+            "max": 1
+          },
+          "target": "uni_li_wue.dw.service.KafkaPublishService.KPI_ENUM_COIN",
+          "on": [
             {
               "ref": [
+                "coin"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "coinInfo",
                 "shortName"
               ]
             }
           ]
         },
         "price": {
+          "type": "cds.Double"
+        },
+        "marketCap": {
+          "type": "cds.Double"
+        },
+        "volume24h": {
+          "type": "cds.Double"
+        },
+        "change24h": {
           "type": "cds.Double"
         }
       },
@@ -1847,11 +2260,25 @@
         },
         "coin": {
           "key": true,
+          "type": "cds.String",
+          "length": 3
+        },
+        "coinInfo": {
           "type": "cds.Association",
-          "target": "uni_li_wue.dw.service.KafkaPublishService.KPI_ENUM_COINS",
-          "keys": [
+          "cardinality": {
+            "max": 1
+          },
+          "target": "uni_li_wue.dw.service.KafkaPublishService.KPI_ENUM_COIN",
+          "on": [
             {
               "ref": [
+                "coin"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "coinInfo",
                 "shortName"
               ]
             }
@@ -1911,11 +2338,25 @@
         },
         "coin": {
           "key": true,
+          "type": "cds.String",
+          "length": 3
+        },
+        "coinInfo": {
           "type": "cds.Association",
-          "target": "uni_li_wue.dw.service.KafkaPublishService.KPI_ENUM_COINS",
-          "keys": [
+          "cardinality": {
+            "max": 1
+          },
+          "target": "uni_li_wue.dw.service.KafkaPublishService.KPI_ENUM_COIN",
+          "on": [
             {
               "ref": [
+                "coin"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "coinInfo",
                 "shortName"
               ]
             }
@@ -1949,11 +2390,25 @@
         },
         "coin": {
           "key": true,
+          "type": "cds.String",
+          "length": 3
+        },
+        "coinInfo": {
           "type": "cds.Association",
-          "target": "uni_li_wue.dw.service.KafkaPublishService.KPI_ENUM_COINS",
-          "keys": [
+          "cardinality": {
+            "max": 1
+          },
+          "target": "uni_li_wue.dw.service.KafkaPublishService.KPI_ENUM_COIN",
+          "on": [
             {
               "ref": [
+                "coin"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "coinInfo",
                 "shortName"
               ]
             }
@@ -1990,11 +2445,25 @@
         },
         "coin": {
           "key": true,
+          "type": "cds.String",
+          "length": 3
+        },
+        "coinInfo": {
           "type": "cds.Association",
-          "target": "uni_li_wue.dw.service.KafkaPublishService.KPI_ENUM_COINS",
-          "keys": [
+          "cardinality": {
+            "max": 1
+          },
+          "target": "uni_li_wue.dw.service.KafkaPublishService.KPI_ENUM_COIN",
+          "on": [
             {
               "ref": [
+                "coin"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "coinInfo",
                 "shortName"
               ]
             }
@@ -2012,102 +2481,6 @@
         "transactionHash": {
           "type": "cds.String",
           "length": 64
-        }
-      },
-      "$syntax": "projection"
-    },
-    "uni_li_wue.dw.service.KafkaPublishService.KPI_NOTIFICATION_CONFIG": {
-      "kind": "entity",
-      "query": {
-        "SELECT": {
-          "from": {
-            "ref": [
-              "uni_li_wue.dw.KPI_NOTIFICATION_CONFIG"
-            ]
-          }
-        }
-      },
-      "elements": {
-        "topic": {
-          "key": true,
-          "type": "cds.Association",
-          "target": "uni_li_wue.dw.service.KafkaPublishService.KPI_ENUM_STREAM_ENTRY",
-          "keys": [
-            {
-              "ref": [
-                "topic"
-              ]
-            }
-          ]
-        },
-        "statisticalType": {
-          "type": "cds.String"
-        },
-        "lowerTreshold": {
-          "type": "cds.Double"
-        },
-        "upperTreshold": {
-          "type": "cds.Double"
-        }
-      },
-      "$syntax": "projection"
-    },
-    "uni_li_wue.dw.service.KafkaPublishService.KPI_REFRESH_CONFIG": {
-      "kind": "entity",
-      "query": {
-        "SELECT": {
-          "from": {
-            "ref": [
-              "uni_li_wue.dw.KPI_REFRESH_CONFIG"
-            ]
-          }
-        }
-      },
-      "elements": {
-        "topic": {
-          "key": true,
-          "type": "cds.Association",
-          "target": "uni_li_wue.dw.service.KafkaPublishService.KPI_ENUM_STREAM_ENTRY",
-          "keys": [
-            {
-              "ref": [
-                "topic"
-              ]
-            }
-          ]
-        },
-        "fetchInterval": {
-          "type": "cds.Integer"
-        }
-      },
-      "$syntax": "projection"
-    },
-    "uni_li_wue.dw.service.KafkaPublishService.KPI_TIME_CONFIG": {
-      "kind": "entity",
-      "query": {
-        "SELECT": {
-          "from": {
-            "ref": [
-              "uni_li_wue.dw.KPI_TIME_CONFIG"
-            ]
-          }
-        }
-      },
-      "elements": {
-        "topic": {
-          "key": true,
-          "type": "cds.Association",
-          "target": "uni_li_wue.dw.service.KafkaPublishService.KPI_ENUM_STREAM_ENTRY",
-          "keys": [
-            {
-              "ref": [
-                "topic"
-              ]
-            }
-          ]
-        },
-        "viewInterval": {
-          "type": "cds.Integer"
         }
       },
       "$syntax": "projection"
@@ -2164,6 +2537,116 @@
       "@source": "srv/sac-consume-service.cds",
       "kind": "service"
     },
+    "uni_li_wue.dw.service.SACSlowLayerDataService.HEALTH_STATUS": {
+      "kind": "entity",
+      "@readonly": true,
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "uni_li_wue.dw.LOG_HEALTH_CHECK"
+            ]
+          },
+          "columns": [
+            {
+              "ref": [
+                "api"
+              ]
+            },
+            {
+              "ref": [
+                "timestamp"
+              ],
+              "as": "last_ping"
+            },
+            {
+              "xpr": [
+                "(",
+                "case",
+                "when",
+                {
+                  "func": "SECONDS_BETWEEN",
+                  "args": [
+                    {
+                      "ref": [
+                        "timestamp"
+                      ]
+                    },
+                    {
+                      "ref": [
+                        "$now"
+                      ]
+                    }
+                  ]
+                },
+                ">",
+                {
+                  "SELECT": {
+                    "from": {
+                      "ref": [
+                        "uni_li_wue.dw.API_CONFIG"
+                      ]
+                    },
+                    "columns": [
+                      {
+                        "func": "TO_INT",
+                        "args": [
+                          {
+                            "ref": [
+                              "value"
+                            ]
+                          }
+                        ],
+                        "as": "delta"
+                      }
+                    ],
+                    "where": [
+                      {
+                        "ref": [
+                          "name"
+                        ]
+                      },
+                      "=",
+                      {
+                        "val": "health_ping_interval"
+                      }
+                    ]
+                  }
+                },
+                "then",
+                {
+                  "val": "down"
+                },
+                "else",
+                {
+                  "val": "up"
+                },
+                "end",
+                ")"
+              ],
+              "as": "status",
+              "cast": {
+                "type": "cds.String"
+              }
+            }
+          ]
+        }
+      },
+      "elements": {
+        "api": {
+          "key": true,
+          "type": "cds.String"
+        },
+        "last_ping": {
+          "type": "cds.Timestamp"
+        },
+        "status": {
+          "@Core.Computed": true,
+          "type": "cds.String"
+        }
+      },
+      "$syntax": "entity"
+    },
     "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_B_SPECIAL_EVT": {
       "kind": "entity",
       "@readonly": true,
@@ -2195,6 +2678,41 @@
       },
       "$syntax": "projection"
     },
+    "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_CONFIG": {
+      "kind": "entity",
+      "@readonly": true,
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "uni_li_wue.dw.KPI_STREAM_TYPE_CONFIG"
+            ]
+          }
+        }
+      },
+      "elements": {
+        "topic": {
+          "key": true,
+          "type": "cds.String"
+        },
+        "aggregationInterval": {
+          "type": "cds.Integer"
+        },
+        "fetchInterval": {
+          "type": "cds.Integer"
+        },
+        "notificationStatisticalType": {
+          "type": "cds.String"
+        },
+        "notificationLowerTreshold": {
+          "type": "cds.Double"
+        },
+        "notificationUpperTreshold": {
+          "type": "cds.Double"
+        }
+      },
+      "$syntax": "projection"
+    },
     "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_ENUM_COINS": {
       "kind": "entity",
       "@readonly": true,
@@ -2202,7 +2720,7 @@
         "SELECT": {
           "from": {
             "ref": [
-              "uni_li_wue.dw.KPI_ENUM_COINS"
+              "uni_li_wue.dw.KPI_ENUM_COIN"
             ]
           }
         }
@@ -2229,7 +2747,7 @@
         "SELECT": {
           "from": {
             "ref": [
-              "uni_li_wue.dw.KPI_ENUM_EVENTS"
+              "uni_li_wue.dw.KPI_ENUM_EVENT"
             ]
           }
         }
@@ -2278,7 +2796,7 @@
         "SELECT": {
           "from": {
             "ref": [
-              "uni_li_wue.dw.KPI_ENUM_STOCK_MARKETS"
+              "uni_li_wue.dw.KPI_ENUM_STOCK_MARKET"
             ]
           }
         }
@@ -2298,55 +2816,31 @@
       },
       "$syntax": "projection"
     },
-    "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_ENUM_STREAM_ENTRY": {
+    "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_E_GASSTATION": {
       "kind": "entity",
       "@readonly": true,
       "query": {
         "SELECT": {
           "from": {
             "ref": [
-              "uni_li_wue.dw.KPI_ENUM_STREAM_ENTRY"
+              "uni_li_wue.dw.KPI_E_GASSTATION"
             ]
           }
         }
       },
       "elements": {
-        "topic": {
+        "timestamp": {
           "key": true,
-          "type": "cds.String"
+          "type": "cds.Timestamp"
         },
-        "timeCfg": {
-          "type": "cds.Association",
-          "target": "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_TIME_CONFIG",
-          "keys": [
-            {
-              "ref": [
-                "topic"
-              ]
-            }
-          ]
+        "safeGasPrice": {
+          "type": "cds.Double"
         },
-        "refreshCfg": {
-          "type": "cds.Association",
-          "target": "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_REFRESH_CONFIG",
-          "keys": [
-            {
-              "ref": [
-                "topic"
-              ]
-            }
-          ]
+        "blockNumber": {
+          "type": "cds.Double"
         },
-        "notificationCfg": {
-          "type": "cds.Association",
-          "target": "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_NOTIFICATION_CONFIG",
-          "keys": [
-            {
-              "ref": [
-                "topic"
-              ]
-            }
-          ]
+        "blockTime": {
+          "type": "cds.Double"
         }
       },
       "$syntax": "projection"
@@ -2396,11 +2890,25 @@
         },
         "coin": {
           "key": true,
+          "type": "cds.String",
+          "length": 3
+        },
+        "coinInfo": {
           "type": "cds.Association",
+          "cardinality": {
+            "max": 1
+          },
           "target": "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_ENUM_COINS",
-          "keys": [
+          "on": [
             {
               "ref": [
+                "coin"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "coinInfo",
                 "shortName"
               ]
             }
@@ -2434,11 +2942,25 @@
         },
         "coin": {
           "key": true,
+          "type": "cds.String",
+          "length": 3
+        },
+        "coinInfo": {
           "type": "cds.Association",
+          "cardinality": {
+            "max": 1
+          },
           "target": "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_ENUM_COINS",
-          "keys": [
+          "on": [
             {
               "ref": [
+                "coin"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "coinInfo",
                 "shortName"
               ]
             }
@@ -2480,11 +3002,25 @@
         },
         "coin": {
           "key": true,
+          "type": "cds.String",
+          "length": 3
+        },
+        "coinInfo": {
           "type": "cds.Association",
+          "cardinality": {
+            "max": 1
+          },
           "target": "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_ENUM_COINS",
-          "keys": [
+          "on": [
             {
               "ref": [
+                "coin"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "coinInfo",
                 "shortName"
               ]
             }
@@ -2515,29 +3051,40 @@
         },
         "coin": {
           "key": true,
-          "type": "cds.Association",
-          "target": "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_ENUM_COINS",
-          "keys": [
-            {
-              "ref": [
-                "shortName"
-              ]
-            }
-          ]
+          "type": "cds.String",
+          "length": 3
         },
-        "stockMarket": {
-          "key": true,
+        "coinInfo": {
           "type": "cds.Association",
-          "target": "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_ENUM_STOCK_MARKETS",
-          "keys": [
+          "cardinality": {
+            "max": 1
+          },
+          "target": "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_ENUM_COINS",
+          "on": [
             {
               "ref": [
+                "coin"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "coinInfo",
                 "shortName"
               ]
             }
           ]
         },
         "price": {
+          "type": "cds.Double"
+        },
+        "marketCap": {
+          "type": "cds.Double"
+        },
+        "volume24h": {
+          "type": "cds.Double"
+        },
+        "change24h": {
           "type": "cds.Double"
         }
       },
@@ -2562,11 +3109,25 @@
         },
         "coin": {
           "key": true,
+          "type": "cds.String",
+          "length": 3
+        },
+        "coinInfo": {
           "type": "cds.Association",
+          "cardinality": {
+            "max": 1
+          },
           "target": "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_ENUM_COINS",
-          "keys": [
+          "on": [
             {
               "ref": [
+                "coin"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "coinInfo",
                 "shortName"
               ]
             }
@@ -2626,11 +3187,25 @@
         },
         "coin": {
           "key": true,
+          "type": "cds.String",
+          "length": 3
+        },
+        "coinInfo": {
           "type": "cds.Association",
+          "cardinality": {
+            "max": 1
+          },
           "target": "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_ENUM_COINS",
-          "keys": [
+          "on": [
             {
               "ref": [
+                "coin"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "coinInfo",
                 "shortName"
               ]
             }
@@ -2664,11 +3239,25 @@
         },
         "coin": {
           "key": true,
+          "type": "cds.String",
+          "length": 3
+        },
+        "coinInfo": {
           "type": "cds.Association",
+          "cardinality": {
+            "max": 1
+          },
           "target": "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_ENUM_COINS",
-          "keys": [
+          "on": [
             {
               "ref": [
+                "coin"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "coinInfo",
                 "shortName"
               ]
             }
@@ -2705,11 +3294,25 @@
         },
         "coin": {
           "key": true,
+          "type": "cds.String",
+          "length": 3
+        },
+        "coinInfo": {
           "type": "cds.Association",
+          "cardinality": {
+            "max": 1
+          },
           "target": "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_ENUM_COINS",
-          "keys": [
+          "on": [
             {
               "ref": [
+                "coin"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "coinInfo",
                 "shortName"
               ]
             }
@@ -2727,105 +3330,6 @@
         "transactionHash": {
           "type": "cds.String",
           "length": 64
-        }
-      },
-      "$syntax": "projection"
-    },
-    "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_NOTIFICATION_CONFIG": {
-      "kind": "entity",
-      "@readonly": true,
-      "query": {
-        "SELECT": {
-          "from": {
-            "ref": [
-              "uni_li_wue.dw.KPI_NOTIFICATION_CONFIG"
-            ]
-          }
-        }
-      },
-      "elements": {
-        "topic": {
-          "key": true,
-          "type": "cds.Association",
-          "target": "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_ENUM_STREAM_ENTRY",
-          "keys": [
-            {
-              "ref": [
-                "topic"
-              ]
-            }
-          ]
-        },
-        "statisticalType": {
-          "type": "cds.String"
-        },
-        "lowerTreshold": {
-          "type": "cds.Double"
-        },
-        "upperTreshold": {
-          "type": "cds.Double"
-        }
-      },
-      "$syntax": "projection"
-    },
-    "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_REFRESH_CONFIG": {
-      "kind": "entity",
-      "@readonly": true,
-      "query": {
-        "SELECT": {
-          "from": {
-            "ref": [
-              "uni_li_wue.dw.KPI_REFRESH_CONFIG"
-            ]
-          }
-        }
-      },
-      "elements": {
-        "topic": {
-          "key": true,
-          "type": "cds.Association",
-          "target": "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_ENUM_STREAM_ENTRY",
-          "keys": [
-            {
-              "ref": [
-                "topic"
-              ]
-            }
-          ]
-        },
-        "fetchInterval": {
-          "type": "cds.Integer"
-        }
-      },
-      "$syntax": "projection"
-    },
-    "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_TIME_CONFIG": {
-      "kind": "entity",
-      "@readonly": true,
-      "query": {
-        "SELECT": {
-          "from": {
-            "ref": [
-              "uni_li_wue.dw.KPI_TIME_CONFIG"
-            ]
-          }
-        }
-      },
-      "elements": {
-        "topic": {
-          "key": true,
-          "type": "cds.Association",
-          "target": "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_ENUM_STREAM_ENTRY",
-          "keys": [
-            {
-              "ref": [
-                "topic"
-              ]
-            }
-          ]
-        },
-        "viewInterval": {
-          "type": "cds.Integer"
         }
       },
       "$syntax": "projection"
