@@ -38,8 +38,8 @@ class StocktwitsDataFetcher:
         try:
             KafkaConnector().send_to_kafka(self.kafka_topic, {
                 "timestamp": get_unix_timestamp(),
-                "BTC_sentiment_score": self.btc_score,
-                "ETH_sentiment_score": self.eth_score
+                "BTC_sentiment_score": "test",
+                "ETH_sentiment_score": "test"
             })
             print(self.btc_score)
             print(self.eth_score)
@@ -141,14 +141,14 @@ class StocktwitsDataFetcher:
                 self.list_ids_eth = list_ids
 
             sum_score += weighted_score
-        average_score = round(sum_score / length, 3)
+        #average_score = round(sum_score / length, 3)
         #print(list_ids)
         #print(complete_dataset[0]["id"])
         #print(complete_dataset)
         # Return of every element
         # for i in range(complete_dataset):
         # print(complete_dataset[i]["id"])
-        return average_score
+        #return average_score
 
     def sentiment_results(self, tickers):
         for ticker in tickers:
@@ -157,8 +157,8 @@ class StocktwitsDataFetcher:
     def get_data(self):
         #self.btc_score = self.get_average_sentiment_score('BTC.X')
         #self.eth_score = self.get_average_sentiment_score('ETH.X')
-        self.btc_score = self.get_data_line("BTC.X")
-        self.eth_score = self.get_data_line("ETH.X")
+        self.get_data_line("BTC.X")
+        self.get_data_line("ETH.X")
 
 
 StocktwitsDataFetcher()
