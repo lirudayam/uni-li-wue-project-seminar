@@ -1,17 +1,17 @@
+import json
 import logging
 import threading
+
+from requests import Session
+from requests.exceptions import ConnectionError, Timeout, TooManyRedirects
 
 from DWConfigs import DWConfigs
 from KafkaConnector import catch_request_error, get_unix_timestamp, KafkaConnector
 
-from requests import Session, Request
-from requests.exceptions import ConnectionError, Timeout, TooManyRedirects
-import json
-
 
 class ETHGasStationDataFetcher:
     fetcher_name = "Eth Gas Station Data Fetcher"
-    kafka_topic = "RAW_E_GasStation"
+    kafka_topic = "RAW_E_GASSTATION"
 
     def __init__(self):
         self.url = "https://ethgasstation.info/api/ethgasAPI.json"

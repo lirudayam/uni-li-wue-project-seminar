@@ -52,6 +52,8 @@ const asyncf = async () => {
     KPI_G_CREDITS,
     LOG_FETCH_ERROR,
     LOG_HEALTH_CHECK,
+    KPI_E_GASSTATION,
+    KPI_G_LATEST_BLOCK
   } = relevantServiceEntites;
 
   var oSimpleTopicMaps = {
@@ -229,15 +231,46 @@ const asyncf = async () => {
                 if (entry.timestamp) {
                   entry.timestamp = moment(entry.timestamp * 1000).format();
                 }
-                console.log("ADD entry");
-                console.log(entry);
-                console.log(topic);
+                
                 await srv.run(
                   INSERT.into(oSimpleTopicMaps[topic]).entries([entry])
                 );
               } catch (e) {
                 //console.error("Error has occurred", e);
               }
+            } else if (topic === 'RAW_E_GASSTATION' || topic === 'RAW_G_LATEST_BLOCK') {
+                let entry = JSON.parse(message.value.toString());
+                if (entry.timestamp) {
+                  entry.timestamp = moment(entry.timestamp * 1000).format();
+                }
+                switch (topic) {
+                  case 'RAW_G_LATEST_BLOCK':
+                    let entries = await srv.run(
+                      SELECT.from(KPI_G_LATEST_BLOCK).where({
+                        identifier: entry.identifier,
+                        coin: entry.coin
+                      })
+                    );
+                    if (entries.length === 0) {
+                      await srv.run(
+                        INSERT.into(KPI_G_LATEST_BLOCK).entries([entry])
+                      );
+                    }
+                    break;
+                  case 'RAW_E_GASSTATION':
+                  default:
+                    let entries = await srv.run(
+                      SELECT.from(KPI_E_GASSTATION).where({
+                        blockNumber: entry.blockNumber,
+                      })
+                    );
+                    if (entries.length === 0) {
+                      await srv.run(
+                        INSERT.into(KPI_E_GASSTATION).entries([entry])
+                      );
+                    }
+                    break;
+                }
             } else if (topic === "RAW_HEALTH_CHECKS") {
               try {
                 let api = message.value.toString().replace(/\"/g, "");

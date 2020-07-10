@@ -1126,6 +1126,59 @@
         }
       }
     },
+    "uni_li_wue.dw.KPI_G_LATEST_BLOCK": {
+      "kind": "entity",
+      "elements": {
+        "timestamp": {
+          "key": true,
+          "type": "cds.Timestamp"
+        },
+        "coin": {
+          "key": true,
+          "type": "cds.String",
+          "length": 3
+        },
+        "coinInfo": {
+          "type": "cds.Association",
+          "cardinality": {
+            "max": 1
+          },
+          "target": "uni_li_wue.dw.KPI_ENUM_COIN",
+          "on": [
+            {
+              "ref": [
+                "coin"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "coinInfo",
+                "shortName"
+              ]
+            }
+          ]
+        },
+        "identifier": {
+          "type": "cds.Integer"
+        },
+        "size": {
+          "type": "cds.Integer"
+        },
+        "difficulty": {
+          "type": "cds.Double"
+        },
+        "gasLimit": {
+          "type": "cds.Double"
+        },
+        "gasUsed": {
+          "type": "cds.Double"
+        },
+        "noOfTransactions": {
+          "type": "cds.Integer"
+        }
+      }
+    },
     "uni_li_wue.dw.KPI_G_NEWS": {
       "kind": "entity",
       "elements": {
@@ -2074,6 +2127,70 @@
       },
       "$syntax": "projection"
     },
+    "uni_li_wue.dw.service.KafkaPublishService.KPI_G_LATEST_BLOCK": {
+      "kind": "entity",
+      "@insertonly": true,
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "uni_li_wue.dw.KPI_G_LATEST_BLOCK"
+            ]
+          }
+        }
+      },
+      "elements": {
+        "timestamp": {
+          "key": true,
+          "type": "cds.Timestamp"
+        },
+        "coin": {
+          "key": true,
+          "type": "cds.String",
+          "length": 3
+        },
+        "coinInfo": {
+          "type": "cds.Association",
+          "cardinality": {
+            "max": 1
+          },
+          "target": "uni_li_wue.dw.service.KafkaPublishService.KPI_ENUM_COIN",
+          "on": [
+            {
+              "ref": [
+                "coin"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "coinInfo",
+                "shortName"
+              ]
+            }
+          ]
+        },
+        "identifier": {
+          "type": "cds.Integer"
+        },
+        "size": {
+          "type": "cds.Integer"
+        },
+        "difficulty": {
+          "type": "cds.Double"
+        },
+        "gasLimit": {
+          "type": "cds.Double"
+        },
+        "gasUsed": {
+          "type": "cds.Double"
+        },
+        "noOfTransactions": {
+          "type": "cds.Integer"
+        }
+      },
+      "$syntax": "projection"
+    },
     "uni_li_wue.dw.service.KafkaPublishService.KPI_G_NEWS": {
       "kind": "entity",
       "@insertonly": true,
@@ -2916,6 +3033,70 @@
         },
         "noOfCredits": {
           "type": "cds.Integer"
+        },
+        "noOfTransactions": {
+          "type": "cds.Integer"
+        }
+      },
+      "$syntax": "projection"
+    },
+    "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_G_LATEST_BLOCK": {
+      "kind": "entity",
+      "@readonly": true,
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "uni_li_wue.dw.KPI_G_LATEST_BLOCK"
+            ]
+          }
+        }
+      },
+      "elements": {
+        "timestamp": {
+          "key": true,
+          "type": "cds.Timestamp"
+        },
+        "coin": {
+          "key": true,
+          "type": "cds.String",
+          "length": 3
+        },
+        "coinInfo": {
+          "type": "cds.Association",
+          "cardinality": {
+            "max": 1
+          },
+          "target": "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_ENUM_COINS",
+          "on": [
+            {
+              "ref": [
+                "coin"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "coinInfo",
+                "shortName"
+              ]
+            }
+          ]
+        },
+        "identifier": {
+          "type": "cds.Integer"
+        },
+        "size": {
+          "type": "cds.Integer"
+        },
+        "difficulty": {
+          "type": "cds.Double"
+        },
+        "gasLimit": {
+          "type": "cds.Double"
+        },
+        "gasUsed": {
+          "type": "cds.Double"
         },
         "noOfTransactions": {
           "type": "cds.Integer"

@@ -32,6 +32,7 @@ service SACSlowLayerDataService {
   entity KPI_G_TRANSACT_INF @readonly as projection on dw.KPI_G_TRANSACT_INF;
   entity KPI_G_PRICE_VOLA @readonly as projection on dw.KPI_G_PRICE_VOLA;
   entity KPI_G_PRICES @readonly as projection on dw.KPI_G_PRICES;
+  entity KPI_G_LATEST_BLOCK @readonly as projection on dw.KPI_G_LATEST_BLOCK;
   entity KPI_E_GASSTATION @readonly as projection on dw.KPI_E_GASSTATION;
   entity KPI_B_SPECIAL_EVT @readonly as projection on dw.KPI_B_SPECIAL_EVT;
   

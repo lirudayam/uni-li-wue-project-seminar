@@ -117,6 +117,19 @@ entity KPI_G_PRICES {
 	change24h 		: Double;
 }
 
+entity KPI_G_LATEST_BLOCK {
+	key timestamp	: Timestamp;
+	key coin		: String(3);
+	coinInfo		: Association to one KPI_ENUM_COIN 
+						on coin = coinInfo.shortName;
+	identifier		: Integer;
+    size			: Integer;
+    difficulty		: Double;
+    gasLimit		: Double;
+    gasUsed			: Double;
+    noOfTransactions: Integer;
+}
+
 entity KPI_E_GASSTATION {
 	key timestamp	: Timestamp;
 	safeGasPrice	: Double;
