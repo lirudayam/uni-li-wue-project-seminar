@@ -21,11 +21,11 @@ In PyCharm: https://www.jetbrains.com/help/pycharm/set-up-a-git-repository.html
 
 ### Gesamt
 
-![High-Level Architektur](img/Detailed_Architecture.png)
+![High-Level Architektur](img/Technische_Architektur.svg)
 
 ### Data Fetcher
 
-![Data Fetcher Architektur](img/Data_Fetcher_Structure.png)
+![Data Fetcher Architektur](img/Data_Fetcher_Structure.svg)
 
 ## Repo-Struktur
 
