@@ -16,12 +16,12 @@ class StocktwitsDataFetcher:
     kafka_topic = "RAW_G_STOCKTWITS_FETCHER"
 
     def __init__(self):
-        self.trigger_health_pings()
-        self.process_data_fetch()
         self.list_ids_btc = []
         self.list_ids_eth = []
         self.complete_btcdataset = []
         self.complete_ethdataset = []
+        self.trigger_health_pings()
+        self.process_data_fetch()
         logging.info('Successful init')
 
     # Supporting methods
@@ -36,13 +36,33 @@ class StocktwitsDataFetcher:
     def process_data_fetch(self):
         self.get_data()
         try:
-            KafkaConnector().send_to_kafka(self.kafka_topic, {
-                "timestamp": get_unix_timestamp(),
-                "BTC_sentiment_score": "test",
-                "ETH_sentiment_score": "test"
-            })
-            print(self.btc_score)
-            print(self.eth_score)
+            for i in range(len(self.complete_btcdataset)):
+                KafkaConnector().send_to_kafka(self.kafka_topic, {
+                    "timestamp": get_unix_timestamp(),
+                    "msg_id": self.complete_btcdataset[i]["id"],
+                    "sentiment": self.complete_btcdataset[i]["sentiment"],
+                    "sentiment_score": self.complete_btcdataset[i]["msg_sentimentscore"],
+                    "weighted_score": self.complete_btcdataset[i]["weighted_score"],
+                    "symbol": "BTC"
+                })
+
+            for i in range(len(self.complete_ethdataset)):
+                KafkaConnector().send_to_kafka(self.kafka_topic, {
+                    "timestamp": get_unix_timestamp(),
+                    "msg_id": self.complete_ethdataset[i]["id"],
+                    "sentiment": self.complete_ethdataset[i]["sentiment"],
+                    "sentiment_score": self.complete_ethdataset[i]["msg_sentimentscore"],
+                    "weighted_score": self.complete_ethdataset[i]["weighted_score"],
+                    "symbol": "ETH"
+                })
+            print(self.complete_btcdataset[0]["id"])
+            print(self.complete_btcdataset[0]["sentiment"])
+            print(self.complete_btcdataset[0]["msg_sentimentscore"])
+            print(self.complete_btcdataset[0]["weighted_score"])
+            print(self.complete_ethdataset[0]["id"])
+            print(self.complete_ethdataset[0]["sentiment"])
+            print(self.complete_ethdataset[0]["msg_sentimentscore"])
+            print(self.complete_ethdataset[0]["weighted_score"])
         except:
             catch_request_error({
                 "error": "msg"
@@ -123,7 +143,9 @@ class StocktwitsDataFetcher:
 
             if message['id'] in copy_list_ids:
                 print("nope")
+                #not in
             else:
+                #print("yep")
                 list_ids.append(message['id'])
                 # Dictionary befüllen --> jeder Datensatz der 30
                 dataset["id"] = message['id']
@@ -140,15 +162,12 @@ class StocktwitsDataFetcher:
                 self.complete_ethdataset = complete_dataset
                 self.list_ids_eth = list_ids
 
-            sum_score += weighted_score
-        #average_score = round(sum_score / length, 3)
         #print(list_ids)
         #print(complete_dataset[0]["id"])
         #print(complete_dataset)
         # Return of every element
         # for i in range(complete_dataset):
         # print(complete_dataset[i]["id"])
-        #return average_score
 
     def sentiment_results(self, tickers):
         for ticker in tickers:
