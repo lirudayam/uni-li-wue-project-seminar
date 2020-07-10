@@ -2,7 +2,7 @@ class DWConfigs:
     class __DWConfigs:
         def __init__(self):
             # in seconds
-            self.fetch_interval = 10.0
+            self.fetch_interval = 300.0
             self.aggregation_interval = 60.0
             self.health_ping_interval = 60.0
 
