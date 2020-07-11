@@ -1,0 +1,15 @@
+{
+    "name": "jobserver",
+    "version": "0.0.1",
+    "description": "",
+    "author": "",
+    "private": true,
+    "scripts": {
+        "start": "node server.js"
+    },
+    "dependencies": {
+        "@sap/xsenv": "^2.2.0",
+        "@sap/hana-client": "^2.4.196",
+        "express": "^4.17.1"
+    }
+}

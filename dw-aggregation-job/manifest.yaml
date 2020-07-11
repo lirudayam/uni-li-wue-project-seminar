@@ -1,0 +1,7 @@
+applications:
+  - name: uni-li-wue-dw-jobserver
+    memory: 256M
+    buildpack: nodejs_buildpack
+    services:
+      - uni-li-wue-dw-xsuaa
+      - uni-li-wue-dw-cloud-db
