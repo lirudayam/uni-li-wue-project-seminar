@@ -240,12 +240,14 @@ const asyncf = async () => {
               }
             } else if (topic === 'RAW_E_GASSTATION' || topic === 'RAW_G_LATEST_BLOCK') {
                 let entry = JSON.parse(message.value.toString());
+                let entries = null;
                 if (entry.timestamp) {
                   entry.timestamp = moment(entry.timestamp * 1000).format();
                 }
+                
                 switch (topic) {
                   case 'RAW_G_LATEST_BLOCK':
-                    let entries = await srv.run(
+                    entries = await srv.run(
                       SELECT.from(KPI_G_LATEST_BLOCK).where({
                         identifier: entry.identifier,
                         coin: entry.coin
@@ -259,7 +261,7 @@ const asyncf = async () => {
                     break;
                   case 'RAW_E_GASSTATION':
                   default:
-                    let entries = await srv.run(
+                    entries = await srv.run(
                       SELECT.from(KPI_E_GASSTATION).where({
                         blockNumber: entry.blockNumber,
                       })
@@ -275,7 +277,7 @@ const asyncf = async () => {
               try {
                 let api = message.value.toString().replace(/\"/g, "");
 
-                let entries = await srv.run(
+                entries = await srv.run(
                   SELECT.from(LOG_HEALTH_CHECK).where({
                     api: api,
                   })

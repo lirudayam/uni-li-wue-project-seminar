@@ -43,19 +43,19 @@ entity API_CONFIG {
 /* Logs */
 entity LOG_HEALTH_CHECK {
 	key api		: String;
-	timestamp	: Timestamp;
+	timestamp	: DateTime;
 }
 
 entity LOG_FETCH_ERROR {
 	key api		: String;
 	message	    : String;
-	timestamp	: Timestamp;
+	timestamp	: DateTime;
 }
 
 
 /* KPI Entites */
 entity KPI_G_RICH_ACC {
-	key timestamp	: Timestamp;
+	key timestamp	: DateTime;
 	key coin		: String(3);
 	coinInfo		: Association to one KPI_ENUM_COIN 
 						on coin = coinInfo.shortName;
@@ -64,7 +64,7 @@ entity KPI_G_RICH_ACC {
 }
 
 entity KPI_G_T_PER_TIME {
-	key timestamp	: Timestamp;
+	key timestamp	: DateTime;
 	key coin		: String(3);
 	coinInfo		: Association to one KPI_ENUM_COIN 
 						on coin = coinInfo.shortName;
@@ -75,13 +75,13 @@ entity KPI_G_T_PER_TIME {
 }
 
 entity KPI_E_SMART_EXEC {
-	key timestamp	: Timestamp;
+	key timestamp	: DateTime;
 	contractAddress	: String;
 	count			: Integer;
 }
 
 entity KPI_G_N_PER_TIME {
-	key timestamp	: Timestamp;
+	key timestamp	: DateTime;
 	key coin		: String(3);
 	coinInfo		: Association to one KPI_ENUM_COIN 
 						on coin = coinInfo.shortName;
@@ -89,7 +89,7 @@ entity KPI_G_N_PER_TIME {
 }
 
 entity KPI_G_TRANSACT_INF {
-	key timestamp			: Timestamp;
+	key timestamp			: DateTime;
 	key coin				: String(3);
 	coinInfo				: Association to one KPI_ENUM_COIN 
 								on coin = coinInfo.shortName;
@@ -99,7 +99,7 @@ entity KPI_G_TRANSACT_INF {
 }
 
 entity KPI_G_PRICE_VOLA {
-	key timestamp		: Timestamp;
+	key timestamp		: DateTime;
 	key coin			: String(3);
 	coinInfo			: Association to one KPI_ENUM_COIN 
 							on coin = coinInfo.shortName;
@@ -107,7 +107,7 @@ entity KPI_G_PRICE_VOLA {
 }
 
 entity KPI_G_PRICES {
-	key timestamp	: Timestamp;
+	key timestamp	: DateTime;
 	key coin		: String(3);
 	coinInfo		: Association to one KPI_ENUM_COIN 
 						on coin = coinInfo.shortName;
@@ -118,7 +118,7 @@ entity KPI_G_PRICES {
 }
 
 entity KPI_G_LATEST_BLOCK {
-	key timestamp	: Timestamp;
+	key timestamp	: DateTime;
 	key coin		: String(3);
 	coinInfo		: Association to one KPI_ENUM_COIN 
 						on coin = coinInfo.shortName;
@@ -131,38 +131,49 @@ entity KPI_G_LATEST_BLOCK {
 }
 
 entity KPI_E_GASSTATION {
-	key timestamp	: Timestamp;
+	key timestamp	: DateTime;
 	safeGasPrice	: Double;
 	blockNumber		: Double;
 	blockTime 		: Double;
 }
 
 entity KPI_B_SPECIAL_EVT {
-	key timestamp	: Timestamp;
+	key timestamp	: DateTime;
 	event			: Association to KPI_ENUM_EVENT;
 }
 
 entity KPI_G_NEWS {
-	key timestamp	: Timestamp;
+	timestamp		: DateTime;
+	key msgId		: Integer;
 	key coin		: String(3);
 	coinInfo		: Association to one KPI_ENUM_COIN 
 						on coin = coinInfo.shortName;
 	url				: String;
 	sentiment		: Association to KPI_ENUM_SEMANTICS;
+	sentimentScore 	: Double;
+    weightedScore	: Double;
 }
 
 entity KPI_G_RECOMM {
-	key timestamp	: Timestamp;
+	key timestamp	: DateTime;
 	token			: String;
 	score			: Decimal;
 	price			: Decimal;
 }
 
 entity KPI_G_CREDITS {
-	key timestamp	: Timestamp;
+	key timestamp	: DateTime;
 	key coin		: String(3);
 	coinInfo		: Association to one KPI_ENUM_COIN 
 						on coin = coinInfo.shortName;
 	noOfCredits		: Integer;
 	noOfTransactions: Integer;
 }
+
+view KPI_AGGREGATE_REQUIRED as
+  select from KPI_STREAM_TYPE_CONFIG
+  {
+    key KPI_STREAM_TYPE_CONFIG.topic as topic,
+	KPI_STREAM_TYPE_CONFIG.aggregationInterval as aggregationInterval
+  }
+  where aggregationInterval != fetchInterval;

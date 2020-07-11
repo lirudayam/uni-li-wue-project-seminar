@@ -1,2 +1,3 @@
 NAME,VALUE
 health_ping_interval,60
+aggregation_delay,86400

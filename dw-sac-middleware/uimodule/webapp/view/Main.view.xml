@@ -9,8 +9,8 @@
             <items>
               <VBox width="100%" direction="Column" class="sapUiSmallPadding">
                 <items>
-                  <Title text="Health Checks" />
-                  <Text text="abc" id="text2"/>
+                  <Title text="{i18n>healthStatus}" />
+                  <Text text="{i18n>healthStatusDetails}"/>
                   <Table noDataText="Drop column list items here and columns in the area above" items="{configuration>/HEALTH_STATUS}">
                     <items>
                       <ColumnListItem type="Active">
@@ -22,19 +22,19 @@
                       </ColumnListItem>
                     </items>
                     <columns>
-                      <Column id="column0">
+                      <Column>
                         <header>
-                          <Label text="API" id="label0"/>
+                          <Label text="{i18n>dataFetcher}" />
                         </header>
                       </Column>
-                      <Column id="column1">
+                      <Column>
                         <header>
-                          <Label text="Last Active" id="label1"/>
+                          <Label text="{i18n>lastPing}" />
                         </header>
                       </Column>
-                      <Column id="column2">
+                      <Column>
                         <header>
-                          <Label text="Status" id="label2"/>
+                          <Label text="{i18n>status}" />
                         </header>
                       </Column>
                     </columns>
@@ -42,7 +42,30 @@
                 </items>
               </VBox>
               <VBox width="100%" direction="Column" class="sapUiSmallPadding">
-              
+              <Title text="{i18n>generalAPIConfig}" />
+                  <Text text="{i18n>generalAPIConfigDetails}"/>
+                  <Table noDataText="Drop column list items here and columns in the area above" items="{configuration>/API_CONFIG}">
+                    <items>
+                      <ColumnListItem type="Active">
+                        <cells>
+                          <Text text="{configuration>name}"/>
+                          <Text text="{configuration>value}"/>
+                        </cells>
+                      </ColumnListItem>
+                    </items>
+                    <columns>
+                      <Column>
+                        <header>
+                          <Label text="{i18n>key}" />
+                        </header>
+                      </Column>
+                      <Column>
+                        <header>
+                          <Label text="{i18n>value}" />
+                        </header>
+                      </Column>
+                    </columns>
+                  </Table>
               </VBox>
             </items>
           </HBox>
