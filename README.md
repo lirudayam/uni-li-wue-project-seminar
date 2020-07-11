@@ -32,3 +32,4 @@ In PyCharm: https://www.jetbrains.com/help/pycharm/set-up-a-git-repository.html
 - data-fetcher: alle Data-Fetchers inklusive Hilfsklassen
 - dw-kafka-processor: Modul, um Kafka auszulesen und ins Data Warehouse zu schreiben
 - dw-sac-middleware: Modul, um mit der SAP Analytics Cloud zu kommunizieren
+- dw-aggregation-job: Modul, ob historische Daten im Data Warehouse zu aggregieren
