@@ -49,14 +49,15 @@ class InfuraDataFetcher:
             self.web3 = False
 
     def register_listener_for_new_block(self):
-        block_filter = w3.eth.filter('latest')
-        loop = asyncio.get_event_loop()
-        try:
-            loop.run_until_complete(
-                asyncio.gather(
-                    self.log_loop(block_filter, 2)))
-        finally:
-            loop.close()
+        self.handle_new_block()
+        #block_filter = w3.eth.filter('latest')
+        #loop = asyncio.get_event_loop()
+        #try:
+        #    loop.run_until_complete(
+        #        asyncio.gather(
+        #            self.log_loop(block_filter, 2)))
+        #finally:
+        #    loop.close()
 
     async def log_loop(self, event_filter, poll_interval):
         while True:
@@ -89,5 +90,9 @@ class InfuraDataFetcher:
                 "noOfTransactions": len(latest_block["transactions"])
             })
             self.latest_identifier = latest_block['number']
+
+        s = threading.Timer(DWConfigs().get_fetch_interval(self.kafka_topic),
+                            self.handle_new_block, [], {})
+        s.start()
 
 InfuraDataFetcher()

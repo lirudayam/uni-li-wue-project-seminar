@@ -8,7 +8,7 @@ import re
 from DWConfigs import DWConfigs
 from KafkaConnector import catch_request_error, get_unix_timestamp, KafkaConnector
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
-#nltk.downloader.download('vader_lexicon')
+nltk.downloader.download('vader_lexicon')
 
 
 class StocktwitsDataFetcher:
@@ -39,30 +39,22 @@ class StocktwitsDataFetcher:
             for i in range(len(self.complete_btcdataset)):
                 KafkaConnector().send_to_kafka(self.kafka_topic, {
                     "timestamp": get_unix_timestamp(),
-                    "msg_id": self.complete_btcdataset[i]["id"],
+                    "msgId": self.complete_btcdataset[i]["id"],
                     "sentiment": self.complete_btcdataset[i]["sentiment"],
-                    "sentiment_score": self.complete_btcdataset[i]["msg_sentimentscore"],
-                    "weighted_score": self.complete_btcdataset[i]["weighted_score"],
-                    "symbol": "BTC"
+                    "sentimentScore": self.complete_btcdataset[i]["msg_sentimentscore"],
+                    "weightedScore": self.complete_btcdataset[i]["weighted_score"],
+                    "coin": "BTC"
                 })
 
             for i in range(len(self.complete_ethdataset)):
                 KafkaConnector().send_to_kafka(self.kafka_topic, {
                     "timestamp": get_unix_timestamp(),
-                    "msg_id": self.complete_ethdataset[i]["id"],
+                    "msgId": self.complete_ethdataset[i]["id"],
                     "sentiment": self.complete_ethdataset[i]["sentiment"],
-                    "sentiment_score": self.complete_ethdataset[i]["msg_sentimentscore"],
-                    "weighted_score": self.complete_ethdataset[i]["weighted_score"],
-                    "symbol": "ETH"
+                    "sentimentScore": self.complete_ethdataset[i]["msg_sentimentscore"],
+                    "weightedScore": self.complete_ethdataset[i]["weighted_score"],
+                    "coin": "ETH"
                 })
-            print(self.complete_btcdataset[0]["id"])
-            print(self.complete_btcdataset[0]["sentiment"])
-            print(self.complete_btcdataset[0]["msg_sentimentscore"])
-            print(self.complete_btcdataset[0]["weighted_score"])
-            print(self.complete_ethdataset[0]["id"])
-            print(self.complete_ethdataset[0]["sentiment"])
-            print(self.complete_ethdataset[0]["msg_sentimentscore"])
-            print(self.complete_ethdataset[0]["weighted_score"])
         except:
             catch_request_error({
                 "error": "msg"
