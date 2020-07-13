@@ -1,11 +1,13 @@
 import json
 import logging
+import sys
 import threading
 
 from requests import Session
 from requests.exceptions import ConnectionError, Timeout, TooManyRedirects
 
 from DWConfigs import DWConfigs
+from ErrorTypes import ErrorTypes
 from KafkaConnector import catch_request_error, get_unix_timestamp, KafkaConnector
 
 
@@ -46,7 +48,8 @@ class ETHGasStationDataFetcher:
         try:
             KafkaConnector().send_to_kafka(self.kafka_topic, {
                 "timestamp": get_unix_timestamp(),
-                "safeGasPrice": self.output["safeLow"],  #this unit divided by 10 = Gwei (Gwei to Ether = divide by 10^9) --> then convert to USD according to current rate
+                "safeGasPrice": self.output["safeLow"],
+                # this unit divided by 10 = Gwei (Gwei to Ether = divide by 10^9) --> then convert to USD according to current rate
                 "blockNumber": self.output["blockNum"],
                 "blockTime": self.output["block_time"]
             })
@@ -58,9 +61,9 @@ class ETHGasStationDataFetcher:
             })
         except:
             catch_request_error({
-                "error": "ERROR"
-            })
-
+                "type": ErrorTypes.FETCH_ERROR,
+                "error": sys.exc_info()[0]
+            }, self.kafka_topic)
 
         s = threading.Timer(DWConfigs().get_fetch_interval(self.kafka_topic), self.process_data_fetch, [], {})
         s.start()

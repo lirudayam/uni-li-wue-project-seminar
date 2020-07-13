@@ -44,8 +44,10 @@ def get_unix_timestamp():
     return int(time.time())
 
 
-def catch_request_error(error):
+def catch_request_error(error, kafka_topic):
     logging.error('Error while fetching', exc_info=error)
+    error['topic'] = kafka_topic
+    error['timestamp'] = get_unix_timestamp()
     KafkaConnector().forward_error(error)
 
 

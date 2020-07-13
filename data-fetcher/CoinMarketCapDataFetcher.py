@@ -1,7 +1,9 @@
 import logging
+import sys
 import threading
 
 from DWConfigs import DWConfigs
+from ErrorTypes import ErrorTypes
 from KafkaConnector import catch_request_error, get_unix_timestamp, KafkaConnector
 
 from requests import Session, Request
@@ -9,9 +11,10 @@ from requests.exceptions import ConnectionError, Timeout, TooManyRedirects
 import json
 
 headers = {
-  'Accepts': 'application/json',
-  'X-CMC_PRO_API_KEY': 'ef16ee68-9b87-48f2-9287-4e0899ff6d07',
+    'Accepts': 'application/json',
+    'X-CMC_PRO_API_KEY': 'ef16ee68-9b87-48f2-9287-4e0899ff6d07',
 }
+
 
 class CoinMarketCapDataFetcher:
     fetcher_name = "CoinMarketCap Data Fetcher"
@@ -52,7 +55,6 @@ class CoinMarketCapDataFetcher:
         except (ConnectionError, Timeout, TooManyRedirects) as e:
             print(e)
 
-
     def process_data_fetch(self):
         self.get_data_from_coinmarketcap()
         try:
@@ -85,9 +87,9 @@ class CoinMarketCapDataFetcher:
             })
         except:
             catch_request_error({
-                "error": "ERROR"
-            })
-
+                "type": ErrorTypes.FETCH_ERROR,
+                "error": sys.exc_info()[0]
+            }, self.kafka_topic)
 
         s = threading.Timer(DWConfigs().get_fetch_interval(self.kafka_topic), self.process_data_fetch, [], {})
         s.start()

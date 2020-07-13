@@ -10,6 +10,7 @@ while (( "$#" )); do
   mkdir "tmp_deploy/${FILE_TO_BE_DEPLOYED}"
   cp DWConfigs.py "tmp_deploy/${FILE_TO_BE_DEPLOYED}"
   cp KafkaConnector.py "tmp_deploy/${FILE_TO_BE_DEPLOYED}"
+  cp ErrorTypes.py "tmp_deploy/${FILE_TO_BE_DEPLOYED}"
   cp setup.py tmp_deploy/
   SCRIPT_FILE="${FILE_TO_BE_DEPLOYED}"
   SCRIPT_FILE+="DataFetcher.py"
@@ -39,7 +40,7 @@ EOT
 
   echo "Insert password for VM to install:"
   ssh -p 64526 pjs@wrzh020.rzhousing.uni-wuerzburg.de /bin/bash << EOF
-    pkill -f "${DIST}"
+    ps ax | grep "${DIST}" | grep -v grep | awk '{print $1}' | xargs kill
     cd python_fetchers
     tar -xvzf "${DIST}"
     cd "${FOLDER_NAME}"
@@ -53,3 +54,5 @@ EOF
   rm -r tmp_deploy
 shift
 done
+
+exit

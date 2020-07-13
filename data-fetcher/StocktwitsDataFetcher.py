@@ -1,4 +1,5 @@
 import logging
+import sys
 import threading
 import nltk
 import requests
@@ -6,6 +7,7 @@ import json
 import re
 
 from DWConfigs import DWConfigs
+from ErrorTypes import ErrorTypes
 from KafkaConnector import catch_request_error, get_unix_timestamp, KafkaConnector
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 nltk.downloader.download('vader_lexicon')
@@ -57,8 +59,9 @@ class StocktwitsDataFetcher:
                 })
         except:
             catch_request_error({
-                "error": "msg"
-            })
+                "type": ErrorTypes.FETCH_ERROR,
+                "error": sys.exc_info()[0]
+            }, self.kafka_topic)
 
         s = threading.Timer(DWConfigs().get_fetch_interval(self.kafka_topic), self.process_data_fetch, [], {})
         s.start()

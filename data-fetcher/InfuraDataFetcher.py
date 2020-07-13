@@ -4,6 +4,7 @@ import os
 import threading
 
 from DWConfigs import DWConfigs
+from ErrorTypes import ErrorTypes
 from KafkaConnector import KafkaConnector, catch_request_error, get_unix_timestamp
 
 os.environ["WEB3_INFURA_PROJECT_ID"] = "37e2249c8d5e41488a9fa7b67b7335b3"
@@ -45,7 +46,10 @@ class InfuraDataFetcher:
         if self.web3.isConnected():
             return self.web3
         else:
-            catch_request_error("No connection")
+            catch_request_error({
+                "type": ErrorTypes.GENERAL_ERROR,
+                "error": "No Connection anymore"
+            }, self.kafka_topic)
             self.web3 = False
 
     def register_listener_for_new_block(self):
