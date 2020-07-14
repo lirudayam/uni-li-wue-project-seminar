@@ -77,17 +77,6 @@ class CoinMarketCapDataFetcher:
                 "volume24h": self.Ethereum["USD"]["volume_24h"],
                 "change24h": self.Ethereum["USD"]["percent_change_24h"]
             })
-            print({
-                "timestamp": get_unix_timestamp(),
-                "BitcoinPrice": self.Bitcoin["USD"]["price"],
-                "EthereumPrice": self.Ethereum["USD"]["price"],
-                "BitcoinMarketCap": self.Bitcoin["USD"]["market_cap"],
-                "EthereumMarketCap": self.Ethereum["USD"]["market_cap"],
-                "BitcoinVolume24h": self.Bitcoin["USD"]["volume_24h"],
-                "EthereumVolume24h": self.Ethereum["USD"]["volume_24h"],
-                "BitcoinChange24h": self.Bitcoin["USD"]["percent_change_24h"],
-                "EthereumChange24h": self.Ethereum["USD"]["percent_change_24h"]
-            })
         except:
             catch_request_error({
                 "type": ErrorTypes.FETCH_ERROR,

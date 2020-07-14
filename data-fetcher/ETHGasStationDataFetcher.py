@@ -2,6 +2,7 @@ import json
 import logging
 import sys
 import threading
+from json import JSONDecodeError
 
 from requests import Session
 from requests.exceptions import ConnectionError, Timeout, TooManyRedirects
@@ -42,6 +43,11 @@ class ETHGasStationDataFetcher:
                 "type": ErrorTypes.API_LIMIT_EXCEED,
                 "error": e
             }, self.kafka_topic)
+        except (TypeError, JSONDecodeError) as e:
+            catch_request_error({
+                "type": ErrorTypes.FETCH_ERROR,
+                "error": e
+            }, self.kafka_topic)
 
     def process_data_fetch(self):
         self.get_data_from_gasstation()
@@ -50,12 +56,6 @@ class ETHGasStationDataFetcher:
                 "timestamp": get_unix_timestamp(),
                 "safeGasPrice": self.request_output["safeLow"],
                 # this unit divided by 10 = Gwei (Gwei to Ether = divide by 10^9) --> then convert to USD according to current rate
-                "blockNumber": self.request_output["blockNum"],
-                "blockTime": self.request_output["block_time"]
-            })
-            print({
-                "timestamp": get_unix_timestamp(),
-                "safeGasPrice": self.request_output["safeLow"],
                 "blockNumber": self.request_output["blockNum"],
                 "blockTime": self.request_output["block_time"]
             })

@@ -33,7 +33,7 @@ class DWConfigs:
             'RAW_G_NEWS': 60,
             'RAW_G_RECOMM': 3600,
             'RAW_G_CREDITS': 3600,
-            'RAW_E_GASSTATION': 5
+            'RAW_E_GASSTATION': 12
         }
 
         return switcher.get(topic, self.fetch_interval)

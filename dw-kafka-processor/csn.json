@@ -1267,19 +1267,8 @@
             }
           ]
         },
-        "url": {
-          "type": "cds.String"
-        },
         "sentiment": {
-          "type": "cds.Association",
-          "target": "uni_li_wue.dw.KPI_ENUM_SEMANTICS",
-          "keys": [
-            {
-              "ref": [
-                "scoreName"
-              ]
-            }
-          ]
+          "type": "cds.Integer"
         },
         "sentimentScore": {
           "type": "cds.Double"
@@ -2296,19 +2285,8 @@
             }
           ]
         },
-        "url": {
-          "type": "cds.String"
-        },
         "sentiment": {
-          "type": "cds.Association",
-          "target": "uni_li_wue.dw.service.KafkaPublishService.KPI_ENUM_SEMANTICS",
-          "keys": [
-            {
-              "ref": [
-                "scoreName"
-              ]
-            }
-          ]
+          "type": "cds.Integer"
         },
         "sentimentScore": {
           "type": "cds.Double"
@@ -3218,19 +3196,8 @@
             }
           ]
         },
-        "url": {
-          "type": "cds.String"
-        },
         "sentiment": {
-          "type": "cds.Association",
-          "target": "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_ENUM_SEMANTICS",
-          "keys": [
-            {
-              "ref": [
-                "scoreName"
-              ]
-            }
-          ]
+          "type": "cds.Integer"
         },
         "sentimentScore": {
           "type": "cds.Double"

@@ -29,8 +29,13 @@ class KafkaConnector:
         return getattr(self.instance, name)
 
     def send_to_kafka(self, topic, dict_elm):
-        self.producer.send(topic, dict_elm).add_callback(on_send_success).add_errback(on_send_error)
-        self.producer.flush()
+        try:
+            self.producer.send(topic, dict_elm).add_callback(on_send_success).add_errback(on_send_error)
+            self.producer.flush()
+        except:
+            self.forward_error({
+                "error": "Failed to send to Kafka"
+            })
 
     def forward_error(self, error):
         self.producer.send('RAW_FETCH_ERRORS', error).add_callback(on_send_success).add_errback(on_send_error)
