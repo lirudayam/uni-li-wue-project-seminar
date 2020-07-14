@@ -3307,7 +3307,7 @@
     },
     "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_G_NODE_DISTRIBUTION": {
       "kind": "entity",
-      "@insertonly": true,
+      "@readonly": true,
       "query": {
         "SELECT": {
           "from": {
