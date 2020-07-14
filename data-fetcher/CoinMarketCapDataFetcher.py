@@ -53,7 +53,10 @@ class CoinMarketCapDataFetcher:
             self.Ethereum = self.EthereumRaw["quote"]
 
         except (ConnectionError, Timeout, TooManyRedirects) as e:
-            print(e)
+            catch_request_error({
+                "type": ErrorTypes.API_LIMIT_EXCEED,
+                "error": e
+            }, self.kafka_topic)
 
     def process_data_fetch(self):
         self.get_data_from_coinmarketcap()

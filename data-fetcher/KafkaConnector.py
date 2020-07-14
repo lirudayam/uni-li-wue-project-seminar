@@ -6,6 +6,7 @@ import time
 from kafka import KafkaProducer
 
 os.environ["KAFKA_BOOTSTRAP_SERVER"] = '132.187.226.20:9092'
+logging.basicConfig(filename='output.log', level=logging.ERROR)
 
 
 # Singleton class for handling any connection and sending to Kafka
