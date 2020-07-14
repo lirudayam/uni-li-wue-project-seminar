@@ -153,6 +153,15 @@ entity KPI_G_NEWS {
     weightedScore	: Double;
 }
 
+entity KPI_G_NODE_DISTRIBUTION {
+	key timestamp	: DateTime;
+	key country		: String(3);
+	key coin		: String(3);
+	coinInfo		: Association to one KPI_ENUM_COIN 
+						on coin = coinInfo.shortName;
+	nodes			: Integer;	
+}
+
 entity KPI_G_RECOMM {
 	key timestamp	: DateTime;
 	token			: String;

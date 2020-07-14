@@ -27,6 +27,7 @@ service KafkaPublishService {
   entity KPI_G_LATEST_BLOCK as projection on dw.KPI_G_LATEST_BLOCK;
   entity KPI_E_GASSTATION as projection on dw.KPI_E_GASSTATION;
   entity KPI_B_SPECIAL_EVT @insertonly as projection on dw.KPI_B_SPECIAL_EVT;
+  entity KPI_G_NODE_DISTRIBUTION @insertonly as projection on dw.KPI_G_NODE_DISTRIBUTION;
   
   entity KPI_G_NEWS @insertonly as projection on dw.KPI_G_NEWS;
   entity KPI_G_RECOMM @insertonly as projection on dw.KPI_G_RECOMM;

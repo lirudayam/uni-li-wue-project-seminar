@@ -39,8 +39,9 @@ EOT
   scp -P 64526 "${DIST}" pjs@wrzh020.rzhousing.uni-wuerzburg.de:/home/pjs/python_fetchers
 
   echo "Insert password for VM to install:"
+  #ps ax | grep "${DIST}" | grep -v grep | awk '{print $1}' | xargs kill
   ssh -p 64526 pjs@wrzh020.rzhousing.uni-wuerzburg.de /bin/bash << EOF
-    ps ax | grep "${DIST}" | grep -v grep | awk '{print $1}' | xargs kill
+
     cd python_fetchers
     tar -xvzf "${DIST}"
     cd "${FOLDER_NAME}"

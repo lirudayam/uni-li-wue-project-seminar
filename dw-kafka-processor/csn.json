@@ -1278,6 +1278,49 @@
         }
       }
     },
+    "uni_li_wue.dw.KPI_G_NODE_DISTRIBUTION": {
+      "kind": "entity",
+      "elements": {
+        "timestamp": {
+          "key": true,
+          "type": "cds.DateTime"
+        },
+        "country": {
+          "key": true,
+          "type": "cds.String",
+          "length": 3
+        },
+        "coin": {
+          "key": true,
+          "type": "cds.String",
+          "length": 3
+        },
+        "coinInfo": {
+          "type": "cds.Association",
+          "cardinality": {
+            "max": 1
+          },
+          "target": "uni_li_wue.dw.KPI_ENUM_COIN",
+          "on": [
+            {
+              "ref": [
+                "coin"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "coinInfo",
+                "shortName"
+              ]
+            }
+          ]
+        },
+        "nodes": {
+          "type": "cds.Integer"
+        }
+      }
+    },
     "uni_li_wue.dw.KPI_G_N_PER_TIME": {
       "kind": "entity",
       "elements": {
@@ -2297,6 +2340,60 @@
       },
       "$syntax": "projection"
     },
+    "uni_li_wue.dw.service.KafkaPublishService.KPI_G_NODE_DISTRIBUTION": {
+      "kind": "entity",
+      "@insertonly": true,
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "uni_li_wue.dw.KPI_G_NODE_DISTRIBUTION"
+            ]
+          }
+        }
+      },
+      "elements": {
+        "timestamp": {
+          "key": true,
+          "type": "cds.DateTime"
+        },
+        "country": {
+          "key": true,
+          "type": "cds.String",
+          "length": 3
+        },
+        "coin": {
+          "key": true,
+          "type": "cds.String",
+          "length": 3
+        },
+        "coinInfo": {
+          "type": "cds.Association",
+          "cardinality": {
+            "max": 1
+          },
+          "target": "uni_li_wue.dw.service.KafkaPublishService.KPI_ENUM_COIN",
+          "on": [
+            {
+              "ref": [
+                "coin"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "coinInfo",
+                "shortName"
+              ]
+            }
+          ]
+        },
+        "nodes": {
+          "type": "cds.Integer"
+        }
+      },
+      "$syntax": "projection"
+    },
     "uni_li_wue.dw.service.KafkaPublishService.KPI_G_N_PER_TIME": {
       "kind": "entity",
       "@insertonly": true,
@@ -3204,6 +3301,60 @@
         },
         "weightedScore": {
           "type": "cds.Double"
+        }
+      },
+      "$syntax": "projection"
+    },
+    "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_G_NODE_DISTRIBUTION": {
+      "kind": "entity",
+      "@insertonly": true,
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "uni_li_wue.dw.KPI_G_NODE_DISTRIBUTION"
+            ]
+          }
+        }
+      },
+      "elements": {
+        "timestamp": {
+          "key": true,
+          "type": "cds.DateTime"
+        },
+        "country": {
+          "key": true,
+          "type": "cds.String",
+          "length": 3
+        },
+        "coin": {
+          "key": true,
+          "type": "cds.String",
+          "length": 3
+        },
+        "coinInfo": {
+          "type": "cds.Association",
+          "cardinality": {
+            "max": 1
+          },
+          "target": "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_ENUM_COINS",
+          "on": [
+            {
+              "ref": [
+                "coin"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "coinInfo",
+                "shortName"
+              ]
+            }
+          ]
+        },
+        "nodes": {
+          "type": "cds.Integer"
         }
       },
       "$syntax": "projection"

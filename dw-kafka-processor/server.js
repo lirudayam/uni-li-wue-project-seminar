@@ -48,6 +48,7 @@ const asyncf = async () => {
     KPI_G_PRICES,
     KPI_B_SPECIAL_EVT,
     KPI_G_NEWS,
+    KPI_G_NODE_DISTRIBUTION,
     KPI_G_RECOMM,
     KPI_G_CREDITS,
     LOG_FETCH_ERROR,
@@ -238,10 +239,11 @@ const asyncf = async () => {
               }
             } else if (
               topic === "RAW_E_GASSTATION" ||
-              topic === "RAW_G_LATEST_BLOCK"
+              topic === "RAW_G_LATEST_BLOCK" ||
+              topic === "RAW_G_NODE_DISTRIBUTION"
             ) {
               let entry = JSON.parse(message.value.toString());
-              let entries = null;
+              let entries;
               if (entry.timestamp) {
                 entry.timestamp = moment(entry.timestamp * 1000).format();
               }
@@ -257,6 +259,29 @@ const asyncf = async () => {
                   if (entries.length === 0) {
                     srv.run(INSERT.into(KPI_G_LATEST_BLOCK).entries([entry]));
                   }
+                  break;
+                case "RAW_G_NODE_DISTRIBUTION":
+                  Object.keys(entry.countries).forEach((country) => {
+                    srv.run(
+                      INSERT.into(KPI_G_NODE_DISTRIBUTION).entries([
+                        {
+                          timestamp: entry.timestamp,
+                          coin: entry.coin,
+                          country: country,
+                          nodes: parseInt(entry.countries[country]),
+                        },
+                      ])
+                    );
+                  });
+                  srv.run(
+                    INSERT.into(KPI_G_N_PER_TIME).entries([
+                      {
+                        timestamp: entry.timestamp,
+                        coin: entry.coin,
+                        numOfNodes: parseInt(entry.nodeCount),
+                      },
+                    ])
+                  );
                   break;
                 case "RAW_E_GASSTATION":
                 default:
