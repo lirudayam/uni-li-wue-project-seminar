@@ -148,8 +148,7 @@ entity KPI_G_NEWS {
 	key coin		: String(3);
 	coinInfo		: Association to one KPI_ENUM_COIN 
 						on coin = coinInfo.shortName;
-	url				: String;
-	sentiment		: Association to KPI_ENUM_SEMANTICS;
+	sentiment		: Integer;
 	sentimentScore 	: Double;
     weightedScore	: Double;
 }

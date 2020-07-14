@@ -10,7 +10,7 @@ from DWConfigs import DWConfigs
 from ErrorTypes import ErrorTypes
 from KafkaConnector import catch_request_error, get_unix_timestamp, KafkaConnector
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
-nltk.downloader.download('vader_lexicon')
+#nltk.downloader.download('vader_lexicon')
 
 
 class StocktwitsDataFetcher:
@@ -132,7 +132,6 @@ class StocktwitsDataFetcher:
             text = self.clean_message(message['body'])
             sent = self.sentiment(message)
             sentiment_score = self.sentiment_analysis_score(text)
-
             # calculate the weighted score
             weighted_score = (sent + sentiment_score) / 2
 
@@ -169,8 +168,6 @@ class StocktwitsDataFetcher:
             print(self.get_average_sentiment_score(ticker))
 
     def get_data(self):
-        #self.btc_score = self.get_average_sentiment_score('BTC.X')
-        #self.eth_score = self.get_average_sentiment_score('ETH.X')
         self.get_data_line("BTC.X")
         self.get_data_line("ETH.X")
 

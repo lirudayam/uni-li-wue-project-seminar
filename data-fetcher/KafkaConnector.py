@@ -6,6 +6,7 @@ import time
 from kafka import KafkaProducer
 
 os.environ["KAFKA_BOOTSTRAP_SERVER"] = '132.187.226.20:9092'
+logging.basicConfig(filename='output.log', level=logging.ERROR)
 
 
 # Singleton class for handling any connection and sending to Kafka
@@ -28,8 +29,13 @@ class KafkaConnector:
         return getattr(self.instance, name)
 
     def send_to_kafka(self, topic, dict_elm):
-        self.producer.send(topic, dict_elm).add_callback(on_send_success).add_errback(on_send_error)
-        self.producer.flush()
+        try:
+            self.producer.send(topic, dict_elm).add_callback(on_send_success).add_errback(on_send_error)
+            self.producer.flush()
+        except:
+            self.forward_error({
+                "error": "Failed to send to Kafka"
+            })
 
     def forward_error(self, error):
         self.producer.send('RAW_FETCH_ERRORS', error).add_callback(on_send_success).add_errback(on_send_error)
