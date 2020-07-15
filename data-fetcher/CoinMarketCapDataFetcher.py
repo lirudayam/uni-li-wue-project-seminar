@@ -1,18 +1,19 @@
+import json
 import logging
 import sys
 import threading
 
+from requests import Session
+from requests.exceptions import ConnectionError, Timeout, TooManyRedirects
+
 from DWConfigs import DWConfigs
 from ErrorTypes import ErrorTypes
+from HashiVaultCredentialStorage import HashiVaultCredentialStorage
 from KafkaConnector import catch_request_error, get_unix_timestamp, KafkaConnector
-
-from requests import Session, Request
-from requests.exceptions import ConnectionError, Timeout, TooManyRedirects
-import json
 
 headers = {
     'Accepts': 'application/json',
-    'X-CMC_PRO_API_KEY': 'ef16ee68-9b87-48f2-9287-4e0899ff6d07',
+    'X-CMC_PRO_API_KEY': HashiVaultCredentialStorage().get_credentials("CoinMarketCap", "X-CMC_PRO_API_KEY")[0]
 }
 
 

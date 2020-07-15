@@ -114,3 +114,4 @@ dw-sac-middleware/Makefile*
 workspace.code-workspace
 
 *.DS_Store
+vault-token.txt

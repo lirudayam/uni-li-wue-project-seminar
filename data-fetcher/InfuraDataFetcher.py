@@ -5,9 +5,10 @@ import threading
 
 from DWConfigs import DWConfigs
 from ErrorTypes import ErrorTypes
+from HashiVaultCredentialStorage import HashiVaultCredentialStorage
 from KafkaConnector import KafkaConnector, catch_request_error, get_unix_timestamp
 
-os.environ["WEB3_INFURA_PROJECT_ID"] = "37e2249c8d5e41488a9fa7b67b7335b3"
+os.environ["WEB3_INFURA_PROJECT_ID"] = HashiVaultCredentialStorage().get_credentials("Infura", "WEB3_INFURA_PROJECT_ID")[0]
 
 from web3 import Web3
 from web3.auto.infura import w3
@@ -19,7 +20,8 @@ class InfuraDataFetcher:
     kafka_topic = "RAW_G_LATEST_BLOCK"
 
     def __init__(self):
-        self.url = "wss://mainnet.infura.io/ws/v3/37e2249c8d5e41488a9fa7b67b7335b3"
+        self.url = "wss://mainnet.infura.io/ws/v3/" + HashiVaultCredentialStorage().get_credentials("Infura",
+                                                                                                    "WEB3_INFURA_PROJECT_ID")[0]
         self.web3 = False
 
         self.trigger_health_pings()
@@ -54,13 +56,13 @@ class InfuraDataFetcher:
 
     def register_listener_for_new_block(self):
         self.handle_new_block()
-        #block_filter = w3.eth.filter('latest')
-        #loop = asyncio.get_event_loop()
-        #try:
+        # block_filter = w3.eth.filter('latest')
+        # loop = asyncio.get_event_loop()
+        # try:
         #    loop.run_until_complete(
         #        asyncio.gather(
         #            self.log_loop(block_filter, 2)))
-        #finally:
+        # finally:
         #    loop.close()
 
     async def log_loop(self, event_filter, poll_interval):
@@ -98,5 +100,6 @@ class InfuraDataFetcher:
         s = threading.Timer(DWConfigs().get_fetch_interval(self.kafka_topic),
                             self.handle_new_block, [], {})
         s.start()
+
 
 InfuraDataFetcher()
