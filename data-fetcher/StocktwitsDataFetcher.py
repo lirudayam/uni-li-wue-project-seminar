@@ -135,11 +135,8 @@ class StocktwitsDataFetcher:
             # calculate the weighted score
             weighted_score = (sent + sentiment_score) / 2
 
-            if message['id'] in copy_list_ids:
-                print("nope")
-                #not in
-            else:
-                #print("yep")
+            if message['id'] not in copy_list_ids:
+                # print("yep")
                 list_ids.append(message['id'])
                 # Dictionary befüllen --> jeder Datensatz der 30
                 dataset["id"] = message['id']
@@ -148,13 +145,17 @@ class StocktwitsDataFetcher:
                 dataset["weighted_score"] = weighted_score
                 # Enter dataset into the whole collection
                 complete_dataset.append(dataset)
+            else:
+                print("nope")
+                #check whether deletion of list is accurate
 
-            if ticker == "BTC.X":
-                self.complete_btcdataset = complete_dataset
-                self.list_ids_btc = list_ids
-            elif ticker == "ETH.X":
-                self.complete_ethdataset = complete_dataset
-                self.list_ids_eth = list_ids
+        #if within for or not - to be checked
+        if ticker == "BTC.X":
+            self.complete_btcdataset = complete_dataset
+            self.list_ids_btc = list_ids
+        elif ticker == "ETH.X":
+            self.complete_ethdataset = complete_dataset
+            self.list_ids_eth = list_ids
 
         #print(list_ids)
         #print(complete_dataset[0]["id"])
