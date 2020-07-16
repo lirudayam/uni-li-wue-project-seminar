@@ -1,7 +1,10 @@
+import logging
 import os
 
 import hvac
 from hvac.exceptions import InvalidPath
+
+logging.basicConfig(filename='output.log', level=logging.ERROR)
 
 
 class HashiVaultCredentialStorage:
@@ -28,4 +31,3 @@ class HashiVaultCredentialStorage:
             except InvalidPath as e:
                 print("Couldn't read path", e)
                 return None
-

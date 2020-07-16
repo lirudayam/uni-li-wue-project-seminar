@@ -11,11 +11,6 @@ from ErrorTypes import ErrorTypes
 from HashiVaultCredentialStorage import HashiVaultCredentialStorage
 from KafkaConnector import catch_request_error, get_unix_timestamp, KafkaConnector
 
-headers = {
-    'Accepts': 'application/json',
-    'X-CMC_PRO_API_KEY': HashiVaultCredentialStorage().get_credentials("CoinMarketCap", "X-CMC_PRO_API_KEY")[0]
-}
-
 
 class CoinMarketCapDataFetcher:
     fetcher_name = "CoinMarketCap Data Fetcher"
@@ -25,7 +20,10 @@ class CoinMarketCapDataFetcher:
         self.url = 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest'
         self.parameters = {'slug': "bitcoin,ethereum"}
         self.session = Session()
-        self.session.headers.update(headers)
+        self.session.headers.update({
+            'Accepts': 'application/json',
+            'X-CMC_PRO_API_KEY': HashiVaultCredentialStorage().get_credentials("CoinMarketCap", "X-CMC_PRO_API_KEY")[0]
+        })
         self.trigger_health_pings()
         self.process_data_fetch()
         self.output = None

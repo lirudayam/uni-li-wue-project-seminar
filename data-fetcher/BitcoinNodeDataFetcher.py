@@ -13,7 +13,6 @@ headers = {
     'Accept': 'application/json; indent=4',
 }
 
-
 class BitcoinNodeDataFetcher:
     fetcher_name = "Bitcoin Node Data Fetcher"
     kafka_topic = "RAW_G_NODE_DISTRIBUTION"
@@ -21,7 +20,7 @@ class BitcoinNodeDataFetcher:
     def __init__(self):
         self.trigger_health_pings()
         self.process_data_fetch()
-        self.response_list = None
+        self.response = None
         self.node_list = None
         self.only_nodes = None
         self.node_count = None
@@ -40,8 +39,19 @@ class BitcoinNodeDataFetcher:
 
     def request_data_from_bitcoinnode(self):
         try:
-            self.response_list = requests.get("https://bitnodes.io/api/v1/snapshots/latest/", headers=headers)
-            self.node_list = self.response_list.json()
+            self.response = requests.get("https://bitnodes.io/api/v1/snapshots/latest/", headers=headers)
+            if self.response.status_code != 200:
+                try:
+                    snapshot_request = requests.get("https://bitnodes.io/api/v1/snapshots/", headers=headers)
+                    latest_snapshot_url = snapshot_request.json()["results"][0]["url"]
+                    self.response = requests.get(latest_snapshot_url, headers=headers)
+                except:
+                    catch_request_error({
+                        "type": ErrorTypes.FETCH_ERROR,
+                        "error": "No snapshot available"
+                    }, self.kafka_topic)
+
+            self.node_list = self.response.json()
             self.only_nodes = self.node_list["nodes"]
             # return node count and corresponding timestamp
             self.node_count = self.node_list["total_nodes"]
@@ -70,11 +80,6 @@ class BitcoinNodeDataFetcher:
                 "nodeCount": self.node_count,
                 "countries": self.countries_nodes,
                 "coin": 'BTC'
-            })
-            print({
-                "timestamp": self.timestamp,
-                "nodeCount": self.node_count,
-                "countries": self.countries_nodes
             })
         except:
             catch_request_error({

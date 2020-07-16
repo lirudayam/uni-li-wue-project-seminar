@@ -2,8 +2,6 @@ echo "Installing Tools"
 pip3 install wheel
 pip3 install setuptools
 
-#FILE_TO_BE_DEPLOYED=$1
-
 while (( "$#" )); do
   FILE_TO_BE_DEPLOYED=$1
   mkdir "tmp_deploy"
@@ -43,10 +41,12 @@ EOT
   #ps ax | grep "${DIST}" | grep -v grep | awk '{print $1}' | xargs kill
   ssh -p 64526 pjs@wrzh020.rzhousing.uni-wuerzburg.de /bin/bash << EOF
     cd python_fetchers
+    kill $(ps aux | grep "${FOLDER_NAME}" | awk '{print $2}')
     tar -xvzf "${DIST}"
     cd "${FOLDER_NAME}"
     echo $DIST
     cd "${FILE_TO_BE_DEPLOYED}"
+
     bash -c "exec -a ${DIST} python3 ${FILE_TO_BE_DEPLOYED}DataFetcher.py" &
     
     cd ../..
