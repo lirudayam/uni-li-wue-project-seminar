@@ -2,6 +2,7 @@ import json
 import logging
 import os
 import time
+from json.decoder import JSONDecodeError
 
 from kafka import KafkaProducer
 
@@ -32,7 +33,7 @@ class KafkaConnector:
         try:
             self.producer.send(topic, dict_elm).add_callback(on_send_success).add_errback(on_send_error)
             self.producer.flush()
-        except:
+        except JSONDecodeError as e:
             self.forward_error({
                 "error": "Failed to send to Kafka"
             })

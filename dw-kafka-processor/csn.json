@@ -1025,6 +1025,30 @@
       },
       "$syntax": "view"
     },
+    "uni_li_wue.dw.KPI_B_BLOCK": {
+      "kind": "entity",
+      "elements": {
+        "timestamp": {
+          "key": true,
+          "type": "cds.DateTime"
+        },
+        "blockTime": {
+          "type": "cds.Double"
+        },
+        "nextRetarget": {
+          "type": "cds.Double"
+        },
+        "difficulty": {
+          "type": "cds.Double"
+        },
+        "estimatedSent": {
+          "type": "cds.Double"
+        },
+        "minersRevenue": {
+          "type": "cds.Double"
+        }
+      }
+    },
     "uni_li_wue.dw.KPI_B_SPECIAL_EVT": {
       "kind": "entity",
       "elements": {
@@ -1944,6 +1968,40 @@
     "uni_li_wue.dw.service.KafkaPublishService": {
       "@source": "srv/kafka-publish-service.cds",
       "kind": "service"
+    },
+    "uni_li_wue.dw.service.KafkaPublishService.KPI_B_BLOCK": {
+      "kind": "entity",
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "uni_li_wue.dw.KPI_B_BLOCK"
+            ]
+          }
+        }
+      },
+      "elements": {
+        "timestamp": {
+          "key": true,
+          "type": "cds.DateTime"
+        },
+        "blockTime": {
+          "type": "cds.Double"
+        },
+        "nextRetarget": {
+          "type": "cds.Double"
+        },
+        "difficulty": {
+          "type": "cds.Double"
+        },
+        "estimatedSent": {
+          "type": "cds.Double"
+        },
+        "minersRevenue": {
+          "type": "cds.Double"
+        }
+      },
+      "$syntax": "projection"
     },
     "uni_li_wue.dw.service.KafkaPublishService.KPI_B_SPECIAL_EVT": {
       "kind": "entity",
@@ -2906,6 +2964,41 @@
         }
       },
       "$syntax": "entity"
+    },
+    "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_B_BLOCK": {
+      "kind": "entity",
+      "@readonly": true,
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "uni_li_wue.dw.KPI_B_BLOCK"
+            ]
+          }
+        }
+      },
+      "elements": {
+        "timestamp": {
+          "key": true,
+          "type": "cds.DateTime"
+        },
+        "blockTime": {
+          "type": "cds.Double"
+        },
+        "nextRetarget": {
+          "type": "cds.Double"
+        },
+        "difficulty": {
+          "type": "cds.Double"
+        },
+        "estimatedSent": {
+          "type": "cds.Double"
+        },
+        "minersRevenue": {
+          "type": "cds.Double"
+        }
+      },
+      "$syntax": "projection"
     },
     "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_B_SPECIAL_EVT": {
       "kind": "entity",

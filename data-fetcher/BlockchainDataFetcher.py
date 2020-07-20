@@ -2,26 +2,26 @@ import logging
 import threading
 
 from DWConfigs import DWConfigs
+from ErrorTypes import ErrorTypes
+from HashiVaultCredentialStorage import HashiVaultCredentialStorage
 from KafkaConnector import catch_request_error, get_unix_timestamp, KafkaConnector
 
 from requests import Session, Request
 from requests.exceptions import ConnectionError, Timeout, TooManyRedirects
 import json
 
-headers = {
-  'Accepts': 'application/json',
-  'X-CMC_PRO_API_KEY': '0ef3ae36-7d23-4451-b552-4e0108c1a9a9',
-}
-
 
 class BlockchainDataFetcher:
     fetcher_name = "BlockchainCom Data Fetcher"
-    kafka_topic = "RAW_G_BLOCK_STATS"
+    kafka_topic = "RAW_B_BLOCK"
 
     def __init__(self):
         self.url = 'https://api.blockchain.info/stats'
         self.session = Session()
-        self.session.headers.update(headers)
+        self.session.headers.update({
+            'Accepts': 'application/json',
+            'X-CMC_PRO_API_KEY': HashiVaultCredentialStorage().get_credentials("Bitcoin", "X-CMC_PRO_API_KEY")[0]
+        })
         self.trigger_health_pings()
         self.process_data_fetch()
         self.output = None
@@ -41,7 +41,10 @@ class BlockchainDataFetcher:
             response = self.session.get(self.url)
             self.output = json.loads(response.text)
         except (ConnectionError, Timeout, TooManyRedirects) as e:
-            print(e)
+            catch_request_error({
+                "type": ErrorTypes.API_LIMIT_EXCEED,
+                "error": e
+            }, self.kafka_topic)
 
 
     def process_data_fetch(self):
@@ -49,12 +52,11 @@ class BlockchainDataFetcher:
         try:
             KafkaConnector().send_to_kafka(self.kafka_topic, {
                 "timestamp": get_unix_timestamp(),
-                "coin": "BTC",
-                "blocktime": self.output['minutes_between_blocks'],
-                "nextretarget": self.output['nextretarget'],
+                "blockTime": self.output['minutes_between_blocks'],
+                "nextRetarget": self.output['nextretarget'],
                 "difficulty": self.output['difficulty'],
-                "estimated_btc_sent": self.output['estimated_btc_sent'],
-                "miners_revenue_btc": self.output['miners_revenue_btc'],
+                "estimatedSent": self.output['estimated_btc_sent'],
+                "minersRevenue": self.output['miners_revenue_btc'],
             })
             print({
                 "timestamp": get_unix_timestamp(),

@@ -34,7 +34,8 @@ class DWConfigs:
             'RAW_G_RECOMM': 3600,
             'RAW_G_CREDITS': 3600,
             'RAW_E_GASSTATION': 12,
-            'RAW_G_NODE_DISTRIBUTION': 7200
+            'RAW_G_NODE_DISTRIBUTION': 7200,
+            'RAW_B_BLOCK': 180
         }
 
         return switcher.get(topic, self.fetch_interval)

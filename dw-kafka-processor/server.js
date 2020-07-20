@@ -55,6 +55,7 @@ const asyncf = async () => {
     LOG_HEALTH_CHECK,
     KPI_E_GASSTATION,
     KPI_G_LATEST_BLOCK,
+    KPI_B_BLOCK
   } = relevantServiceEntites;
 
   var oSimpleTopicMaps = {
@@ -72,6 +73,8 @@ const asyncf = async () => {
     RAW_G_STOCKTWITS_FETCHER: KPI_G_NEWS,
     RAW_G_RECOMM: KPI_G_RECOMM,
     RAW_G_CREDITS: KPI_G_CREDITS,
+
+    RAW_B_BLOCK: KPI_B_BLOCK
   };
 
   const socketAliveTime = 60 * 60 * 1000;
