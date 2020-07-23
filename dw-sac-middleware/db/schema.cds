@@ -108,7 +108,10 @@ entity KPI_G_PRICE_VOLA {
     key coin            : String(3);
         coinInfo        : Association to one KPI_ENUM_COIN
                               on coin = coinInfo.shortName;
-        priceVolatility : Double;
+    key stockMarket     : String(3);
+        stockInfo       : Association to one KPI_ENUM_STOCK_MARKET
+                              on stockMarket = stockInfo.shortName;
+        price : Double;
 }
 
 entity KPI_G_PRICES {

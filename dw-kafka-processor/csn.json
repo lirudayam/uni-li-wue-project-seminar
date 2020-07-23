@@ -1463,7 +1463,33 @@
             }
           ]
         },
-        "priceVolatility": {
+        "stockMarket": {
+          "key": true,
+          "type": "cds.String",
+          "length": 3
+        },
+        "stockInfo": {
+          "type": "cds.Association",
+          "cardinality": {
+            "max": 1
+          },
+          "target": "uni_li_wue.dw.KPI_ENUM_STOCK_MARKET",
+          "on": [
+            {
+              "ref": [
+                "stockMarket"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "stockInfo",
+                "shortName"
+              ]
+            }
+          ]
+        },
+        "price": {
           "type": "cds.Double"
         }
       }
@@ -2602,7 +2628,33 @@
             }
           ]
         },
-        "priceVolatility": {
+        "stockMarket": {
+          "key": true,
+          "type": "cds.String",
+          "length": 3
+        },
+        "stockInfo": {
+          "type": "cds.Association",
+          "cardinality": {
+            "max": 1
+          },
+          "target": "uni_li_wue.dw.service.KafkaPublishService.KPI_ENUM_STOCK_MARKET",
+          "on": [
+            {
+              "ref": [
+                "stockMarket"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "stockInfo",
+                "shortName"
+              ]
+            }
+          ]
+        },
+        "price": {
           "type": "cds.Double"
         }
       },
@@ -3559,6 +3611,111 @@
       },
       "$syntax": "projection"
     },
+    "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_G_PRICE_DIFF": {
+      "kind": "entity",
+      "@readonly": true,
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "uni_li_wue.dw.KPI_G_PRICE_VOLA"
+            ]
+          },
+          "columns": [
+            {
+              "key": true,
+              "ref": [
+                "timestamp"
+              ]
+            },
+            {
+              "key": true,
+              "ref": [
+                "coin"
+              ]
+            },
+            {
+              "func": "MIN",
+              "args": [
+                {
+                  "ref": [
+                    "price"
+                  ]
+                }
+              ],
+              "as": "Minimum",
+              "cast": {
+                "type": "cds.Double"
+              }
+            },
+            {
+              "func": "MAX",
+              "args": [
+                {
+                  "ref": [
+                    "price"
+                  ]
+                }
+              ],
+              "as": "Maximum",
+              "cast": {
+                "type": "cds.Double"
+              }
+            },
+            {
+              "func": "AVG",
+              "args": [
+                {
+                  "ref": [
+                    "price"
+                  ]
+                }
+              ],
+              "as": "Average",
+              "cast": {
+                "type": "cds.Double"
+              }
+            }
+          ],
+          "groupBy": [
+            {
+              "ref": [
+                "timestamp"
+              ]
+            },
+            {
+              "ref": [
+                "coin"
+              ]
+            }
+          ]
+        }
+      },
+      "elements": {
+        "timestamp": {
+          "key": true,
+          "type": "cds.DateTime"
+        },
+        "coin": {
+          "key": true,
+          "type": "cds.String",
+          "length": 3
+        },
+        "Minimum": {
+          "@Core.Computed": true,
+          "type": "cds.Double"
+        },
+        "Maximum": {
+          "@Core.Computed": true,
+          "type": "cds.Double"
+        },
+        "Average": {
+          "@Core.Computed": true,
+          "type": "cds.Double"
+        }
+      },
+      "$syntax": "entity"
+    },
     "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_G_PRICE_VOLA": {
       "kind": "entity",
       "@readonly": true,
@@ -3602,7 +3759,33 @@
             }
           ]
         },
-        "priceVolatility": {
+        "stockMarket": {
+          "key": true,
+          "type": "cds.String",
+          "length": 3
+        },
+        "stockInfo": {
+          "type": "cds.Association",
+          "cardinality": {
+            "max": 1
+          },
+          "target": "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_ENUM_STOCK_MARKETS",
+          "on": [
+            {
+              "ref": [
+                "stockMarket"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "stockInfo",
+                "shortName"
+              ]
+            }
+          ]
+        },
+        "price": {
           "type": "cds.Double"
         }
       },

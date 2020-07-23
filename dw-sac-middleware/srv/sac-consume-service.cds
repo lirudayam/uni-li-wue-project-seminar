@@ -31,6 +31,7 @@ service SACSlowLayerDataService {
   entity KPI_G_N_PER_TIME @readonly as projection on dw.KPI_G_N_PER_TIME;
   entity KPI_G_TRANSACT_INF @readonly as projection on dw.KPI_G_TRANSACT_INF;
   entity KPI_G_PRICE_VOLA @readonly as projection on dw.KPI_G_PRICE_VOLA;
+  entity KPI_G_PRICE_DIFF @readonly as select key timestamp, key coin, MIN(price) as Minimum: Double, MAX(price) as Maximum: Double, AVG(price) as Average: Double from dw.KPI_G_PRICE_VOLA group by timestamp, coin;
   entity KPI_G_PRICES @readonly as projection on dw.KPI_G_PRICES;
   entity KPI_G_LATEST_BLOCK @readonly as projection on dw.KPI_G_LATEST_BLOCK;
   entity KPI_E_GASSTATION @readonly as projection on dw.KPI_E_GASSTATION;
