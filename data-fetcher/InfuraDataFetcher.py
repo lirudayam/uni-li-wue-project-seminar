@@ -77,7 +77,6 @@ class InfuraDataFetcher:
         if self.latest_identifier != latest_block['number']:
             KafkaConnector().send_to_kafka(self.kafka_topic, {
                 "timestamp": get_unix_timestamp(),
-                "coin": "ETH",
                 "identifier": latest_block['number'],
                 "size": latest_block['size'],
                 "difficulty": latest_block['difficulty'],
@@ -85,16 +84,7 @@ class InfuraDataFetcher:
                 "gasUsed": latest_block['gasUsed'],
                 "noOfTransactions": len(latest_block["transactions"])
             })
-            print({
-                "timestamp": get_unix_timestamp(),
-                "coin": "ETH",
-                "identifier": latest_block['number'],
-                "size": latest_block['size'],
-                "difficulty": latest_block['difficulty'],
-                "gasLimit": latest_block['gasLimit'],
-                "gasUsed": latest_block['gasUsed'],
-                "noOfTransactions": len(latest_block["transactions"])
-            })
+            print(latest_block['number'])
             self.latest_identifier = latest_block['number']
 
         s = threading.Timer(DWConfigs().get_fetch_interval(self.kafka_topic),

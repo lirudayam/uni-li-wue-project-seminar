@@ -30,7 +30,7 @@ service SACSlowLayerDataService {
   entity KPI_G_PRICE_VOLA @readonly as projection on dw.KPI_G_PRICE_VOLA;
   entity KPI_G_PRICE_DIFF @readonly as select key timestamp, key coin, MIN(price) as Minimum: Double, MAX(price) as Maximum: Double, AVG(price) as Average: Double from dw.KPI_G_PRICE_VOLA group by timestamp, coin;
   entity KPI_G_PRICES @readonly as projection on dw.KPI_G_PRICES;
-  entity KPI_E_BLOCK @readonly as select * from dw.KPI_E_BLOCK inner join dw.KPI_E_EXT_GASSTATION on identifier = blockNumber;
+  entity KPI_E_BLOCK @readonly as select key identifier, timestamp, size, difficulty, gasLimit, gasUsed, safeGasPrice, blockTime, noOfTransactions from dw.KPI_E_BLOCK inner join dw.KPI_E_EXT_GASSTATION on identifier = blockNumber;
   entity KPI_B_BLOCK @readonly as projection on dw.KPI_B_BLOCK;
   entity KPI_B_SPECIAL_EVT @readonly as projection on dw.KPI_B_SPECIAL_EVT;
   entity KPI_G_NODE_DISTRIBUTION @readonly as projection on dw.KPI_G_NODE_DISTRIBUTION;

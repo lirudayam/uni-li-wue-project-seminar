@@ -9,7 +9,8 @@ service KafkaPublishService {
   entity KPI_ENUM_EVENT @readonly as projection on dw.KPI_ENUM_EVENT;
   
 /* configs tables */
-  entity KPI_CONFIG as projection on dw.KPI_STREAM_TYPE_CONFIG;
+  entity KPI_CONFIG @readonly as projection on dw.KPI_STREAM_TYPE_CONFIG;
+  entity API_CONFIG @readonly as projection on dw.API_CONFIG;
 
 /* logs tables */
   entity LOG_HEALTH_CHECK as projection on dw.LOG_HEALTH_CHECK;

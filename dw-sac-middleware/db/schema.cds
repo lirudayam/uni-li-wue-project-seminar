@@ -100,9 +100,6 @@ entity KPI_G_PRICES {
 
 entity KPI_E_BLOCK {
     key timestamp        : DateTime;
-    key coin             : String(3);
-        coinInfo         : Association to one KPI_ENUM_COIN
-                               on coin = coinInfo.shortName;
         identifier       : Integer;
         size             : Integer;
         difficulty       : Double;
