@@ -29,7 +29,7 @@ app.listen(port, function () {
 
 async function findAndAggregateData() {
     const schema = db.getSchema();
-    const selectSQL = `SELECT * FROM ${schema}.UNI_LI_WUE_DW_KPI_AGGREGATE_REQUIRED`;
+    const selectSQL = `SELECT * FROM ${schema}.UNI_LI_WUE_DW_KPI_STREAM_TYPE_CONFIG`;
     const selectAggregationSQL = `SELECT * FROM ${schema}.UNI_LI_WUE_DW_API_CONFIG WHERE Name = 'aggregation_delay'`;
 
     let selectStmt, updateStmt, insertStmt;
@@ -48,71 +48,64 @@ async function findAndAggregateData() {
         selectStmt = conn.prepare(selectAggregationSQL);
         const iAggregationDelay = selectStmt.exec([])[0].VALUE;
 
+        const oAggregationsFormula = {
+            KPI_G_PRICE_VOLA: {
+                select: "MIN(Timestamp) as Timestamp, Coin, StockMarket, AVG(Price) as Price",
+                fields: ["Timestamp", "Coin", "StockMarket", "Price"],
+                groupBy: ", Coin, StockMarket"
+            },
+            KPI_G_PRICES: {
+                select: "MIN(Timestamp) as Timestamp, Coin, AVG(Price) as Price, AVG(MarketCap) as MarketCap, AVG(volume24h) as volume24h, AVG(change24h) as change24h",
+                fields: ["Timestamp", "Coin", "Price", "MarketCap", "Volume24h", "Change24h"],
+                groupBy: ", Coin"
+            },
+            KPI_E_BLOCK: {
+                select: "MIN(Timestamp) as Timestamp, MIN(identifier) as identifier, AVG(Size) as Size, AVG(difficulty) as difficulty, AVG(gasLimit) as gasLimit, AVG(gasUsed) as gasUsed, CEIL(AVG(noOfTransactions)) as noOfTransactions",
+                fields: ["Timestamp", "identifier", "size", "difficulty", "gasLimit", "gasUsed", "noOfTransactions"],
+                groupBy: ""
+            },
+            KPI_B_BLOCK: {
+                select: "MIN(Timestamp) as Timestamp, AVG(blockTime) as blockTime, AVG(nextRetarget) as nextRetarget, AVG(difficulty) as difficulty, AVG(estimatedSent) as estimatedSent, AVG(minersRevenue) as minersRevenue",
+                fields: ["Timestamp", "blockTime", "nextRetarget", "difficulty", "estimatedSent", "minersRevenue"],
+                groupBy: ""
+            },
+            KPI_G_NODE_DISTRIBUTION: {
+                select: "MIN(Timestamp) as Timestamp, Country, Coin, CEIL(AVG(nodes)) as nodes",
+                fields: ["Timestamp", "Country", "Coin", "nodes"],
+                groupBy: ", Coin, Country"
+            }
+        }
+
+
         if (aRelevantEntites.length === 0) {
             return true;
         } else {
             aRelevantEntites.forEach(element => {
-                console.log("do it for", element.TOPIC);
-                console.log(iAggregationDelay, element.AGGREGATIONINTERVAL);
-                switch (element.TOPIC) {
-                    case 'RAW_G_PRICES':
-                        sAggregationQuery = `SELECT Coin, MIN(Timestamp) as N_Timestamp, AVG(Price) as N_Price, AVG(MarketCap) as N_MarketCap, AVG(Volume24h) as N_Volume, AVG(Change24h) as N_Change FROM ${schema}.UNI_LI_WUE_DW_KPI_G_PRICES WHERE SECONDS_BETWEEN(Timestamp, NOW()) > ? GROUP BY CEIL(SECONDS_BETWEEN(Timestamp, NOW()) * 1.0 / ?), Coin`;
-                        sDeletionQuery = `DELETE FROM ${schema}.UNI_LI_WUE_DW_KPI_G_PRICES WHERE SECONDS_BETWEEN(Timestamp, NOW()) > ?`;
-                        sInsertQuery = `INSERT INTO ${schema}.UNI_LI_WUE_DW_KPI_G_PRICES(TIMESTAMP, PRICE, MARKETCAP, VOLUME24H, CHANGE24H, COIN) VALUES(?, ?, ?, ?, ?, ?)`;
+                var sEntityName = "KPI" + element.TOPIC.substr(3).toUpperCase();
+                var sTableName = "UNI_LI_WUE_DW_" + sEntityName;
 
-                        selectStmt = conn.prepare(sAggregationQuery);
-                        const aPriceEntities = selectStmt.exec([iAggregationDelay, element.AGGREGATIONINTERVAL]).map(entry => {
-                            return [entry.N_TIMESTAMP, entry.N_PRICE, entry.N_MARKETCAP, entry.N_VOLUME, entry.N_CHANGE, entry.COIN];
-                        });
+                if (oAggregationsFormula.hasOwnProperty(sEntityName)) {
+                    console.log(sTableName);
+                    var aFieldNames = oAggregationsFormula[sEntityName].fields.map(item => item.toUpperCase());
+                    var aQuestionMarks = oAggregationsFormula[sEntityName].fields.map(item => "?");
 
-                        if (aPriceEntities.length > 0) {
-                            selectStmt = conn.prepare(sDeletionQuery);
-                            console.log(selectStmt.exec([iAggregationDelay]), "dropped");
-    
-                            insertStmt = conn.prepare(sInsertQuery);
-                            console.log(insertStmt.execBatch(aPriceEntities), "inserted");
-                        }
+                    sAggregationQuery = `SELECT ${oAggregationsFormula[sEntityName].select} FROM ${schema}.${sTableName} WHERE SECONDS_BETWEEN(Timestamp, NOW()) > ? GROUP BY CEIL(SECONDS_BETWEEN(Timestamp, NOW()) * 1.0 / ?)${oAggregationsFormula[sEntityName].groupBy}`;
+                    sDeletionQuery = `DELETE FROM ${schema}.${sTableName} WHERE SECONDS_BETWEEN(Timestamp, NOW()) > ?`;
+                    sInsertQuery = `INSERT INTO ${schema}.${sTableName}(${aFieldNames.join(", ")}) VALUES(${aQuestionMarks.join(", ")})`;
 
-                    break;
+                    selectStmt = conn.prepare(sAggregationQuery);
+                    const aEntities = selectStmt.exec([iAggregationDelay, element.AGGREGATIONINTERVAL]).map(entry => {
+                        return aFieldNames.map(field => entry[field.toUpperCase()])
+                    });
 
-                    case 'RAW_E_GASSTATION':
-                        sAggregationQuery = `SELECT MIN(Timestamp) as N_Timestamp, AVG(SafeGasPrice) as N_SafeGasPrice, MIN(BlockNumber) as N_BlockNumber, AVG(BlockTime) as N_BlockTime FROM ${schema}.UNI_LI_WUE_DW_KPI_E_GASSTATION WHERE SECONDS_BETWEEN(Timestamp, NOW()) > ? GROUP BY CEIL(SECONDS_BETWEEN(Timestamp, NOW()) * 1.0 / ?)`;
-                        sDeletionQuery = `DELETE FROM ${schema}.UNI_LI_WUE_DW_KPI_E_GASSTATION WHERE SECONDS_BETWEEN(Timestamp, NOW()) > ?`;
-                        sInsertQuery = `INSERT INTO ${schema}.UNI_LI_WUE_DW_KPI_E_GASSTATION(TIMESTAMP, SafeGasPrice, BlockNumber, BlockTime) VALUES(?, ?, ?, ?)`;
-
-                        selectStmt = conn.prepare(sAggregationQuery);
-                        const aGasEntities = selectStmt.exec([iAggregationDelay, element.AGGREGATIONINTERVAL]).map(entry => {
-                            return [entry.N_TIMESTAMP, entry.N_SAFEGASPRICE, entry.N_BLOCKNUMBER, entry.N_BLOCKTIME];
-                        });
-                        
-                        if (aGasEntities.length > 0) {
-                            selectStmt = conn.prepare(sDeletionQuery);
-                            console.log(selectStmt.exec([iAggregationDelay]), "dropped");
-    
-                            insertStmt = conn.prepare(sInsertQuery);
-                            console.log(insertStmt.execBatch(aGasEntities), "inserted");
-                        }
-
-                    break;
-
-                    case 'RAW_G_LATEST_BLOCK':
-                        /*let sAggregationQuery = "SELECT Coin, MIN(Timestamp) as N_Timestamp, AVG(Price) as N_Price, AVG(MarketCap) as N_MarketCap, AVG(Volume24h) as N_Volume, AVG(Change24h) as N_Change FROM UNI_LI_WUE_DW_KPI_G_PRICES WHERE SECONDS_BETWEEN(Timestamp, NOW()) > ? GROUP BY CEIL(SECONDS_BETWEEN(Timestamp, NOW()) * 1.0 / ?), Coin";
-                        let sDeletionQuery = "DELETE FROM UNI_LI_WUE_DW_KPI_G_PRICES WHERE SECONDS_BETWEEN(Timestamp, NOW()) > ?";
-                        let sInsertQuery = "INSERT INTO UNI_LI_WUE_DW_KPI_G_PRICES(TIMESTAMP, PRICE, MARKETCAP, VOLUME24H, CHANGE24H, COIN) VALUES(?, ?, ?, ?, ?, ?)";
-
-                        selectStmt = conn.prepare(sAggregationQuery);
-                        const aEntities = selectStmt.exec([iAggregationDelay, element.AGGREGATIONINTERVAL]).map(entry => {
-                            return [entry.N_Timestamp, entry.N_Price, entry.N_MarketCap, entry.N_Volume, entry.N_Change, entry.Coin];
-                        });
-
+                    if (aEntities.length > 0) {
                         selectStmt = conn.prepare(sDeletionQuery);
-                        selectStmt.exec([]);
+                        console.log(selectStmt.exec([iAggregationDelay]), "dropped");
 
                         insertStmt = conn.prepare(sInsertQuery);
-                        insertStmt.execBatch(aEntities);*/
-                    break;
+                        console.log(insertStmt.execBatch(aEntities), "inserted");
+                    }
                 }
-
             });
             return true;
         }
