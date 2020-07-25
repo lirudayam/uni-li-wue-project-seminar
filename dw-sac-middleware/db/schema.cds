@@ -24,12 +24,6 @@ entity KPI_ENUM_EVENT {
         description : String;
 }
 
-entity KPI_ENUM_SEMANTICS {
-    key scoreName   : String;
-        pointScore  : Integer;
-        description : String;
-}
-
 /* Confiugration Entites */
 entity KPI_STREAM_TYPE_CONFIG {
     key topic                       : String;
@@ -68,17 +62,6 @@ entity KPI_G_RICH_ACC {
         balance        : Double;
 }
 
-entity KPI_G_T_PER_TIME {
-    key timestamp       : DateTime;
-    key coin            : String(3);
-        coinInfo        : Association to one KPI_ENUM_COIN
-                              on coin = coinInfo.shortName;
-        senderAddress   : String;
-        recieverAddress : String;
-        units           : Decimal;
-        transactionHash : String(64);
-}
-
 entity KPI_E_SMART_EXEC {
     key timestamp       : DateTime;
         contractAddress : String;
@@ -91,16 +74,6 @@ entity KPI_G_N_PER_TIME {
         coinInfo   : Association to one KPI_ENUM_COIN
                          on coin = coinInfo.shortName;
         numOfNodes : Integer;
-}
-
-entity KPI_G_TRANSACT_INF {
-    key timestamp              : DateTime;
-    key coin                   : String(3);
-        coinInfo               : Association to one KPI_ENUM_COIN
-                                     on coin = coinInfo.shortName;
-        totalTransactionFees   : Double;
-        numOfTransactions      : Integer;
-        totalTransactionVolume : Double;
 }
 
 entity KPI_G_PRICE_VOLA {
@@ -125,7 +98,7 @@ entity KPI_G_PRICES {
         change24h : Double;
 }
 
-entity KPI_G_LATEST_BLOCK {
+entity KPI_E_BLOCK {
     key timestamp        : DateTime;
     key coin             : String(3);
         coinInfo         : Association to one KPI_ENUM_COIN
@@ -138,10 +111,9 @@ entity KPI_G_LATEST_BLOCK {
         noOfTransactions : Integer;
 }
 
-entity KPI_E_GASSTATION {
-    key timestamp    : DateTime;
+entity KPI_E_EXT_GASSTATION {
+    key blockNumber  : Double;
         safeGasPrice : Double;
-        blockNumber  : Double;
         blockTime    : Double;
 }
 
