@@ -11,7 +11,7 @@ Grundlegend gibt es dabei mehrere relevante Klassen, wie im UML-Klassendiagramm 
 Beim Packaging werden die drei zuvor erwähnten Klassen in einen tmp Ordner gepackt. Zusätzlich dazu wird die setup.py reinkopiert und mit den entsprechenden Benamungen modifiziert. Desweiteren wird der eigentliche Data Fetcher Code mit reinkopiert. Es erfolgt ein Build und eine ZIP-Komprimierung.
 
 ## Deployment
-Das fertige ZIP wird via scp auf die VM kopiert, dabei sind zweifach das Passwort einzugeben (einmal für scp und einmal für ssh). Danach wird automatisch in das Package navigiert und ein Task gestartet. Dieser wird benamt nach dem Ordnernamen. Laufende Prozesse sind via ps aux | grep Fetcher zu sehen.
+Das fertige ZIP wird via scp auf die VM kopiert, dabei sind zweifach das Passwort einzugeben pro Fetcher (einmal für scp und einmal für ssh). Danach wird automatisch in das Package navigiert und ein Task gestartet. Dieser wird benamt nach dem Ordnernamen. Laufende Prozesse sind via ps aux | grep Fetcher zu sehen.
 
 ### Deployment Script
 Das deploy.sh übernimmt alle Aufgaben aus dem Packaging und Deployment. 
