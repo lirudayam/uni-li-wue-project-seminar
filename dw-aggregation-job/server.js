@@ -136,3 +136,8 @@ async function findAndAggregateData() {
         return e;
     }
 }
+
+// setup like a cronjob every day to trigger a cleanup
+setInterval(() => {
+    findAndAggregateData()
+}, 24 * 60 * 60 * 1000);
