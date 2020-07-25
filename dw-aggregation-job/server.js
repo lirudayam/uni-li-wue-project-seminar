@@ -29,6 +29,8 @@ app.listen(port, function () {
 
 async function findAndAggregateData() {
     const schema = db.getSchema();
+
+    // get kpi-specific configs and the general aggregation delay
     const selectSQL = `SELECT * FROM ${schema}.UNI_LI_WUE_DW_KPI_STREAM_TYPE_CONFIG`;
     const selectAggregationSQL = `SELECT * FROM ${schema}.UNI_LI_WUE_DW_API_CONFIG WHERE Name = 'aggregation_delay'`;
 
@@ -48,6 +50,7 @@ async function findAndAggregateData() {
         selectStmt = conn.prepare(selectAggregationSQL);
         const iAggregationDelay = selectStmt.exec([])[0].VALUE;
 
+        // map each kpi to select statment to be used to filter and reinsert
         const oAggregationsFormula = {
             KPI_G_PRICE_VOLA: {
                 select: "MIN(Timestamp) as Timestamp, Coin, StockMarket, AVG(Price) as Price",
@@ -84,8 +87,9 @@ async function findAndAggregateData() {
                 var sEntityName = "KPI" + element.TOPIC.substr(3).toUpperCase();
                 var sTableName = "UNI_LI_WUE_DW_" + sEntityName;
 
+                // check if in mapping
                 if (oAggregationsFormula.hasOwnProperty(sEntityName)) {
-                    console.log(sTableName);
+                    
                     var aFieldNames = oAggregationsFormula[sEntityName].fields.map(item => item.toUpperCase());
                     var aQuestionMarks = oAggregationsFormula[sEntityName].fields.map(item => "?");
 
@@ -93,15 +97,18 @@ async function findAndAggregateData() {
                     sDeletionQuery = `DELETE FROM ${schema}.${sTableName} WHERE SECONDS_BETWEEN(Timestamp, NOW()) > ?`;
                     sInsertQuery = `INSERT INTO ${schema}.${sTableName}(${aFieldNames.join(", ")}) VALUES(${aQuestionMarks.join(", ")})`;
 
+                    // get all relevant entries
                     selectStmt = conn.prepare(sAggregationQuery);
                     const aEntities = selectStmt.exec([iAggregationDelay, element.AGGREGATIONINTERVAL]).map(entry => {
                         return aFieldNames.map(field => entry[field.toUpperCase()])
                     });
 
                     if (aEntities.length > 0) {
+                        // delete them
                         selectStmt = conn.prepare(sDeletionQuery);
                         console.log(selectStmt.exec([iAggregationDelay]), "dropped");
 
+                        // insert new aggregated ones
                         insertStmt = conn.prepare(sInsertQuery);
                         console.log(insertStmt.execBatch(aEntities), "inserted");
                     }

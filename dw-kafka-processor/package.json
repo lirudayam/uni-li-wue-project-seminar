@@ -14,6 +14,7 @@
     "@sap/cds": "^3.34.2",
     "@sap/hana-client": "^2.4.194",
     "@sap/xsenv": "^3.0.0",
+    "cf-nodejs-logging-support": "^6.4.3",
     "client-oauth2": "^4.3.0",
     "express": "^4.17.1",
     "kafkajs": "^1.12.0",
@@ -22,12 +23,9 @@
   },
   "cds": {
     "requires": {
-      "externalService": {
+      "dwInsertService": {
         "kind": "odata",
         "model": "./csn.json",
-        "vcap": {
-          "label": "destinations"
-        },
         "credentials": {
           "destination": "DWODataService",
           "requestTimeout": 30000000

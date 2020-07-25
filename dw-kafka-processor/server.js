@@ -1,15 +1,24 @@
 const { Kafka, logLevel } = require("kafkajs");
+
+// XS-Advanced environment variables
+const xsenv = require("@sap/xsenv");
 const oauthClient = require("client-oauth2");
 
-const xsenv = require("@sap/xsenv");
+// Moment.js
 const moment = require("moment");
 
+// Logging information
+const log = require("cf-nodejs-logging-support");
+log.setLoggingLevel("info");
+
+// get the connectivity service for Kafka connection
 const connService = xsenv.getServices({
   connectivity: function (service) {
     return service.label === "connectivity";
   },
 }).connectivity;
 
+// enhance String with new func to get bytes for STOMP5 protocol
 String.prototype.getBytes = function () {
   var bytes = [];
   for (var i = 0; i < this.length; ++i) {
@@ -18,22 +27,26 @@ String.prototype.getBytes = function () {
   return bytes;
 };
 
+// get CDS module
 const cds = require("@sap/cds");
+
+// async function for consuming kafka and writing to data warehouse
 const asyncInitialRunFn = async () => {
-  const srv = await cds.connect.to("externalService");
+  // connect to the external service of dw -> access via OData, no direct access
+  const srv = await cds.connect.to("dwInsertService");
+  // get entities for namespace
   const entites = srv.entities("uni_li_wue.dw");
-  let relevantServiceEntites = {};
+
+  // filter for any relevant ones in the required KafkaPublishService
+  let relevantServiceEntities = {};
   Object.keys(entites).map((key) => {
     if (key.startsWith("service.KafkaPublishService.")) {
-      relevantServiceEntites[key.replace("service.KafkaPublishService.", "")] =
+      relevantServiceEntities[key.replace("service.KafkaPublishService.", "")] =
         entites[key];
     }
   });
 
   const {
-    KPI_ENUM_COIN,
-    KPI_ENUM_STOCK_MARKET,
-    KPI_ENUM_EVENT,
     KPI_G_RICH_ACC,
     KPI_E_SMART_EXEC,
     KPI_G_N_PER_TIME,
@@ -49,8 +62,9 @@ const asyncInitialRunFn = async () => {
     KPI_E_EXT_GASSTATION,
     KPI_E_BLOCK,
     KPI_B_BLOCK,
-  } = relevantServiceEntites;
+  } = relevantServiceEntities;
 
+  // group by speed layer and batch layer topic
   var oSpeedLayerTopics = {
     RAW_G_RICH_ACC: KPI_G_RICH_ACC,
     RAW_E_SMART_EXEC: KPI_E_SMART_EXEC,
@@ -110,6 +124,7 @@ const asyncInitialRunFn = async () => {
           STATE_2VERSION = 2,
           STATE_STATUS = 3;
 
+          // Establish a SOCKS5 handshake for TCP connection via connectivity service and Cloud Connector
         socks.connect(
           {
             host: "kafka.cloud",
@@ -191,8 +206,6 @@ const asyncInitialRunFn = async () => {
       var myCustomSocketFactory = ({ host, port, ssl, onConnect }) => {
         socket.setKeepAlive(true, socketAliveTime);
         onConnect();
-        //socket.pipe(process.stdout);
-
         return socket;
       };
 
@@ -237,7 +250,7 @@ const asyncInitialRunFn = async () => {
               } catch (e) {
                 console.error("Error has occurred", e);
               }
-            } 
+            }
             // ---------------------------------------------------
             // --- BEGIN BATCH LAYER -----------------------------
             // ---------------------------------------------------
@@ -305,7 +318,7 @@ const asyncInitialRunFn = async () => {
                   }
                   break;
               }
-            } 
+            }
             // ---------------------------------------------------
             // --- HEALTH CHECKS ---------------------------------
             // ---------------------------------------------------
@@ -373,7 +386,7 @@ const asyncInitialRunFn = async () => {
   };
 
   triggerListener();
-  
+
   // Delay the socket restart interval
   setTimeout(() => {
     setInterval(function () {
@@ -384,7 +397,6 @@ const asyncInitialRunFn = async () => {
   console.log("async start");
 };
 asyncInitialRunFn();
-
 
 // Ping - Pong Health
 const express = require("express");

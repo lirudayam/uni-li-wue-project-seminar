@@ -1097,21 +1097,6 @@
         }
       }
     },
-    "uni_li_wue.dw.KPI_ENUM_SEMANTICS": {
-      "kind": "entity",
-      "elements": {
-        "scoreName": {
-          "key": true,
-          "type": "cds.String"
-        },
-        "pointScore": {
-          "type": "cds.Integer"
-        },
-        "description": {
-          "type": "cds.String"
-        }
-      }
-    },
     "uni_li_wue.dw.KPI_ENUM_STOCK_MARKET": {
       "kind": "entity",
       "elements": {
@@ -1128,17 +1113,41 @@
         }
       }
     },
-    "uni_li_wue.dw.KPI_E_GASSTATION": {
+    "uni_li_wue.dw.KPI_E_BLOCK": {
       "kind": "entity",
       "elements": {
         "timestamp": {
           "key": true,
           "type": "cds.DateTime"
         },
-        "safeGasPrice": {
+        "identifier": {
+          "type": "cds.Integer"
+        },
+        "size": {
+          "type": "cds.Integer"
+        },
+        "difficulty": {
           "type": "cds.Double"
         },
+        "gasLimit": {
+          "type": "cds.Double"
+        },
+        "gasUsed": {
+          "type": "cds.Double"
+        },
+        "noOfTransactions": {
+          "type": "cds.Integer"
+        }
+      }
+    },
+    "uni_li_wue.dw.KPI_E_EXT_GASSTATION": {
+      "kind": "entity",
+      "elements": {
         "blockNumber": {
+          "key": true,
+          "type": "cds.Double"
+        },
+        "safeGasPrice": {
           "type": "cds.Double"
         },
         "blockTime": {
@@ -1196,59 +1205,6 @@
         },
         "noOfCredits": {
           "type": "cds.Integer"
-        },
-        "noOfTransactions": {
-          "type": "cds.Integer"
-        }
-      }
-    },
-    "uni_li_wue.dw.KPI_G_LATEST_BLOCK": {
-      "kind": "entity",
-      "elements": {
-        "timestamp": {
-          "key": true,
-          "type": "cds.DateTime"
-        },
-        "coin": {
-          "key": true,
-          "type": "cds.String",
-          "length": 3
-        },
-        "coinInfo": {
-          "type": "cds.Association",
-          "cardinality": {
-            "max": 1
-          },
-          "target": "uni_li_wue.dw.KPI_ENUM_COIN",
-          "on": [
-            {
-              "ref": [
-                "coin"
-              ]
-            },
-            "=",
-            {
-              "ref": [
-                "coinInfo",
-                "shortName"
-              ]
-            }
-          ]
-        },
-        "identifier": {
-          "type": "cds.Integer"
-        },
-        "size": {
-          "type": "cds.Integer"
-        },
-        "difficulty": {
-          "type": "cds.Double"
-        },
-        "gasLimit": {
-          "type": "cds.Double"
-        },
-        "gasUsed": {
-          "type": "cds.Double"
         },
         "noOfTransactions": {
           "type": "cds.Integer"
@@ -1553,98 +1509,6 @@
         }
       }
     },
-    "uni_li_wue.dw.KPI_G_TRANSACT_INF": {
-      "kind": "entity",
-      "elements": {
-        "timestamp": {
-          "key": true,
-          "type": "cds.DateTime"
-        },
-        "coin": {
-          "key": true,
-          "type": "cds.String",
-          "length": 3
-        },
-        "coinInfo": {
-          "type": "cds.Association",
-          "cardinality": {
-            "max": 1
-          },
-          "target": "uni_li_wue.dw.KPI_ENUM_COIN",
-          "on": [
-            {
-              "ref": [
-                "coin"
-              ]
-            },
-            "=",
-            {
-              "ref": [
-                "coinInfo",
-                "shortName"
-              ]
-            }
-          ]
-        },
-        "totalTransactionFees": {
-          "type": "cds.Double"
-        },
-        "numOfTransactions": {
-          "type": "cds.Integer"
-        },
-        "totalTransactionVolume": {
-          "type": "cds.Double"
-        }
-      }
-    },
-    "uni_li_wue.dw.KPI_G_T_PER_TIME": {
-      "kind": "entity",
-      "elements": {
-        "timestamp": {
-          "key": true,
-          "type": "cds.DateTime"
-        },
-        "coin": {
-          "key": true,
-          "type": "cds.String",
-          "length": 3
-        },
-        "coinInfo": {
-          "type": "cds.Association",
-          "cardinality": {
-            "max": 1
-          },
-          "target": "uni_li_wue.dw.KPI_ENUM_COIN",
-          "on": [
-            {
-              "ref": [
-                "coin"
-              ]
-            },
-            "=",
-            {
-              "ref": [
-                "coinInfo",
-                "shortName"
-              ]
-            }
-          ]
-        },
-        "senderAddress": {
-          "type": "cds.String"
-        },
-        "recieverAddress": {
-          "type": "cds.String"
-        },
-        "units": {
-          "type": "cds.Decimal"
-        },
-        "transactionHash": {
-          "type": "cds.String",
-          "length": 64
-        }
-      }
-    },
     "uni_li_wue.dw.KPI_STREAM_TYPE_CONFIG": {
       "kind": "entity",
       "elements": {
@@ -1914,31 +1778,6 @@
       },
       "$syntax": "projection"
     },
-    "uni_li_wue.dw.service.ConfigurationService.KPI_ENUM_SEMANTICS": {
-      "kind": "entity",
-      "query": {
-        "SELECT": {
-          "from": {
-            "ref": [
-              "uni_li_wue.dw.KPI_ENUM_SEMANTICS"
-            ]
-          }
-        }
-      },
-      "elements": {
-        "scoreName": {
-          "key": true,
-          "type": "cds.String"
-        },
-        "pointScore": {
-          "type": "cds.Integer"
-        },
-        "description": {
-          "type": "cds.String"
-        }
-      },
-      "$syntax": "projection"
-    },
     "uni_li_wue.dw.service.ConfigurationService.KPI_ENUM_STOCK_MARKET": {
       "kind": "entity",
       "query": {
@@ -1994,6 +1833,29 @@
     "uni_li_wue.dw.service.KafkaPublishService": {
       "@source": "srv/kafka-publish-service.cds",
       "kind": "service"
+    },
+    "uni_li_wue.dw.service.KafkaPublishService.API_CONFIG": {
+      "kind": "entity",
+      "@readonly": true,
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "uni_li_wue.dw.API_CONFIG"
+            ]
+          }
+        }
+      },
+      "elements": {
+        "name": {
+          "key": true,
+          "type": "cds.String"
+        },
+        "value": {
+          "type": "cds.String"
+        }
+      },
+      "$syntax": "projection"
     },
     "uni_li_wue.dw.service.KafkaPublishService.KPI_B_BLOCK": {
       "kind": "entity",
@@ -2062,6 +1924,7 @@
     },
     "uni_li_wue.dw.service.KafkaPublishService.KPI_CONFIG": {
       "kind": "entity",
+      "@readonly": true,
       "query": {
         "SELECT": {
           "from": {
@@ -2144,32 +2007,6 @@
       },
       "$syntax": "projection"
     },
-    "uni_li_wue.dw.service.KafkaPublishService.KPI_ENUM_SEMANTICS": {
-      "kind": "entity",
-      "@readonly": true,
-      "query": {
-        "SELECT": {
-          "from": {
-            "ref": [
-              "uni_li_wue.dw.KPI_ENUM_SEMANTICS"
-            ]
-          }
-        }
-      },
-      "elements": {
-        "scoreName": {
-          "key": true,
-          "type": "cds.String"
-        },
-        "pointScore": {
-          "type": "cds.Integer"
-        },
-        "description": {
-          "type": "cds.String"
-        }
-      },
-      "$syntax": "projection"
-    },
     "uni_li_wue.dw.service.KafkaPublishService.KPI_ENUM_STOCK_MARKET": {
       "kind": "entity",
       "@readonly": true,
@@ -2197,13 +2034,13 @@
       },
       "$syntax": "projection"
     },
-    "uni_li_wue.dw.service.KafkaPublishService.KPI_E_GASSTATION": {
+    "uni_li_wue.dw.service.KafkaPublishService.KPI_E_BLOCK": {
       "kind": "entity",
       "query": {
         "SELECT": {
           "from": {
             "ref": [
-              "uni_li_wue.dw.KPI_E_GASSTATION"
+              "uni_li_wue.dw.KPI_E_BLOCK"
             ]
           }
         }
@@ -2213,10 +2050,44 @@
           "key": true,
           "type": "cds.DateTime"
         },
-        "safeGasPrice": {
+        "identifier": {
+          "type": "cds.Integer"
+        },
+        "size": {
+          "type": "cds.Integer"
+        },
+        "difficulty": {
           "type": "cds.Double"
         },
+        "gasLimit": {
+          "type": "cds.Double"
+        },
+        "gasUsed": {
+          "type": "cds.Double"
+        },
+        "noOfTransactions": {
+          "type": "cds.Integer"
+        }
+      },
+      "$syntax": "projection"
+    },
+    "uni_li_wue.dw.service.KafkaPublishService.KPI_E_EXT_GASSTATION": {
+      "kind": "entity",
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "uni_li_wue.dw.KPI_E_EXT_GASSTATION"
+            ]
+          }
+        }
+      },
+      "elements": {
         "blockNumber": {
+          "key": true,
+          "type": "cds.Double"
+        },
+        "safeGasPrice": {
           "type": "cds.Double"
         },
         "blockTime": {
@@ -2296,69 +2167,6 @@
         },
         "noOfCredits": {
           "type": "cds.Integer"
-        },
-        "noOfTransactions": {
-          "type": "cds.Integer"
-        }
-      },
-      "$syntax": "projection"
-    },
-    "uni_li_wue.dw.service.KafkaPublishService.KPI_G_LATEST_BLOCK": {
-      "kind": "entity",
-      "query": {
-        "SELECT": {
-          "from": {
-            "ref": [
-              "uni_li_wue.dw.KPI_G_LATEST_BLOCK"
-            ]
-          }
-        }
-      },
-      "elements": {
-        "timestamp": {
-          "key": true,
-          "type": "cds.DateTime"
-        },
-        "coin": {
-          "key": true,
-          "type": "cds.String",
-          "length": 3
-        },
-        "coinInfo": {
-          "type": "cds.Association",
-          "cardinality": {
-            "max": 1
-          },
-          "target": "uni_li_wue.dw.service.KafkaPublishService.KPI_ENUM_COIN",
-          "on": [
-            {
-              "ref": [
-                "coin"
-              ]
-            },
-            "=",
-            {
-              "ref": [
-                "coinInfo",
-                "shortName"
-              ]
-            }
-          ]
-        },
-        "identifier": {
-          "type": "cds.Integer"
-        },
-        "size": {
-          "type": "cds.Integer"
-        },
-        "difficulty": {
-          "type": "cds.Double"
-        },
-        "gasLimit": {
-          "type": "cds.Double"
-        },
-        "gasUsed": {
-          "type": "cds.Double"
         },
         "noOfTransactions": {
           "type": "cds.Integer"
@@ -2741,120 +2549,6 @@
       },
       "$syntax": "projection"
     },
-    "uni_li_wue.dw.service.KafkaPublishService.KPI_G_TRANSACT_INF": {
-      "kind": "entity",
-      "@insertonly": true,
-      "query": {
-        "SELECT": {
-          "from": {
-            "ref": [
-              "uni_li_wue.dw.KPI_G_TRANSACT_INF"
-            ]
-          }
-        }
-      },
-      "elements": {
-        "timestamp": {
-          "key": true,
-          "type": "cds.DateTime"
-        },
-        "coin": {
-          "key": true,
-          "type": "cds.String",
-          "length": 3
-        },
-        "coinInfo": {
-          "type": "cds.Association",
-          "cardinality": {
-            "max": 1
-          },
-          "target": "uni_li_wue.dw.service.KafkaPublishService.KPI_ENUM_COIN",
-          "on": [
-            {
-              "ref": [
-                "coin"
-              ]
-            },
-            "=",
-            {
-              "ref": [
-                "coinInfo",
-                "shortName"
-              ]
-            }
-          ]
-        },
-        "totalTransactionFees": {
-          "type": "cds.Double"
-        },
-        "numOfTransactions": {
-          "type": "cds.Integer"
-        },
-        "totalTransactionVolume": {
-          "type": "cds.Double"
-        }
-      },
-      "$syntax": "projection"
-    },
-    "uni_li_wue.dw.service.KafkaPublishService.KPI_G_T_PER_TIME": {
-      "kind": "entity",
-      "@insertonly": true,
-      "query": {
-        "SELECT": {
-          "from": {
-            "ref": [
-              "uni_li_wue.dw.KPI_G_T_PER_TIME"
-            ]
-          }
-        }
-      },
-      "elements": {
-        "timestamp": {
-          "key": true,
-          "type": "cds.DateTime"
-        },
-        "coin": {
-          "key": true,
-          "type": "cds.String",
-          "length": 3
-        },
-        "coinInfo": {
-          "type": "cds.Association",
-          "cardinality": {
-            "max": 1
-          },
-          "target": "uni_li_wue.dw.service.KafkaPublishService.KPI_ENUM_COIN",
-          "on": [
-            {
-              "ref": [
-                "coin"
-              ]
-            },
-            "=",
-            {
-              "ref": [
-                "coinInfo",
-                "shortName"
-              ]
-            }
-          ]
-        },
-        "senderAddress": {
-          "type": "cds.String"
-        },
-        "recieverAddress": {
-          "type": "cds.String"
-        },
-        "units": {
-          "type": "cds.Decimal"
-        },
-        "transactionHash": {
-          "type": "cds.String",
-          "length": 64
-        }
-      },
-      "$syntax": "projection"
-    },
     "uni_li_wue.dw.service.KafkaPublishService.LOG_FETCH_ERROR": {
       "kind": "entity",
       "@insertonly": true,
@@ -3168,32 +2862,6 @@
       },
       "$syntax": "projection"
     },
-    "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_ENUM_SEMANTICS": {
-      "kind": "entity",
-      "@readonly": true,
-      "query": {
-        "SELECT": {
-          "from": {
-            "ref": [
-              "uni_li_wue.dw.KPI_ENUM_SEMANTICS"
-            ]
-          }
-        }
-      },
-      "elements": {
-        "scoreName": {
-          "key": true,
-          "type": "cds.String"
-        },
-        "pointScore": {
-          "type": "cds.Integer"
-        },
-        "description": {
-          "type": "cds.String"
-        }
-      },
-      "$syntax": "projection"
-    },
     "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_ENUM_STOCK_MARKETS": {
       "kind": "entity",
       "@readonly": true,
@@ -3221,34 +2889,120 @@
       },
       "$syntax": "projection"
     },
-    "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_E_GASSTATION": {
+    "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_E_BLOCK": {
       "kind": "entity",
       "@readonly": true,
       "query": {
         "SELECT": {
           "from": {
-            "ref": [
-              "uni_li_wue.dw.KPI_E_GASSTATION"
+            "join": "inner",
+            "args": [
+              {
+                "ref": [
+                  "uni_li_wue.dw.KPI_E_BLOCK"
+                ]
+              },
+              {
+                "ref": [
+                  "uni_li_wue.dw.KPI_E_EXT_GASSTATION"
+                ]
+              }
+            ],
+            "on": [
+              {
+                "ref": [
+                  "identifier"
+                ]
+              },
+              "=",
+              {
+                "ref": [
+                  "blockNumber"
+                ]
+              }
             ]
-          }
+          },
+          "columns": [
+            {
+              "key": true,
+              "ref": [
+                "identifier"
+              ]
+            },
+            {
+              "ref": [
+                "timestamp"
+              ]
+            },
+            {
+              "ref": [
+                "size"
+              ]
+            },
+            {
+              "ref": [
+                "difficulty"
+              ]
+            },
+            {
+              "ref": [
+                "gasLimit"
+              ]
+            },
+            {
+              "ref": [
+                "gasUsed"
+              ]
+            },
+            {
+              "ref": [
+                "safeGasPrice"
+              ]
+            },
+            {
+              "ref": [
+                "blockTime"
+              ]
+            },
+            {
+              "ref": [
+                "noOfTransactions"
+              ]
+            }
+          ]
         }
       },
       "elements": {
-        "timestamp": {
+        "identifier": {
           "key": true,
+          "type": "cds.Integer"
+        },
+        "timestamp": {
           "type": "cds.DateTime"
+        },
+        "size": {
+          "type": "cds.Integer"
+        },
+        "difficulty": {
+          "type": "cds.Double"
+        },
+        "gasLimit": {
+          "type": "cds.Double"
+        },
+        "gasUsed": {
+          "type": "cds.Double"
         },
         "safeGasPrice": {
           "type": "cds.Double"
         },
-        "blockNumber": {
-          "type": "cds.Double"
-        },
         "blockTime": {
           "type": "cds.Double"
+        },
+        "noOfTransactions": {
+          "type": "cds.Integer"
         }
       },
-      "$syntax": "projection"
+      "$syntax": "entity"
     },
     "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_E_SMART_EXEC": {
       "kind": "entity",
@@ -3321,70 +3075,6 @@
         },
         "noOfCredits": {
           "type": "cds.Integer"
-        },
-        "noOfTransactions": {
-          "type": "cds.Integer"
-        }
-      },
-      "$syntax": "projection"
-    },
-    "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_G_LATEST_BLOCK": {
-      "kind": "entity",
-      "@readonly": true,
-      "query": {
-        "SELECT": {
-          "from": {
-            "ref": [
-              "uni_li_wue.dw.KPI_G_LATEST_BLOCK"
-            ]
-          }
-        }
-      },
-      "elements": {
-        "timestamp": {
-          "key": true,
-          "type": "cds.DateTime"
-        },
-        "coin": {
-          "key": true,
-          "type": "cds.String",
-          "length": 3
-        },
-        "coinInfo": {
-          "type": "cds.Association",
-          "cardinality": {
-            "max": 1
-          },
-          "target": "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_ENUM_COINS",
-          "on": [
-            {
-              "ref": [
-                "coin"
-              ]
-            },
-            "=",
-            {
-              "ref": [
-                "coinInfo",
-                "shortName"
-              ]
-            }
-          ]
-        },
-        "identifier": {
-          "type": "cds.Integer"
-        },
-        "size": {
-          "type": "cds.Integer"
-        },
-        "difficulty": {
-          "type": "cds.Double"
-        },
-        "gasLimit": {
-          "type": "cds.Double"
-        },
-        "gasUsed": {
-          "type": "cds.Double"
         },
         "noOfTransactions": {
           "type": "cds.Integer"
@@ -3868,120 +3558,6 @@
         },
         "balance": {
           "type": "cds.Double"
-        }
-      },
-      "$syntax": "projection"
-    },
-    "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_G_TRANSACT_INF": {
-      "kind": "entity",
-      "@readonly": true,
-      "query": {
-        "SELECT": {
-          "from": {
-            "ref": [
-              "uni_li_wue.dw.KPI_G_TRANSACT_INF"
-            ]
-          }
-        }
-      },
-      "elements": {
-        "timestamp": {
-          "key": true,
-          "type": "cds.DateTime"
-        },
-        "coin": {
-          "key": true,
-          "type": "cds.String",
-          "length": 3
-        },
-        "coinInfo": {
-          "type": "cds.Association",
-          "cardinality": {
-            "max": 1
-          },
-          "target": "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_ENUM_COINS",
-          "on": [
-            {
-              "ref": [
-                "coin"
-              ]
-            },
-            "=",
-            {
-              "ref": [
-                "coinInfo",
-                "shortName"
-              ]
-            }
-          ]
-        },
-        "totalTransactionFees": {
-          "type": "cds.Double"
-        },
-        "numOfTransactions": {
-          "type": "cds.Integer"
-        },
-        "totalTransactionVolume": {
-          "type": "cds.Double"
-        }
-      },
-      "$syntax": "projection"
-    },
-    "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_G_T_PER_TIME": {
-      "kind": "entity",
-      "@readonly": true,
-      "query": {
-        "SELECT": {
-          "from": {
-            "ref": [
-              "uni_li_wue.dw.KPI_G_T_PER_TIME"
-            ]
-          }
-        }
-      },
-      "elements": {
-        "timestamp": {
-          "key": true,
-          "type": "cds.DateTime"
-        },
-        "coin": {
-          "key": true,
-          "type": "cds.String",
-          "length": 3
-        },
-        "coinInfo": {
-          "type": "cds.Association",
-          "cardinality": {
-            "max": 1
-          },
-          "target": "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_ENUM_COINS",
-          "on": [
-            {
-              "ref": [
-                "coin"
-              ]
-            },
-            "=",
-            {
-              "ref": [
-                "coinInfo",
-                "shortName"
-              ]
-            }
-          ]
-        },
-        "senderAddress": {
-          "type": "cds.String"
-        },
-        "recieverAddress": {
-          "type": "cds.String"
-        },
-        "units": {
-          "type": "cds.Decimal"
-        },
-        "transactionHash": {
-          "type": "cds.String",
-          "length": 64
         }
       },
       "$syntax": "projection"
