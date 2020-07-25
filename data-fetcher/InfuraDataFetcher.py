@@ -17,7 +17,7 @@ from web3.auto.infura import w3
 class InfuraDataFetcher:
     latest_identifier = 0
     fetcher_name = "INFURA API"
-    kafka_topic = "RAW_G_LATEST_BLOCK"
+    kafka_topic = "RAW_E_BLOCK"
 
     def __init__(self):
         self.url = "wss://mainnet.infura.io/ws/v3/" + HashiVaultCredentialStorage().get_credentials("Infura",

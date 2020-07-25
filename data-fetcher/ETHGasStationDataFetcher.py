@@ -53,7 +53,6 @@ class ETHGasStationDataFetcher:
         self.get_data_from_gasstation()
         try:
             KafkaConnector().send_to_kafka(self.kafka_topic, {
-                "timestamp": get_unix_timestamp(),
                 "safeGasPrice": self.request_output["safeLow"],
                 # this unit divided by 10 = Gwei (Gwei to Ether = divide by 10^9) --> then convert to USD according to current rate
                 "blockNumber": self.request_output["blockNum"],
