@@ -24,6 +24,13 @@ entity KPI_ENUM_EVENT {
         description : String;
 }
 
+entity KPI_ENUM_ETHEREUM_TOKEN {
+    key symbol  : String;
+        address : String;
+        name    : String;
+}
+
+
 /* Confiugration Entites */
 entity KPI_STREAM_TYPE_CONFIG {
     key topic                       : String;
@@ -148,11 +155,26 @@ entity KPI_G_NODE_DISTRIBUTION {
         nodes     : Integer;
 }
 
+
 entity KPI_G_RECOMM {
     key timestamp : DateTime;
         token     : String;
         score     : Decimal;
         price     : Decimal;
+}
+
+entity KPI_E_TOKEN {
+    key timestamp       : DateTime;
+        token           : String;
+        tokenInfo       : Association to one KPI_ENUM_ETHEREUM_TOKEN
+                               on token = tokenInfo.symbol;
+        holdersCount    : Integer;
+        issuancesCount  : Integer;
+        txsCount        : Integer;
+        marketCapUsd    : Decimal;
+        availableSupply : Decimal;
+        rate            : Decimal;
+        volume24h       : Decimal;
 }
 
 entity KPI_G_GINI {

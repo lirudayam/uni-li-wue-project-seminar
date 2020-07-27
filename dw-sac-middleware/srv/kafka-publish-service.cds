@@ -7,6 +7,7 @@ service KafkaPublishService {
   entity KPI_ENUM_COIN @readonly as projection on dw.KPI_ENUM_COIN;
   entity KPI_ENUM_STOCK_MARKET @readonly as projection on dw.KPI_ENUM_STOCK_MARKET;
   entity KPI_ENUM_EVENT @readonly as projection on dw.KPI_ENUM_EVENT;
+  entity KPI_ENUM_ETHEREUM_TOKEN as projection on dw.KPI_ENUM_ETHEREUM_TOKEN;
   
 /* configs tables */
   entity KPI_CONFIG @readonly as projection on dw.KPI_STREAM_TYPE_CONFIG;
@@ -28,6 +29,7 @@ service KafkaPublishService {
   entity KPI_B_SPECIAL_EVT @insertonly as projection on dw.KPI_B_SPECIAL_EVT;
   entity KPI_G_NODE_DISTRIBUTION @insertonly as projection on dw.KPI_G_NODE_DISTRIBUTION;
   entity KPI_G_GINI @insertonly as projection on dw.KPI_G_GINI;
+  entity KPI_E_TOKEN @insertonly as projection on dw.KPI_E_TOKEN;
   
   entity KPI_G_NEWS @insertonly as projection on dw.KPI_G_NEWS;
   entity KPI_G_RECOMM @insertonly as projection on dw.KPI_G_RECOMM;

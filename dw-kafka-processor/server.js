@@ -47,6 +47,7 @@ const asyncInitialRunFn = async () => {
   });
 
   const {
+    KPI_ENUM_ETHEREUM_TOKEN,
     KPI_G_RICH_ACC,
     KPI_E_SMART_EXEC,
     KPI_G_N_PER_TIME,
@@ -62,6 +63,8 @@ const asyncInitialRunFn = async () => {
     KPI_E_EXT_GASSTATION,
     KPI_E_BLOCK,
     KPI_B_BLOCK,
+    KPI_E_TOKEN,
+    KPI_G_GINI
   } = relevantServiceEntities;
 
   // group by speed layer and batch layer topic
@@ -77,6 +80,8 @@ const asyncInitialRunFn = async () => {
     RAW_G_STOCKTWITS_FETCHER: KPI_G_NEWS,
     RAW_G_RECOMM: KPI_G_RECOMM,
     RAW_G_CREDITS: KPI_G_CREDITS,
+
+    RAW_G_GINI: KPI_G_GINI,
   };
   var aBatchLayerTopics = [
     "RAW_E_GASSTATION",
@@ -84,6 +89,7 @@ const asyncInitialRunFn = async () => {
     "RAW_G_NODE_DISTRIBUTION",
     "RAW_E_BLOCK",
     "RAW_B_BLOCK",
+    "RAW_E_TOKEN"
   ];
 
   const socketAliveTime = 60 * 60 * 1000;
@@ -273,6 +279,23 @@ const asyncInitialRunFn = async () => {
                     srv.run(INSERT.into(KPI_E_BLOCK).entries([entry]));
                   }
                   break;
+                case "RAW_E_TOKEN":
+                    entries = await srv.run(
+                      SELECT.from(KPI_ENUM_ETHEREUM_TOKEN).where({
+                        symbol: entry.token
+                      })
+                    );
+                    if (entries.length === 0) {
+                      srv.run(INSERT.into(KPI_ENUM_ETHEREUM_TOKEN).entries([{
+                        symbol: entry.token,
+                        address: entry.address,
+                        name: entry.name
+                      }]));
+                    }
+                    delete entry.address;
+                    delete entry.name;
+                    srv.run(INSERT.into(KPI_E_TOKEN).entries([entry]));
+                    break;
                 case "RAW_B_BLOCK":
                   entries = await srv.run(
                     SELECT.from(KPI_B_BLOCK)

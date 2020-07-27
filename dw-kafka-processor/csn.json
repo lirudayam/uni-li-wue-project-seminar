@@ -1085,6 +1085,21 @@
         }
       }
     },
+    "uni_li_wue.dw.KPI_ENUM_ETHEREUM_TOKEN": {
+      "kind": "entity",
+      "elements": {
+        "symbol": {
+          "key": true,
+          "type": "cds.String"
+        },
+        "address": {
+          "type": "cds.String"
+        },
+        "name": {
+          "type": "cds.String"
+        }
+      }
+    },
     "uni_li_wue.dw.KPI_ENUM_EVENT": {
       "kind": "entity",
       "elements": {
@@ -1170,6 +1185,60 @@
         }
       }
     },
+    "uni_li_wue.dw.KPI_E_TOKEN": {
+      "kind": "entity",
+      "elements": {
+        "timestamp": {
+          "key": true,
+          "type": "cds.DateTime"
+        },
+        "token": {
+          "type": "cds.String"
+        },
+        "tokenInfo": {
+          "type": "cds.Association",
+          "cardinality": {
+            "max": 1
+          },
+          "target": "uni_li_wue.dw.KPI_ENUM_ETHEREUM_TOKEN",
+          "on": [
+            {
+              "ref": [
+                "token"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "tokenInfo",
+                "symbol"
+              ]
+            }
+          ]
+        },
+        "holdersCount": {
+          "type": "cds.Integer"
+        },
+        "issuancesCount": {
+          "type": "cds.Integer"
+        },
+        "txsCount": {
+          "type": "cds.Integer"
+        },
+        "marketCapUsd": {
+          "type": "cds.Decimal"
+        },
+        "availableSupply": {
+          "type": "cds.Decimal"
+        },
+        "rate": {
+          "type": "cds.Decimal"
+        },
+        "volume24h": {
+          "type": "cds.Decimal"
+        }
+      }
+    },
     "uni_li_wue.dw.KPI_G_CREDITS": {
       "kind": "entity",
       "elements": {
@@ -1208,6 +1277,44 @@
         },
         "noOfTransactions": {
           "type": "cds.Integer"
+        }
+      }
+    },
+    "uni_li_wue.dw.KPI_G_GINI": {
+      "kind": "entity",
+      "elements": {
+        "date": {
+          "key": true,
+          "type": "cds.Date"
+        },
+        "coin": {
+          "key": true,
+          "type": "cds.String",
+          "length": 3
+        },
+        "coinInfo": {
+          "type": "cds.Association",
+          "cardinality": {
+            "max": 1
+          },
+          "target": "uni_li_wue.dw.KPI_ENUM_COIN",
+          "on": [
+            {
+              "ref": [
+                "coin"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "coinInfo",
+                "shortName"
+              ]
+            }
+          ]
+        },
+        "gini": {
+          "type": "cds.Double"
         }
       }
     },
@@ -1984,6 +2091,31 @@
       },
       "$syntax": "projection"
     },
+    "uni_li_wue.dw.service.KafkaPublishService.KPI_ENUM_ETHEREUM_TOKEN": {
+      "kind": "entity",
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "uni_li_wue.dw.KPI_ENUM_ETHEREUM_TOKEN"
+            ]
+          }
+        }
+      },
+      "elements": {
+        "symbol": {
+          "key": true,
+          "type": "cds.String"
+        },
+        "address": {
+          "type": "cds.String"
+        },
+        "name": {
+          "type": "cds.String"
+        }
+      },
+      "$syntax": "projection"
+    },
     "uni_li_wue.dw.service.KafkaPublishService.KPI_ENUM_EVENT": {
       "kind": "entity",
       "@readonly": true,
@@ -2122,6 +2254,71 @@
       },
       "$syntax": "projection"
     },
+    "uni_li_wue.dw.service.KafkaPublishService.KPI_E_TOKEN": {
+      "kind": "entity",
+      "@insertonly": true,
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "uni_li_wue.dw.KPI_E_TOKEN"
+            ]
+          }
+        }
+      },
+      "elements": {
+        "timestamp": {
+          "key": true,
+          "type": "cds.DateTime"
+        },
+        "token": {
+          "type": "cds.String"
+        },
+        "tokenInfo": {
+          "type": "cds.Association",
+          "cardinality": {
+            "max": 1
+          },
+          "target": "uni_li_wue.dw.service.KafkaPublishService.KPI_ENUM_ETHEREUM_TOKEN",
+          "on": [
+            {
+              "ref": [
+                "token"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "tokenInfo",
+                "symbol"
+              ]
+            }
+          ]
+        },
+        "holdersCount": {
+          "type": "cds.Integer"
+        },
+        "issuancesCount": {
+          "type": "cds.Integer"
+        },
+        "txsCount": {
+          "type": "cds.Integer"
+        },
+        "marketCapUsd": {
+          "type": "cds.Decimal"
+        },
+        "availableSupply": {
+          "type": "cds.Decimal"
+        },
+        "rate": {
+          "type": "cds.Decimal"
+        },
+        "volume24h": {
+          "type": "cds.Decimal"
+        }
+      },
+      "$syntax": "projection"
+    },
     "uni_li_wue.dw.service.KafkaPublishService.KPI_G_CREDITS": {
       "kind": "entity",
       "@insertonly": true,
@@ -2170,6 +2367,55 @@
         },
         "noOfTransactions": {
           "type": "cds.Integer"
+        }
+      },
+      "$syntax": "projection"
+    },
+    "uni_li_wue.dw.service.KafkaPublishService.KPI_G_GINI": {
+      "kind": "entity",
+      "@insertonly": true,
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "uni_li_wue.dw.KPI_G_GINI"
+            ]
+          }
+        }
+      },
+      "elements": {
+        "date": {
+          "key": true,
+          "type": "cds.Date"
+        },
+        "coin": {
+          "key": true,
+          "type": "cds.String",
+          "length": 3
+        },
+        "coinInfo": {
+          "type": "cds.Association",
+          "cardinality": {
+            "max": 1
+          },
+          "target": "uni_li_wue.dw.service.KafkaPublishService.KPI_ENUM_COIN",
+          "on": [
+            {
+              "ref": [
+                "coin"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "coinInfo",
+                "shortName"
+              ]
+            }
+          ]
+        },
+        "gini": {
+          "type": "cds.Double"
         }
       },
       "$syntax": "projection"
@@ -2839,6 +3085,32 @@
       },
       "$syntax": "projection"
     },
+    "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_ENUM_ETHEREUM_TOKEN": {
+      "kind": "entity",
+      "@readonly": true,
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "uni_li_wue.dw.KPI_ENUM_ETHEREUM_TOKEN"
+            ]
+          }
+        }
+      },
+      "elements": {
+        "symbol": {
+          "key": true,
+          "type": "cds.String"
+        },
+        "address": {
+          "type": "cds.String"
+        },
+        "name": {
+          "type": "cds.String"
+        }
+      },
+      "$syntax": "projection"
+    },
     "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_ENUM_EVENTS": {
       "kind": "entity",
       "@readonly": true,
@@ -3030,6 +3302,71 @@
       },
       "$syntax": "projection"
     },
+    "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_E_TOKEN": {
+      "kind": "entity",
+      "@readonly": true,
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "uni_li_wue.dw.KPI_E_TOKEN"
+            ]
+          }
+        }
+      },
+      "elements": {
+        "timestamp": {
+          "key": true,
+          "type": "cds.DateTime"
+        },
+        "token": {
+          "type": "cds.String"
+        },
+        "tokenInfo": {
+          "type": "cds.Association",
+          "cardinality": {
+            "max": 1
+          },
+          "target": "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_ENUM_ETHEREUM_TOKEN",
+          "on": [
+            {
+              "ref": [
+                "token"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "tokenInfo",
+                "symbol"
+              ]
+            }
+          ]
+        },
+        "holdersCount": {
+          "type": "cds.Integer"
+        },
+        "issuancesCount": {
+          "type": "cds.Integer"
+        },
+        "txsCount": {
+          "type": "cds.Integer"
+        },
+        "marketCapUsd": {
+          "type": "cds.Decimal"
+        },
+        "availableSupply": {
+          "type": "cds.Decimal"
+        },
+        "rate": {
+          "type": "cds.Decimal"
+        },
+        "volume24h": {
+          "type": "cds.Decimal"
+        }
+      },
+      "$syntax": "projection"
+    },
     "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_G_CREDITS": {
       "kind": "entity",
       "@readonly": true,
@@ -3078,6 +3415,55 @@
         },
         "noOfTransactions": {
           "type": "cds.Integer"
+        }
+      },
+      "$syntax": "projection"
+    },
+    "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_G_GINI": {
+      "kind": "entity",
+      "@readonly": true,
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "uni_li_wue.dw.KPI_G_GINI"
+            ]
+          }
+        }
+      },
+      "elements": {
+        "date": {
+          "key": true,
+          "type": "cds.Date"
+        },
+        "coin": {
+          "key": true,
+          "type": "cds.String",
+          "length": 3
+        },
+        "coinInfo": {
+          "type": "cds.Association",
+          "cardinality": {
+            "max": 1
+          },
+          "target": "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_ENUM_COINS",
+          "on": [
+            {
+              "ref": [
+                "coin"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "coinInfo",
+                "shortName"
+              ]
+            }
+          ]
+        },
+        "gini": {
+          "type": "cds.Double"
         }
       },
       "$syntax": "projection"
