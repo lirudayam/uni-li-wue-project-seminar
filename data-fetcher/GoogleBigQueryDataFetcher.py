@@ -1,14 +1,15 @@
 import logging
 import os
 import threading
-from decimal import Decimal
 
 from google.cloud import bigquery
 
 from DWConfigs import DWConfigs
 from KafkaConnector import catch_request_error, KafkaConnector
 
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "/Users/d067805/Documents/IJ_Workspace/uni-li-wue-project-seminar/data-fetcher/googlebigquerytoken.json"
+os.environ[
+    "GOOGLE_APPLICATION_CREDENTIALS"] = "/home/pjs/python_fetchers/googlebigquerytoken.json"
+
 
 class GoogleBigQueryDataFetcher:
     fetcher_name = "Google Big Query Data Fetcher"
@@ -16,7 +17,7 @@ class GoogleBigQueryDataFetcher:
 
     def __init__(self):
         self.client = bigquery.Client()
-        #self.trigger_health_pings()
+        # self.trigger_health_pings()
         self.process_data_fetch()
         logging.info('Successful init')
 
@@ -119,7 +120,7 @@ order by date asc""")
                 })
 
     def calc_btc_gini(self):
-            query_job = self.client.query("""with
+        query_job = self.client.query("""with
 double_entry_book as (
     select
         array_to_string(outputs.addresses,',') as address,
@@ -184,19 +185,19 @@ from ranked_daily_balances
 group by date
 having sum(balance) > 0
 order by date asc""")
-            results = query_job.result()  # Waits for job to complete.
+        results = query_job.result()  # Waits for job to complete.
 
-            for row in results:
-                try:
-                    KafkaConnector().send_to_kafka(self.kafka_topic, {
-                        "date": row.date.strftime("%Y-%m-%d"),
-                        "coin": "BTC",
-                        "gini": row.gini * 1.0 # avoid decimal object
-                    })
-                except:
-                    catch_request_error({
-                        "error": "Couldn't calculate Gini for Bitcoin"
-                    })
+        for row in results:
+            try:
+                KafkaConnector().send_to_kafka(self.kafka_topic, {
+                    "date": row.date.strftime("%Y-%m-%d"),
+                    "coin": "BTC",
+                    "gini": row.gini * 1.0  # avoid decimal object
+                })
+            except:
+                catch_request_error({
+                    "error": "Couldn't calculate Gini for Bitcoin"
+                })
 
     def process_data_fetch(self):
         self.calc_eth_gini()
