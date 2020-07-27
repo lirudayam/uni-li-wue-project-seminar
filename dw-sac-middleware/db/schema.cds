@@ -155,6 +155,14 @@ entity KPI_G_RECOMM {
         price     : Decimal;
 }
 
+entity KPI_G_GINI {
+    key date             : Date;
+    key coin             : String(3);
+        coinInfo         : Association to one KPI_ENUM_COIN
+                               on coin = coinInfo.shortName;
+        gini             : Double;
+}
+
 entity KPI_G_CREDITS {
     key timestamp        : DateTime;
     key coin             : String(3);

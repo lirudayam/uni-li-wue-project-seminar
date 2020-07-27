@@ -115,3 +115,4 @@ workspace.code-workspace
 
 *.DS_Store
 vault-token.txt
+data-fetcher/googlebigquerytoken.json
