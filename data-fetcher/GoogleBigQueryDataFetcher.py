@@ -17,7 +17,7 @@ class GoogleBigQueryDataFetcher:
 
     def __init__(self):
         self.client = bigquery.Client()
-        # self.trigger_health_pings()
+        self.trigger_health_pings()
         self.process_data_fetch()
         logging.info('Successful init')
 
