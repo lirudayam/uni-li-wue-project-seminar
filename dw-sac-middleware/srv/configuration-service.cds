@@ -7,7 +7,6 @@ service ConfigurationService {
   entity KPI_ENUM_COIN as projection on dw.KPI_ENUM_COIN;
   entity KPI_ENUM_STOCK_MARKET as projection on dw.KPI_ENUM_STOCK_MARKET;
   entity KPI_ENUM_EVENT as projection on dw.KPI_ENUM_EVENT;
-  entity KPI_ENUM_SEMANTICS as projection on dw.KPI_ENUM_SEMANTICS;
 
 /* configs tables */
   entity KPI_CONFIG as projection on dw.KPI_STREAM_TYPE_CONFIG;

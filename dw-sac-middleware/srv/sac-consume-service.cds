@@ -7,7 +7,6 @@ service SACSlowLayerDataService {
   entity KPI_ENUM_COINS @readonly as projection on dw.KPI_ENUM_COIN;
   entity KPI_ENUM_STOCK_MARKETS @readonly as projection on dw.KPI_ENUM_STOCK_MARKET;
   entity KPI_ENUM_EVENTS @readonly as projection on dw.KPI_ENUM_EVENT;
-  entity KPI_ENUM_SEMANTICS @readonly as projection on dw.KPI_ENUM_SEMANTICS;
 
 /* logs tables */
   entity HEALTH_STATUS @readonly as select api, timestamp as last_ping, (
@@ -26,14 +25,12 @@ service SACSlowLayerDataService {
   
 /* kpi readonly */
   entity KPI_G_RICH_ACC @readonly as projection on dw.KPI_G_RICH_ACC;
-  entity KPI_G_T_PER_TIME @readonly as projection on dw.KPI_G_T_PER_TIME;
   entity KPI_E_SMART_EXEC @readonly as projection on dw.KPI_E_SMART_EXEC;
   entity KPI_G_N_PER_TIME @readonly as projection on dw.KPI_G_N_PER_TIME;
-  entity KPI_G_TRANSACT_INF @readonly as projection on dw.KPI_G_TRANSACT_INF;
   entity KPI_G_PRICE_VOLA @readonly as projection on dw.KPI_G_PRICE_VOLA;
+  entity KPI_G_PRICE_DIFF @readonly as select key timestamp, key coin, MIN(price) as Minimum: Double, MAX(price) as Maximum: Double, AVG(price) as Average: Double from dw.KPI_G_PRICE_VOLA group by timestamp, coin;
   entity KPI_G_PRICES @readonly as projection on dw.KPI_G_PRICES;
-  entity KPI_G_LATEST_BLOCK @readonly as projection on dw.KPI_G_LATEST_BLOCK;
-  entity KPI_E_GASSTATION @readonly as projection on dw.KPI_E_GASSTATION;
+  entity KPI_E_BLOCK @readonly as select key identifier, timestamp, size, difficulty, gasLimit, gasUsed, safeGasPrice, blockTime, noOfTransactions from dw.KPI_E_BLOCK inner join dw.KPI_E_EXT_GASSTATION on identifier = blockNumber;
   entity KPI_B_BLOCK @readonly as projection on dw.KPI_B_BLOCK;
   entity KPI_B_SPECIAL_EVT @readonly as projection on dw.KPI_B_SPECIAL_EVT;
   entity KPI_G_NODE_DISTRIBUTION @readonly as projection on dw.KPI_G_NODE_DISTRIBUTION;

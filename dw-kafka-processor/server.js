@@ -1,15 +1,24 @@
 const { Kafka, logLevel } = require("kafkajs");
+
+// XS-Advanced environment variables
+const xsenv = require("@sap/xsenv");
 const oauthClient = require("client-oauth2");
 
-const xsenv = require("@sap/xsenv");
+// Moment.js
 const moment = require("moment");
 
+// Logging information
+const log = require("cf-nodejs-logging-support");
+log.setLoggingLevel("info");
+
+// get the connectivity service for Kafka connection
 const connService = xsenv.getServices({
   connectivity: function (service) {
     return service.label === "connectivity";
   },
 }).connectivity;
 
+// enhance String with new func to get bytes for STOMP5 protocol
 String.prototype.getBytes = function () {
   var bytes = [];
   for (var i = 0; i < this.length; ++i) {
@@ -18,32 +27,29 @@ String.prototype.getBytes = function () {
   return bytes;
 };
 
+// get CDS module
 const cds = require("@sap/cds");
-const asyncf = async () => {
-  const srv = await cds.connect.to("externalService");
+
+// async function for consuming kafka and writing to data warehouse
+const asyncInitialRunFn = async () => {
+  // connect to the external service of dw -> access via OData, no direct access
+  const srv = await cds.connect.to("dwInsertService");
+  // get entities for namespace
   const entites = srv.entities("uni_li_wue.dw");
-  let relevantServiceEntites = {};
+
+  // filter for any relevant ones in the required KafkaPublishService
+  let relevantServiceEntities = {};
   Object.keys(entites).map((key) => {
     if (key.startsWith("service.KafkaPublishService.")) {
-      relevantServiceEntites[key.replace("service.KafkaPublishService.", "")] =
+      relevantServiceEntities[key.replace("service.KafkaPublishService.", "")] =
         entites[key];
     }
   });
 
   const {
-    KPI_ENUM_COINS,
-    KPI_ENUM_STOCK_MARKETS,
-    KPI_ENUM_EVENTS,
-    KPI_ENUM_SEMANTICS,
-    KPI_ENUM_STREAM_ENTRY,
-    KPI_TIME_CONFIG,
-    KPI_REFRESH_CONFIG,
-    KPI_NOTIFICATION_CONFIG,
     KPI_G_RICH_ACC,
-    KPI_G_T_PER_TIME,
     KPI_E_SMART_EXEC,
     KPI_G_N_PER_TIME,
-    KPI_G_TRANSACT_INF,
     KPI_G_PRICE_VOLA,
     KPI_G_PRICES,
     KPI_B_SPECIAL_EVT,
@@ -53,18 +59,16 @@ const asyncf = async () => {
     KPI_G_CREDITS,
     LOG_FETCH_ERROR,
     LOG_HEALTH_CHECK,
-    KPI_E_GASSTATION,
-    KPI_G_LATEST_BLOCK,
-    KPI_B_BLOCK
-  } = relevantServiceEntites;
+    KPI_E_EXT_GASSTATION,
+    KPI_E_BLOCK,
+    KPI_B_BLOCK,
+  } = relevantServiceEntities;
 
-  var oSimpleTopicMaps = {
+  // group by speed layer and batch layer topic
+  var oSpeedLayerTopics = {
     RAW_G_RICH_ACC: KPI_G_RICH_ACC,
-    RAW_G_T_PER_TIME: KPI_G_T_PER_TIME,
     RAW_E_SMART_EXEC: KPI_E_SMART_EXEC,
     RAW_G_N_PER_TIME: KPI_G_N_PER_TIME,
-
-    RAW_G_TRANSACT_INF: KPI_G_TRANSACT_INF,
 
     RAW_G_PRICE_VOLA: KPI_G_PRICE_VOLA,
     RAW_G_PRICES: KPI_G_PRICES,
@@ -73,9 +77,14 @@ const asyncf = async () => {
     RAW_G_STOCKTWITS_FETCHER: KPI_G_NEWS,
     RAW_G_RECOMM: KPI_G_RECOMM,
     RAW_G_CREDITS: KPI_G_CREDITS,
-
-    RAW_B_BLOCK: KPI_B_BLOCK
   };
+  var aBatchLayerTopics = [
+    "RAW_E_GASSTATION",
+    "RAW_G_LATEST_BLOCK",
+    "RAW_G_NODE_DISTRIBUTION",
+    "RAW_E_BLOCK",
+    "RAW_B_BLOCK",
+  ];
 
   const socketAliveTime = 60 * 60 * 1000;
 
@@ -115,6 +124,7 @@ const asyncf = async () => {
           STATE_2VERSION = 2,
           STATE_STATUS = 3;
 
+          // Establish a SOCKS5 handshake for TCP connection via connectivity service and Cloud Connector
         socks.connect(
           {
             host: "kafka.cloud",
@@ -194,11 +204,8 @@ const asyncf = async () => {
 
     async function startKafka(socket) {
       var myCustomSocketFactory = ({ host, port, ssl, onConnect }) => {
-        console.log("Start listening to Kafka", host, port, ssl);
         socket.setKeepAlive(true, socketAliveTime);
         onConnect();
-        socket.pipe(process.stdout);
-
         return socket;
       };
 
@@ -227,7 +234,10 @@ const asyncf = async () => {
         await consumer.run({
           autoCommitInterval: 5000,
           eachMessage: async ({ topic, partition, message }) => {
-            if (oSimpleTopicMaps.hasOwnProperty(topic)) {
+            // ---------------------------------------------------
+            // --- BEGIN SPEED LAYER -----------------------------
+            // ---------------------------------------------------
+            if (oSpeedLayerTopics.hasOwnProperty(topic)) {
               try {
                 let entry = JSON.parse(message.value.toString());
                 if (entry.timestamp) {
@@ -235,16 +245,16 @@ const asyncf = async () => {
                 }
 
                 await srv.run(
-                  INSERT.into(oSimpleTopicMaps[topic]).entries([entry])
+                  INSERT.into(oSpeedLayerTopics[topic]).entries([entry])
                 );
               } catch (e) {
                 console.error("Error has occurred", e);
               }
-            } else if (
-              topic === "RAW_E_GASSTATION" ||
-              topic === "RAW_G_LATEST_BLOCK" ||
-              topic === "RAW_G_NODE_DISTRIBUTION"
-            ) {
+            }
+            // ---------------------------------------------------
+            // --- BEGIN BATCH LAYER -----------------------------
+            // ---------------------------------------------------
+            else if (aBatchLayerTopics.indexOf(topic) !== -1) {
               let entry = JSON.parse(message.value.toString());
               let entries;
               if (entry.timestamp) {
@@ -252,15 +262,25 @@ const asyncf = async () => {
               }
 
               switch (topic) {
-                case "RAW_G_LATEST_BLOCK":
+                case "RAW_E_BLOCK":
                   entries = await srv.run(
-                    SELECT.from(KPI_G_LATEST_BLOCK).where({
+                    SELECT.from(KPI_E_BLOCK).where({
                       identifier: entry.identifier,
                       coin: entry.coin,
                     })
                   );
                   if (entries.length === 0) {
-                    srv.run(INSERT.into(KPI_G_LATEST_BLOCK).entries([entry]));
+                    srv.run(INSERT.into(KPI_E_BLOCK).entries([entry]));
+                  }
+                  break;
+                case "RAW_B_BLOCK":
+                  entries = await srv.run(
+                    SELECT.from(KPI_B_BLOCK)
+                      .orderBy({ timestamp: "desc" })
+                      .limit(1)
+                  );
+                  if (!entries[0] || entries[0].blockTime !== entry.blockTime) {
+                    srv.run(INSERT.into(KPI_B_BLOCK).entries([entry]));
                   }
                   break;
                 case "RAW_G_NODE_DISTRIBUTION":
@@ -289,16 +309,20 @@ const asyncf = async () => {
                 case "RAW_E_GASSTATION":
                 default:
                   entries = await srv.run(
-                    SELECT.from(KPI_E_GASSTATION).where({
+                    SELECT.from(KPI_E_EXT_GASSTATION).where({
                       blockNumber: entry.blockNumber,
                     })
                   );
                   if (entries.length === 0) {
-                    srv.run(INSERT.into(KPI_E_GASSTATION).entries([entry]));
+                    srv.run(INSERT.into(KPI_E_EXT_GASSTATION).entries([entry]));
                   }
                   break;
               }
-            } else if (topic === "RAW_HEALTH_CHECKS") {
+            }
+            // ---------------------------------------------------
+            // --- HEALTH CHECKS ---------------------------------
+            // ---------------------------------------------------
+            else if (topic === "RAW_HEALTH_CHECKS") {
               try {
                 let api = message.value.toString().replace(/\"/g, "");
 
@@ -362,21 +386,24 @@ const asyncf = async () => {
   };
 
   triggerListener();
+
   // Delay the socket restart interval
   setTimeout(() => {
     setInterval(function () {
       triggerListener();
     }, socketAliveTime);
   }, 1000);
+
   console.log("async start");
 };
-asyncf();
+asyncInitialRunFn();
 
+// Ping - Pong Health
 const express = require("express");
 const app = express();
 
-app.get("/", function (req, res) {
-  res.send("Hello World");
+app.get("/ping", function (req, res) {
+  res.send("pong");
 });
 
 app.listen(8080);

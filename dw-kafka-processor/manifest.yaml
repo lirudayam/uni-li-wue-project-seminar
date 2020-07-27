@@ -12,5 +12,5 @@ applications:
       memory: 512M
       services:
         - uni-li-wue-dw-connectivity
-        - uni-li-wue-dw-destinations
         - uni-li-wue-dw-xsuaa
+        - uni-li-wue-dw-destinations

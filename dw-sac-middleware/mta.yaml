@@ -4,7 +4,7 @@
 ## approuter=
 _schema-version: '3.1'
 ID: uni-li-wue-dw-cloud
-version: 1.0.2
+version: 1.2.0
 description: "Uni Liechtenstein Team Project @ Würzburg CAP Data Warehouse"
 parameters:
   enable-parallel-deployments: true

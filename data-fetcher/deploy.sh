@@ -2,6 +2,27 @@ echo "Installing Tools"
 pip3 install wheel
 pip3 install setuptools
 
+################################################################################
+# Help                                                                         #
+################################################################################
+Help()
+{
+   # Display Help
+   echo "Manual Deployment for a single data fetcher."
+   echo
+   echo "Syntax: ./deploy.sh [fetcher_name...]"
+   echo "arguments:"
+   echo "fetcher_name     The name of the data fetcher to be deployed, space-separated (e.g. Infura ETHGasStation)"
+   echo
+}
+
+################################################################################
+################################################################################
+# Main program                                                                 #
+################################################################################
+#############################################################################
+Help
+
 while (( "$#" )); do
   FILE_TO_BE_DEPLOYED=$1
   mkdir "tmp_deploy"
