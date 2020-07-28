@@ -1,4 +1,3 @@
-import asyncio
 import logging
 import os
 import threading
@@ -56,22 +55,9 @@ class InfuraDataFetcher:
 
     def register_listener_for_new_block(self):
         self.handle_new_block()
-        # block_filter = w3.eth.filter('latest')
-        # loop = asyncio.get_event_loop()
-        # try:
-        #    loop.run_until_complete(
-        #        asyncio.gather(
-        #            self.log_loop(block_filter, 2)))
-        # finally:
-        #    loop.close()
-
-    async def log_loop(self, event_filter, poll_interval):
-        while True:
-            for event in event_filter.get_new_entries():
-                self.handle_new_block()
-            await asyncio.sleep(poll_interval)
 
     def handle_new_block(self):
+        self.get_connection()
         latest_block = dict(w3.eth.getBlock("latest"))
 
         if self.latest_identifier != latest_block['number']:

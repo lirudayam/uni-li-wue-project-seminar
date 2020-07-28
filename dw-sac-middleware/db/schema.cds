@@ -159,8 +159,8 @@ entity KPI_G_NODE_DISTRIBUTION {
 entity KPI_G_RECOMM {
     key timestamp : DateTime;
         token     : String;
-        score     : Decimal;
-        price     : Decimal;
+        score     : Double;
+        price     : Double;
 }
 
 entity KPI_E_TOKEN {
@@ -171,10 +171,10 @@ entity KPI_E_TOKEN {
         holdersCount    : Integer;
         issuancesCount  : Integer;
         txsCount        : Integer;
-        marketCapUsd    : Decimal;
-        availableSupply : Decimal;
-        rate            : Decimal;
-        volume24h       : Decimal;
+        marketCapUsd    : Double;
+        availableSupply : Double;
+        rate            : Double;
+        volume24h       : Double;
 }
 
 entity KPI_G_GINI {

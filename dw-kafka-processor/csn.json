@@ -1226,16 +1226,16 @@
           "type": "cds.Integer"
         },
         "marketCapUsd": {
-          "type": "cds.Decimal"
+          "type": "cds.Double"
         },
         "availableSupply": {
-          "type": "cds.Decimal"
+          "type": "cds.Double"
         },
         "rate": {
-          "type": "cds.Decimal"
+          "type": "cds.Double"
         },
         "volume24h": {
-          "type": "cds.Decimal"
+          "type": "cds.Double"
         }
       }
     },
@@ -1568,10 +1568,10 @@
           "type": "cds.String"
         },
         "score": {
-          "type": "cds.Decimal"
+          "type": "cds.Double"
         },
         "price": {
-          "type": "cds.Decimal"
+          "type": "cds.Double"
         }
       }
     },
@@ -2305,16 +2305,16 @@
           "type": "cds.Integer"
         },
         "marketCapUsd": {
-          "type": "cds.Decimal"
+          "type": "cds.Double"
         },
         "availableSupply": {
-          "type": "cds.Decimal"
+          "type": "cds.Double"
         },
         "rate": {
-          "type": "cds.Decimal"
+          "type": "cds.Double"
         },
         "volume24h": {
-          "type": "cds.Decimal"
+          "type": "cds.Double"
         }
       },
       "$syntax": "projection"
@@ -2735,10 +2735,10 @@
           "type": "cds.String"
         },
         "score": {
-          "type": "cds.Decimal"
+          "type": "cds.Double"
         },
         "price": {
-          "type": "cds.Decimal"
+          "type": "cds.Double"
         }
       },
       "$syntax": "projection"
@@ -3353,16 +3353,16 @@
           "type": "cds.Integer"
         },
         "marketCapUsd": {
-          "type": "cds.Decimal"
+          "type": "cds.Double"
         },
         "availableSupply": {
-          "type": "cds.Decimal"
+          "type": "cds.Double"
         },
         "rate": {
-          "type": "cds.Decimal"
+          "type": "cds.Double"
         },
         "volume24h": {
-          "type": "cds.Decimal"
+          "type": "cds.Double"
         }
       },
       "$syntax": "projection"
@@ -3888,10 +3888,10 @@
           "type": "cds.String"
         },
         "score": {
-          "type": "cds.Decimal"
+          "type": "cds.Double"
         },
         "price": {
-          "type": "cds.Decimal"
+          "type": "cds.Double"
         }
       },
       "$syntax": "projection"
