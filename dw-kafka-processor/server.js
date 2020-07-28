@@ -261,15 +261,13 @@ const asyncInitialRunFn = async () => {
 						console.log(...values)
 						if (values.length > 0) {
 							srv.run(INSERT.into(relevantServiceEntities[entity]).entries( ...values )).catch((error) => {
-								//log.error(entity);
-								//log.error(values);
-								//log.error(error);
+								log.error(error);
 							});
 						}
 					}
 					catch (e) {
-						//log.error(entry);
-						//log.error("Error has occurred", e);
+						log.error(entity);
+						log.error("Error has occurred", e);
 					}
 				}
 			}

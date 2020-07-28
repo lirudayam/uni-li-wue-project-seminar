@@ -43,11 +43,13 @@ class ETHGasStationDataFetcher:
                 "type": ErrorTypes.API_LIMIT_EXCEED,
                 "error": e
             }, self.kafka_topic)
+            pass
         except (TypeError, JSONDecodeError) as e:
             catch_request_error({
                 "type": ErrorTypes.FETCH_ERROR,
                 "error": e
             }, self.kafka_topic)
+            pass
 
     def process_data_fetch(self):
         self.get_data_from_gasstation()
@@ -63,9 +65,9 @@ class ETHGasStationDataFetcher:
                 "type": ErrorTypes.FETCH_ERROR,
                 "error": sys.exc_info()[0]
             }, self.kafka_topic)
-
-        s = threading.Timer(DWConfigs().get_fetch_interval(self.kafka_topic), self.process_data_fetch, [], {})
-        s.start()
+        finally:
+            s = threading.Timer(DWConfigs().get_fetch_interval(self.kafka_topic), self.process_data_fetch, [], {})
+            s.start()
 
 
 ETHGasStationDataFetcher()

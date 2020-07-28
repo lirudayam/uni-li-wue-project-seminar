@@ -198,6 +198,7 @@ order by date asc""")
                 catch_request_error({
                     "error": "Couldn't calculate Gini for Bitcoin"
                 })
+                pass
 
     def process_data_fetch(self):
         self.calc_eth_gini()
