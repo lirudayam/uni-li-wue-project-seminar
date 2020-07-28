@@ -55,7 +55,6 @@ const asyncInitialRunFn = async () => {
     KPI_G_PRICES,
     KPI_B_SPECIAL_EVT,
     KPI_G_NEWS,
-    KPI_G_NODE_DISTRIBUTION,
     KPI_G_RECOMM,
     KPI_G_CREDITS,
     LOG_FETCH_ERROR,
@@ -63,7 +62,6 @@ const asyncInitialRunFn = async () => {
     KPI_E_EXT_GASSTATION,
     KPI_E_BLOCK,
     KPI_B_BLOCK,
-    KPI_E_TOKEN,
     KPI_G_GINI
   } = relevantServiceEntities;
 
@@ -81,7 +79,7 @@ const asyncInitialRunFn = async () => {
     RAW_G_RECOMM: KPI_G_RECOMM,
     RAW_G_CREDITS: KPI_G_CREDITS,
 
-    RAW_G_GINI: KPI_G_GINI,
+    RAW_G_GINI: KPI_G_GINI
   };
   var aBatchLayerTopics = [
     "RAW_E_GASSTATION",
@@ -130,7 +128,7 @@ const asyncInitialRunFn = async () => {
           STATE_2VERSION = 2,
           STATE_STATUS = 3;
 
-          // Establish a SOCKS5 handshake for TCP connection via connectivity service and Cloud Connector
+        // Establish a SOCKS5 handshake for TCP connection via connectivity service and Cloud Connector
         socks.connect(
           {
             host: "kafka.cloud",
@@ -206,7 +204,7 @@ const asyncInitialRunFn = async () => {
         );
         console.log("DONE");
       })
-      .catch((err) => console.log(err));
+      .catch((err) => log.error(err));
 
     async function startKafka(socket) {
       var myCustomSocketFactory = ({ host, port, ssl, onConnect }) => {
@@ -230,12 +228,54 @@ const asyncInitialRunFn = async () => {
         logLevel: logLevel.ERROR,
       });
 
-      const consumer = kafka.consumer({ groupId: "dw-consumer" });
+      const consumer = kafka.consumer({
+        groupId: "dw-consumer",
+      });
 
       const run = async () => {
         // Consuming
         await consumer.connect();
-        await consumer.subscribe({ topic: /RAW_.*/i });
+        await consumer.subscribe({
+          topic: /RAW_.*/i,
+		});
+		
+		let oBatchInsertQueue = {};
+
+		function addIntoBatchInsertQueue(entity, value) {
+			if (oBatchInsertQueue[entity]) {
+				oBatchInsertQueue[entity].push(value);
+			}
+			else {
+				oBatchInsertQueue[entity] = [value];
+			}
+		}
+
+		const runBatchInserts = async () => {
+			// clone the queue for thread safety and reset the other one
+			const threadSafeQueueCopy = {...oBatchInsertQueue};
+			if (threadSafeQueueCopy !== {}) {
+				oBatchInsertQueue = {};
+				// iterate over copied queue and make batch inserts
+				for (const [entity, values] of Object.entries(threadSafeQueueCopy)) {
+					try {
+						console.log(...values)
+						if (values.length > 0) {
+							srv.run(INSERT.into(relevantServiceEntities[entity]).entries( ...values )).catch((error) => {
+								//log.error(entity);
+								//log.error(values);
+								//log.error(error);
+							});
+						}
+					}
+					catch (e) {
+						//log.error(entry);
+						//log.error("Error has occurred", e);
+					}
+				}
+			}
+		}
+
+		var fnBatchInterval = setInterval(() => {runBatchInserts()}, 5000);
 
         await consumer.run({
           autoCommitInterval: 5000,
@@ -244,17 +284,18 @@ const asyncInitialRunFn = async () => {
             // --- BEGIN SPEED LAYER -----------------------------
             // ---------------------------------------------------
             if (oSpeedLayerTopics.hasOwnProperty(topic)) {
-              try {
-                let entry = JSON.parse(message.value.toString());
-                if (entry.timestamp) {
-                  entry.timestamp = moment(entry.timestamp * 1000).format();
-                }
+              let entry = JSON.parse(message.value.toString());
+              if (entry.timestamp) {
+                entry.timestamp = moment(entry.timestamp * 1000).format();
+              }
 
+              try {
                 await srv.run(
                   INSERT.into(oSpeedLayerTopics[topic]).entries([entry])
                 );
               } catch (e) {
-                console.error("Error has occurred", e);
+                log.error(entry);
+                log.error("Error has occurred", e);
               }
             }
             // ---------------------------------------------------
@@ -266,80 +307,95 @@ const asyncInitialRunFn = async () => {
               if (entry.timestamp) {
                 entry.timestamp = moment(entry.timestamp * 1000).format();
               }
-
-              switch (topic) {
-                case "RAW_E_BLOCK":
-                  entries = await srv.run(
-                    SELECT.from(KPI_E_BLOCK).where({
-                      identifier: entry.identifier,
-                      coin: entry.coin,
-                    })
-                  );
-                  if (entries.length === 0) {
-                    srv.run(INSERT.into(KPI_E_BLOCK).entries([entry]));
-                  }
-                  break;
-                case "RAW_E_TOKEN":
+              try {
+                switch (topic) {
+                  case "RAW_E_BLOCK":
+                    entries = await srv.run(
+                      SELECT.from(KPI_E_BLOCK).where({
+                        identifier: entry.identifier
+                      })
+                    );
+                    if (
+                      entries.length === 0 &&
+                      entry.identifier !== null &&
+                      entry.identifier !== undefined
+                    ) {
+						addIntoBatchInsertQueue("KPI_E_BLOCK", entry);
+                    }
+                    break;
+                  case "RAW_E_TOKEN":
                     entries = await srv.run(
                       SELECT.from(KPI_ENUM_ETHEREUM_TOKEN).where({
-                        symbol: entry.token
+                        symbol: entry.token,
                       })
                     );
                     if (entries.length === 0) {
-                      srv.run(INSERT.into(KPI_ENUM_ETHEREUM_TOKEN).entries([{
-                        symbol: entry.token,
-                        address: entry.address,
-                        name: entry.name
-                      }]));
-                    }
+                      srv.run(
+                        INSERT.into(KPI_ENUM_ETHEREUM_TOKEN).entries([
+                          {
+                            symbol: entry.token,
+                            address: entry.address,
+                            name: entry.name,
+                          },
+                        ])
+                      );
+					}
+					if (entry.marketCapUsd === null) {
+						entry.marketCapUsd = 0;
+					}
+					if (entry.availableSupply === null) {
+						entry.availableSupply = 0;
+					}
+
                     delete entry.address;
-                    delete entry.name;
-                    srv.run(INSERT.into(KPI_E_TOKEN).entries([entry]));
+					delete entry.name;
+					addIntoBatchInsertQueue("KPI_E_TOKEN", entry);
                     break;
-                case "RAW_B_BLOCK":
-                  entries = await srv.run(
-                    SELECT.from(KPI_B_BLOCK)
-                      .orderBy({ timestamp: "desc" })
-                      .limit(1)
-                  );
-                  if (!entries[0] || entries[0].blockTime !== entry.blockTime) {
-                    srv.run(INSERT.into(KPI_B_BLOCK).entries([entry]));
-                  }
-                  break;
-                case "RAW_G_NODE_DISTRIBUTION":
-                  Object.keys(entry.countries).forEach((country) => {
-                    srv.run(
-                      INSERT.into(KPI_G_NODE_DISTRIBUTION).entries([
-                        {
-                          timestamp: entry.timestamp,
-                          coin: entry.coin,
-                          country: country,
-                          nodes: parseInt(entry.countries[country]),
-                        },
-                      ])
+                  case "RAW_B_BLOCK":
+                    entries = await srv.run(
+                      SELECT.from(KPI_B_BLOCK)
+                        .orderBy({
+                          timestamp: "desc",
+                        })
+                        .limit(1)
                     );
-                  });
-                  srv.run(
-                    INSERT.into(KPI_G_N_PER_TIME).entries([
-                      {
-                        timestamp: entry.timestamp,
-                        coin: entry.coin,
-                        numOfNodes: parseInt(entry.nodeCount),
-                      },
-                    ])
-                  );
-                  break;
-                case "RAW_E_GASSTATION":
-                default:
-                  entries = await srv.run(
-                    SELECT.from(KPI_E_EXT_GASSTATION).where({
-                      blockNumber: entry.blockNumber,
-                    })
-                  );
-                  if (entries.length === 0) {
-                    srv.run(INSERT.into(KPI_E_EXT_GASSTATION).entries([entry]));
-                  }
-                  break;
+                    if (
+                      !entries[0] ||
+                      entries[0].blockTime !== entry.blockTime
+                    ) {
+						addIntoBatchInsertQueue("KPI_B_BLOCK", entry);
+                    }
+                    break;
+                  case "RAW_G_NODE_DISTRIBUTION":
+                    Object.keys(entry.countries).forEach((country) => {
+						addIntoBatchInsertQueue("KPI_G_NODE_DISTRIBUTION", {
+                            timestamp: entry.timestamp,
+                            coin: entry.coin,
+                            country: country,
+                            nodes: parseInt(entry.countries[country]),
+                          });
+					});
+					addIntoBatchInsertQueue("KPI_G_N_PER_TIME", {
+						timestamp: entry.timestamp,
+						coin: entry.coin,
+						numOfNodes: parseInt(entry.nodeCount),
+					  });
+                    break;
+                  case "RAW_E_GASSTATION":
+                  default:
+                    entries = await srv.run(
+                      SELECT.from(KPI_E_EXT_GASSTATION).where({
+                        blockNumber: entry.blockNumber,
+                      })
+                    );
+                    if (entries.length === 0) {
+						addIntoBatchInsertQueue("KPI_E_EXT_GASSTATION", entry);
+                    }
+                    break;
+                }
+              } catch (e) {
+                log.error(entry);
+                log.error("Error has occurred", e);
               }
             }
             // ---------------------------------------------------
@@ -376,7 +432,7 @@ const asyncInitialRunFn = async () => {
                   );
                 }
               } catch (e) {
-                console.error("Error has occurred", e);
+                log.error("Error has occurred", e);
               }
             } else if (topic === "RAW_FETCH_ERROR") {
               try {
@@ -391,16 +447,22 @@ const asyncInitialRunFn = async () => {
                 };
                 await srv.run(INSERT.into(LOG_FETCH_ERROR).entries([newEntry]));
               } catch (e) {
-                console.error("Error has occurred", e);
+                log.error("Error has occurred", e);
               }
             }
           },
         });
 
         setTimeout(function () {
-          consumer.pause([{ topic: /RAW_.*/i }]);
+          consumer.pause([
+            {
+              topic: /RAW_.*/i,
+            },
+          ]);
           consumer.disconnect();
-          delete consumer;
+		  delete consumer;
+		  clearInterval(fnBatchInterval);
+		  runBatchInserts();
         }, socketAliveTime);
       };
 
