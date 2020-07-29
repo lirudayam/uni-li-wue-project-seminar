@@ -49,7 +49,6 @@ const asyncInitialRunFn = async () => {
   const {
     KPI_ENUM_ETHEREUM_TOKEN,
     KPI_G_RICH_ACC,
-    KPI_E_SMART_EXEC,
     KPI_G_N_PER_TIME,
     KPI_G_PRICE_VOLA,
     KPI_G_PRICES,
@@ -68,7 +67,6 @@ const asyncInitialRunFn = async () => {
   // group by speed layer and batch layer topic
   var oSpeedLayerTopics = {
     RAW_G_RICH_ACC: KPI_G_RICH_ACC,
-    RAW_E_SMART_EXEC: KPI_E_SMART_EXEC,
     RAW_G_N_PER_TIME: KPI_G_N_PER_TIME,
 
     RAW_G_PRICE_VOLA: KPI_G_PRICE_VOLA,

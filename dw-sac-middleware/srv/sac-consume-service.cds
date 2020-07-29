@@ -26,7 +26,6 @@ service SACSlowLayerDataService {
   
 /* kpi readonly */
   entity KPI_G_RICH_ACC @readonly as projection on dw.KPI_G_RICH_ACC;
-  entity KPI_E_SMART_EXEC @readonly as projection on dw.KPI_E_SMART_EXEC;
   entity KPI_G_N_PER_TIME @readonly as projection on dw.KPI_G_N_PER_TIME;
   entity KPI_G_PRICE_VOLA @readonly as projection on dw.KPI_G_PRICE_VOLA;
   entity KPI_G_PRICE_DIFF @readonly as select key timestamp, key coin, MIN(price) as Minimum: Double, MAX(price) as Maximum: Double, AVG(price) as Average: Double from dw.KPI_G_PRICE_VOLA group by timestamp, coin;
@@ -40,5 +39,4 @@ service SACSlowLayerDataService {
   
   entity KPI_G_NEWS @readonly as projection on dw.KPI_G_NEWS;
   entity KPI_G_RECOMM @readonly as projection on dw.KPI_G_RECOMM;
-  entity KPI_G_CREDITS @readonly as projection on dw.KPI_G_CREDITS;
 }

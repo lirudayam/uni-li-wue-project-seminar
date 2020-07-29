@@ -69,12 +69,6 @@ entity KPI_G_RICH_ACC {
         balance        : Double;
 }
 
-entity KPI_E_SMART_EXEC {
-    key timestamp       : DateTime;
-        contractAddress : String;
-        count           : Integer;
-}
-
 entity KPI_G_N_PER_TIME {
     key timestamp  : DateTime;
     key coin       : String(3);
@@ -183,15 +177,6 @@ entity KPI_G_GINI {
         coinInfo         : Association to one KPI_ENUM_COIN
                                on coin = coinInfo.shortName;
         gini             : Double;
-}
-
-entity KPI_G_CREDITS {
-    key timestamp        : DateTime;
-    key coin             : String(3);
-        coinInfo         : Association to one KPI_ENUM_COIN
-                               on coin = coinInfo.shortName;
-        noOfCredits      : Integer;
-        noOfTransactions : Integer;
 }
 
 view KPI_AGGREGATE_REQUIRED as
