@@ -43,30 +43,39 @@ class EthplorerDataFetcher:
                 "type": ErrorTypes.API_LIMIT_EXCEED,
                 "error": e
             }, self.kafka_topic)
+            pass
         except (TypeError, JSONDecodeError) as e:
             catch_request_error({
                 "type": ErrorTypes.FETCH_ERROR,
                 "error": e
             }, self.kafka_topic)
+            pass
 
     def process_data_fetch(self):
         tokens = self.get_data_from_api()
         try:
             for token in tokens:
                 if token["price"] is not False:
-                    KafkaConnector().send_to_kafka(self.kafka_topic, {
-                        "timestamp": token["price"]["ts"],
-                        "token": token["symbol"],
-                        "address": token["address"],
-                        "name": token["name"],
-                        "holdersCount": token["holdersCount"],
-                        "issuancesCount": token["issuancesCount"],
-                        "txsCount": token["txsCount"],
-                        "marketCapUsd": token["price"]["marketCapUsd"],
-                        "availableSupply": token["price"]["availableSupply"],
-                        "rate": token["price"]["rate"],
-                        "volume24h": token["price"]["volume24h"]
-                    })
+                    try:
+                        KafkaConnector().send_to_kafka(self.kafka_topic, {
+                            "timestamp": token["price"]["ts"],
+                            "token": token["symbol"],
+                            "address": token["address"],
+                            "name": token["name"],
+                            "holdersCount": token["holdersCount"],
+                            "issuancesCount": token["issuancesCount"],
+                            "txsCount": token["txsCount"],
+                            "marketCapUsd": token["price"]["marketCapUsd"],
+                            "availableSupply": token["price"]["availableSupply"],
+                            "rate": token["price"]["rate"],
+                            "volume24h": token["price"]["volume24h"]
+                        })
+                    except:
+                        catch_request_error({
+                            "type": ErrorTypes.FETCH_ERROR,
+                            "error": sys.exc_info()[0]
+                        }, self.kafka_topic)
+                        pass
         except:
             catch_request_error({
                 "type": ErrorTypes.FETCH_ERROR,

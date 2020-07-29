@@ -5,7 +5,7 @@ import threading
 from google.cloud import bigquery
 
 from DWConfigs import DWConfigs
-from KafkaConnector import catch_request_error, KafkaConnector
+from KafkaConnector import catch_request_error, KafkaConnector, get_unix_timestamp
 
 os.environ[
     "GOOGLE_APPLICATION_CREDENTIALS"] = "/home/pjs/python_fetchers/googlebigquerytoken.json"
@@ -14,6 +14,7 @@ os.environ[
 class GoogleBigQueryDataFetcher:
     fetcher_name = "Google Big Query Data Fetcher"
     kafka_topic = "RAW_G_GINI"
+    sub_kafka_topic = "RAW_G_RICH_ACC"
 
     def __init__(self):
         self.client = bigquery.Client()
@@ -200,9 +201,56 @@ order by date asc""")
                 })
                 pass
 
+    def get_richest_eth_account(self):
+        query_job = self.client.query("""        with 
+        double_entry_book as (
+            -- debits
+            select to_address as address, value as value
+            from `bigquery-public-data.crypto_ethereum.traces`
+            where to_address is not null
+            and status = 1
+            and (call_type not in ('delegatecall', 'callcode', 'staticcall') or call_type is null)
+            union all
+            -- credits
+            select from_address as address, -value as value
+            from `bigquery-public-data.crypto_ethereum.traces`
+            where from_address is not null
+            and status = 1
+            and (call_type not in ('delegatecall', 'callcode', 'staticcall') or call_type is null)
+            union all
+            -- transaction fees debits
+            select miner as address, sum(cast(receipt_gas_used as numeric) * cast(gas_price as numeric)) as value
+            from `bigquery-public-data.crypto_ethereum.transactions` as transactions
+            join `bigquery-public-data.crypto_ethereum.blocks` as blocks on blocks.number = transactions.block_number
+            group by blocks.miner
+            union all
+            -- transaction fees credits
+            select from_address as address, -(cast(receipt_gas_used as numeric) * cast(gas_price as numeric)) as value
+            from `bigquery-public-data.crypto_ethereum.transactions`
+        )
+        select
+        address, sum(value) as balance from double_entry_book
+        group by address order by balance desc limit 1""")
+        results = query_job.result()  # Waits for job to complete.
+
+        for row in results:
+            try:
+                KafkaConnector().send_to_kafka(self.sub_kafka_topic, {
+                    "date": get_unix_timestamp(),
+                    "coin": "BTC",
+                    "accountAddress": row.address,
+                    "balance": row.balance * 1.0
+                })
+            except:
+                catch_request_error({
+                    "error": "Couldn't get richest ETH account"
+                })
+                pass
+
     def process_data_fetch(self):
         self.calc_eth_gini()
         self.calc_btc_gini()
+        self.get_richest_eth_account()
 
         s = threading.Timer(DWConfigs().get_fetch_interval(self.kafka_topic), self.process_data_fetch, [], {})
         s.start()
