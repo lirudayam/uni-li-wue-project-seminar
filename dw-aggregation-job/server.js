@@ -58,7 +58,7 @@ async function findAndAggregateData() {
                 groupBy: ", Coin, StockMarket"
             },
             KPI_G_PRICES: {
-                select: "MIN(Timestamp) as Timestamp, Coin, AVG(Price) as Price, AVG(MarketCap) as MarketCap, AVG(volume24h) as volume24h, AVG(change24h) as change24h",
+                select: "MIN(Timestamp) as Timestamp, Coin, AVG(Price) as Price, MAX(MarketCap) as MarketCap, AVG(volume24h) as volume24h, AVG(change24h) as change24h",
                 fields: ["Timestamp", "Coin", "Price", "MarketCap", "Volume24h", "Change24h"],
                 groupBy: ", Coin"
             },

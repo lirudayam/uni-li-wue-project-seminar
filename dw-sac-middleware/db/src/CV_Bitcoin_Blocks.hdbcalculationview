@@ -32,13 +32,13 @@
     </calculationView>
 </calculationViews>
   <logicalModel id="Projection_1" ignoreMultipleOutputsForFilter="true">
-    <attributes />
+    <attributes>
+      <attribute id="timestamp" order="1" displayAttribute="false" attributeHierarchyActive="false">
+        <keyMapping columnObjectName="Projection_1" columnName="TIMESTAMP"/>
+      </attribute>
+    </attributes>
     <calculatedAttributes/>
     <baseMeasures>
-      <measure id="timestamp" order="1" measureType="simple">
-    		<descriptions defaultDescription="TIMESTAMP"/>
-    		<measureMapping columnObjectName="Projection_1" columnName="TIMESTAMP"/>
-    	</measure>
       <measure id="blocktime" order="2" measureType="simple">
     		<descriptions defaultDescription="BLOCKTIME"/>
     		<measureMapping columnObjectName="Projection_1" columnName="BLOCKTIME"/>

@@ -35,16 +35,15 @@
 </calculationViews>
   <logicalModel id="Projection_1" ignoreMultipleOutputsForFilter="true">
     <attributes>
+      <attribute id="timestamp" order="1" displayAttribute="false" attributeHierarchyActive="false">
+        <keyMapping columnObjectName="Projection_1" columnName="TIMESTAMP"/>
+      </attribute>
       <attribute id="identifier" order="2" displayAttribute="false" attributeHierarchyActive="false">
         <keyMapping columnObjectName="Projection_1" columnName="IDENTIFIER"/>
       </attribute>
     </attributes>
     <calculatedAttributes/>
     <baseMeasures>
-      <measure id="timestamp" order="1" measureType="simple">
-    		<descriptions defaultDescription="TIMESTAMP"/>
-    		<measureMapping columnObjectName="Projection_1" columnName="TIMESTAMP"/>
-    	</measure>
     	<measure id="size" order="3" measureType="simple">
     		<descriptions defaultDescription="SIZE"/>
     		<measureMapping columnObjectName="Projection_1" columnName="SIZE"/>

@@ -67,7 +67,7 @@ class CoinMarketCapDataFetcher:
                 "price": self.Bitcoin["USD"]["price"],
                 "marketCap": self.Bitcoin["USD"]["market_cap"],
                 "volume24h": self.Bitcoin["USD"]["volume_24h"],
-                "change24h": self.Bitcoin["USD"]["percent_change_24h"]
+                "change24h": self.Bitcoin["USD"]["percent_change_24h"] / 100
             })
             KafkaConnector().send_to_kafka(self.kafka_topic, {
                 "timestamp": get_unix_timestamp(),
@@ -75,7 +75,7 @@ class CoinMarketCapDataFetcher:
                 "price": self.Ethereum["USD"]["price"],
                 "marketCap": self.Ethereum["USD"]["market_cap"],
                 "volume24h": self.Ethereum["USD"]["volume_24h"],
-                "change24h": self.Ethereum["USD"]["percent_change_24h"]
+                "change24h": self.Ethereum["USD"]["percent_change_24h"] / 100
             })
         except:
             catch_request_error({
