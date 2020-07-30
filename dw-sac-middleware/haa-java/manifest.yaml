@@ -1,0 +1,21 @@
+---
+    applications:
+    - name: haa-java
+      memory: 768M
+      path: target/java-xsahaa.war
+      routes:
+        - route: cf-dts-eim-ch-sac-blockchain-haa-java.cfapps.eu10.hana.ondemand.com
+    
+      buildpacks:
+        - sap_java_buildpack
+      services:
+        - xsahaa-uaa
+        - uni-li-wue-dw-cloud-db
+        - uni-li-wue-dw-cloud-logger
+    
+      env:
+          TARGET_RUNTIME: tomee
+          PERSONALIZE_JWT: true
+          JBP_CONFIG_RESOURCE_CONFIGURATION: "['tomee/webapps/ROOT/WEB-INF/resources.xml': {'xsahaa-hdi-container':'uni-li-wue-dw-cloud-db'}]"
+          SET_LOGGING_LEVEL: '{ROOT: INFO, com.sap.cloud.sdk: INFO}'
+          ALLOW_MOCKED_AUTH_HEADER: true
