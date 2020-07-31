@@ -30,6 +30,12 @@ entity KPI_ENUM_ETHEREUM_TOKEN {
         name    : String;
 }
 
+entity KPI_ENUM_COUNTRY_CODES {
+    key isoCode     : String(2);
+        latitude    : Double;
+        longitude   : Double;
+        name        : String;
+}
 
 /* Confiugration Entites */
 entity KPI_STREAM_TYPE_CONFIG {
@@ -159,7 +165,7 @@ entity KPI_G_RECOMM {
 
 entity KPI_E_TOKEN {
     key timestamp       : DateTime;
-        token           : String;
+    key token           : String;
         tokenInfo       : Association to one KPI_ENUM_ETHEREUM_TOKEN
                                on token = tokenInfo.symbol;
         holdersCount    : Integer;
