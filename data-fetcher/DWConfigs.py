@@ -25,7 +25,7 @@ class DWConfigs:
         try:
             SERVICE_URL = HashiVaultCredentialStorage().get_credentials("DWConfigs", "ODataServiceURL")[0]
             result = requests.get(SERVICE_URL + "/KPI_CONFIG('" + topic + "')").json()
-            if result == None:
+            if result is None:
                 raise ValueError('Error')
             return result
         except:

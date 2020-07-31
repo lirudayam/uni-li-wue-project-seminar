@@ -1,8 +1,10 @@
 import logging
 import os
 import threading
+from typing import re
 
 from google.cloud import bigquery
+from requests import Session
 
 from DWConfigs import DWConfigs
 from KafkaConnector import catch_request_error, KafkaConnector, get_unix_timestamp
@@ -75,7 +77,7 @@ double_entry_book as (
         from double_entry_book_by_date
 )
 ,calendar as (
-    select date from unnest(generate_date_array(DATE_SUB(current_date(), INTERVAL 1 DAY), current_date())) as date
+    select date from unnest(generate_date_array(DATE_SUB(current_date(), INTERVAL 1 WEEK), current_date())) as date
 )
 ,daily_balances as (
     select address, calendar.date, balance
@@ -150,7 +152,7 @@ daily_balances_with_gaps as (
         from double_entry_book_by_date
 ),
 calendar as (
-    select date from unnest(generate_date_array(DATE_SUB(current_date(), INTERVAL 1 DAY), current_date())) as date
+    select date from unnest(generate_date_array(DATE_SUB(current_date(), INTERVAL 1 WEEK), current_date())) as date
 ),
 daily_balances as (
     select address, calendar.date, balance
@@ -202,7 +204,7 @@ order by date asc""")
                 pass
 
     def get_richest_eth_account(self):
-        query_job = self.client.query("""        with 
+        query_job = self.client.query("""with 
         double_entry_book as (
             -- debits
             select to_address as address, value as value
@@ -236,8 +238,8 @@ order by date asc""")
         for row in results:
             try:
                 KafkaConnector().send_to_kafka(self.sub_kafka_topic, {
-                    "date": get_unix_timestamp(),
-                    "coin": "BTC",
+                    "timestamp": get_unix_timestamp(),
+                    "coin": "ETH",
                     "accountAddress": row.address,
                     "balance": row.balance * 1.0
                 })
@@ -247,10 +249,33 @@ order by date asc""")
                 })
                 pass
 
+    def get_richest_btc_account(self):
+        session = Session()
+        response = session.get("https://bitinfocharts.com/de/top-100-richest-bitcoin-addresses.html")
+        m = re.match(
+            r"id=\"tblOne\"(.+)>((.|\s)+?(?=tbody))((.|\s)+?(?=<a href))((.|\s)+?(?=>))>(.+)<\/a>((.|\s)+?(?=<td ))<td (.+)data-val=\"(.+)\">",
+            response.text)
+        address = m[8]
+        balance = m[12]
+        if address and balance:
+            try:
+                KafkaConnector().send_to_kafka(self.sub_kafka_topic, {
+                    "timestamp": get_unix_timestamp(),
+                    "coin": "BTC",
+                    "accountAddress": address,
+                    "balance": balance * 1.0
+                })
+            except:
+                catch_request_error({
+                    "error": "Couldn't get richest BTC account"
+                })
+                pass
+
     def process_data_fetch(self):
         self.calc_eth_gini()
         self.calc_btc_gini()
         self.get_richest_eth_account()
+        self.get_richest_btc_account()
 
         s = threading.Timer(DWConfigs().get_fetch_interval(self.kafka_topic), self.process_data_fetch, [], {})
         s.start()

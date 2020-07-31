@@ -18,7 +18,7 @@ class CoinMarketCapDataFetcher:
 
     def __init__(self):
         self.url = 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest'
-        self.parameters = {'slug': "bitcoin,ethereum"}
+        self.parameters = {'slug': "bitcoin,ethereum,ren"}
         self.session = Session()
         self.session.headers.update({
             'Accepts': 'application/json',
@@ -26,11 +26,9 @@ class CoinMarketCapDataFetcher:
         })
         self.trigger_health_pings()
         self.process_data_fetch()
-        self.output = None
         self.Bitcoin = None
         self.Ethereum = None
-        self.BitcoinRaw = None
-        self.EthereumRaw = None
+        self.Ren = None
         logging.info('Successful init')
 
     # Supporting methods
@@ -45,11 +43,13 @@ class CoinMarketCapDataFetcher:
     def get_data_from_coinmarketcap(self):
         try:
             response = self.session.get(self.url, params=self.parameters)
-            self.output = json.loads(response.text)
-            self.BitcoinRaw = self.output["data"]["1"]
-            self.EthereumRaw = self.output["data"]["1027"]
-            self.Bitcoin = self.BitcoinRaw["quote"]
-            self.Ethereum = self.EthereumRaw["quote"]
+            output = json.loads(response.text)
+            BitcoinRaw = output["data"]["1"]
+            EthereumRaw = output["data"]["1027"]
+            RenRaw = output["data"]["2539"]
+            self.Bitcoin = BitcoinRaw["quote"]
+            self.Ethereum = EthereumRaw["quote"]
+            self.Ren = RenRaw["quote"]
 
         except (ConnectionError, Timeout, TooManyRedirects) as e:
             catch_request_error({
@@ -77,11 +77,20 @@ class CoinMarketCapDataFetcher:
                 "volume24h": self.Ethereum["USD"]["volume_24h"],
                 "change24h": self.Ethereum["USD"]["percent_change_24h"] / 100
             })
+            KafkaConnector().send_to_kafka(self.kafka_topic, {
+                "timestamp": get_unix_timestamp(),
+                "coin": "REN",
+                "price": self.Ren["USD"]["price"],
+                "marketCap": self.Ren["USD"]["market_cap"],
+                "volume24h": self.Ren["USD"]["volume_24h"],
+                "change24h": self.Ren["USD"]["percent_change_24h"] / 100
+            })
         except:
             catch_request_error({
                 "type": ErrorTypes.FETCH_ERROR,
                 "error": sys.exc_info()[0]
             }, self.kafka_topic)
+            pass
         finally:
             s = threading.Timer(DWConfigs().get_fetch_interval(self.kafka_topic), self.process_data_fetch, [], {})
             s.start()
