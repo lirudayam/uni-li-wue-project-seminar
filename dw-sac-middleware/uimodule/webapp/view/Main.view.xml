@@ -1,76 +1,112 @@
-<mvc:View controllerName="uni.li.wue.project.dwconfig.controller.Main" displayBlock="true" 
-  xmlns="sap.m" 
-  xmlns:mvc="sap.ui.core.mvc">
-  <App id="idAppControl">
-    <pages>
-      <Page title="{i18n>title}">
-        <content>
-          <HBox width="100%">
-            <items>
-              <VBox width="100%" direction="Column" class="sapUiSmallPadding">
-                <items>
-                  <Title text="{i18n>healthStatus}" />
-                  <Text text="{i18n>healthStatusDetails}"/>
-                  <Table noDataText="Drop column list items here and columns in the area above" items="{configuration>/HEALTH_STATUS}">
-                    <items>
-                      <ColumnListItem type="Active">
-                        <cells>
-                          <Text text="{configuration>api}"/>
-                          <Text text="{configuration>last_ping}"/>
-                          <Text text="{configuration>status}"/>
-                        </cells>
-                      </ColumnListItem>
-                    </items>
-                    <columns>
-                      <Column>
-                        <header>
-                          <Label text="{i18n>dataFetcher}" />
-                        </header>
-                      </Column>
-                      <Column>
-                        <header>
-                          <Label text="{i18n>lastPing}" />
-                        </header>
-                      </Column>
-                      <Column>
-                        <header>
-                          <Label text="{i18n>status}" />
-                        </header>
-                      </Column>
-                    </columns>
-                  </Table>
-                </items>
-              </VBox>
-              <VBox width="100%" direction="Column" class="sapUiSmallPadding">
-              <Title text="{i18n>generalAPIConfig}" />
-                  <Text text="{i18n>generalAPIConfigDetails}"/>
-                  <Table noDataText="Drop column list items here and columns in the area above" items="{configuration>/API_CONFIG}">
-                    <items>
-                      <ColumnListItem type="Active">
-                        <cells>
-                          <Text text="{configuration>name}"/>
-                          <Text text="{configuration>value}"/>
-                        </cells>
-                      </ColumnListItem>
-                    </items>
-                    <columns>
-                      <Column>
-                        <header>
-                          <Label text="{i18n>key}" />
-                        </header>
-                      </Column>
-                      <Column>
-                        <header>
-                          <Label text="{i18n>value}" />
-                        </header>
-                      </Column>
-                    </columns>
-                  </Table>
-              </VBox>
-            </items>
-          </HBox>
-        </content>
-      </Page>
-    </pages>
-  </App>
+<mvc:View xmlns="sap.m" xmlns:mvc="sap.ui.core.mvc" controllerName="uni.li.wue.project.dwconfig.controller.Main" displayBlock="true">
+	<App id="idAppControl">
+		<pages>
+			<Page title="{i18n>title}">
+				<content>
+					<HBox width="100%">
+						<items>
+							<VBox width="100%" direction="Column" class="sapUiSmallPadding sapUiTinyMargin">
+								<items>
+									<Title text="{i18n>healthStatus}"/>
+									<Text text="{i18n>healthStatusDetails}"/>
+									<Table noDataText="Drop column list items here and columns in the area above" items="{configuration>/HEALTH_STATUS}">
+										<items>
+											<ColumnListItem type="Active">
+												<cells>
+													<Text text="{configuration>api}"/>
+													<Text text="{configuration>last_ping}"/>
+													<Text text="{configuration>status}"/>
+												</cells>
+											</ColumnListItem>
+										</items>
+										<columns>
+											<Column>
+												<header>
+													<Label text="{i18n>dataFetcher}"/>
+												</header>
+											</Column>
+											<Column>
+												<header>
+													<Label text="{i18n>lastPing}"/>
+												</header>
+											</Column>
+											<Column>
+												<header>
+													<Label text="{i18n>status}"/>
+												</header>
+											</Column>
+										</columns>
+									</Table>
+								</items>
+							</VBox>
+							<VBox width="100%" direction="Column" class="sapUiSmallPadding sapUiTinyMargin">
+								<Title text="{i18n>generalAPIConfig}"/>
+								<Text text="{i18n>generalAPIConfigDetails}"/>
+								<Table noDataText="Drop column list items here and columns in the area above" items="{configuration>/API_CONFIG}">
+									<items>
+										<ColumnListItem type="Active">
+											<cells>
+												<Text text="{configuration>name}"/>
+												<Text text="{configuration>value}"/>
+											</cells>
+										</ColumnListItem>
+									</items>
+									<columns>
+										<Column>
+											<header>
+												<Label text="{i18n>key}"/>
+											</header>
+										</Column>
+										<Column>
+											<header>
+												<Label text="{i18n>value}"/>
+											</header>
+										</Column>
+									</columns>
+								</Table>
+							</VBox>
+						</items>
+					</HBox>
+					<HBox width="100%" id="hbox1">
+						<items>
+							<VBox width="100%" direction="Column" class="sapUiSmallPadding sapUiTinyMargin">
+								<items>
+									<Title text="{i18n>fetchErrors}"/>
+									<Text text="{i18n>fetchErrorsDetails}"/>
+									<Table noDataText="Drop column list items here and columns in the area above" items="{configuration>/LOG_FETCH_ERROR}">
+										<items>
+											<ColumnListItem type="Active">
+												<cells>
+													<Text text="{configuration>api}"/>
+													<Text text="{configuration>timestamp}"/>
+													<Text text="{configuration>message}"/>
+												</cells>
+											</ColumnListItem>
+										</items>
+										<columns>
+											<Column>
+												<header>
+													<Label text="{i18n>api}"/>
+												</header>
+											</Column>
+											<Column>
+												<header>
+													<Label text="{i18n>timestamp}"/>
+												</header>
+											</Column>
+											<Column>
+												<header>
+													<Label text="{i18n>message}"/>
+												</header>
+											</Column>
+										</columns>
+									</Table>
+								</items>
+							</VBox>
+						</items>
+					</HBox>
+				</content>
+			</Page>
+		</pages>
+	</App>
 </mvc:View>
