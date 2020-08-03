@@ -45,7 +45,7 @@ class BlockchainDataFetcher:
                 "type": ErrorTypes.API_LIMIT_EXCEED,
                 "error": e
             }, self.kafka_topic)
-
+            pass
 
     def process_data_fetch(self):
         self.get_data_from_blockchain()
@@ -58,21 +58,13 @@ class BlockchainDataFetcher:
                 "estimatedSent": self.output['estimated_btc_sent'],
                 "minersRevenue": self.output['miners_revenue_btc'],
             })
-            print({
-                "timestamp": get_unix_timestamp(),
-                "coin": "BTC",
-                "blocktime": self.output['minutes_between_blocks'],
-                "nextretarget": self.output['nextretarget'],
-                "difficulty": self.output['difficulty'],
-                "estimated_btc_sent": self.output['estimated_btc_sent'],
-                "miners_revenue_btc": self.output['miners_revenue_btc'],
-            })
         except:
             catch_request_error({
                 "error": "ERROR"
             })
-        s = threading.Timer(DWConfigs().get_fetch_interval(self.kafka_topic), self.process_data_fetch, [], {})
-        s.start()
+        finally:
+            s = threading.Timer(DWConfigs().get_fetch_interval(self.kafka_topic), self.process_data_fetch, [], {})
+            s.start()
 
 
 BlockchainDataFetcher()

@@ -7,3 +7,6 @@ cd dw-sac-middleware
 cf deploy mta_archives/uni-li-wue-dw-cloud_1.2.0.mtar
 cd ../dw-kafka-processor
 cf push
+
+
+#cf deploy mta_archives/uni-li-wue-dw-cloud_1.2.0.mtar -m uni-li-wue-dw-cloud-srv -m db -r uni-li-wue-dw-cloud-db

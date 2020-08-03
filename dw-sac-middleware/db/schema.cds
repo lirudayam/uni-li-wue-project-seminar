@@ -24,6 +24,19 @@ entity KPI_ENUM_EVENT {
         description : String;
 }
 
+entity KPI_ENUM_ETHEREUM_TOKEN {
+    key symbol  : String;
+        address : String;
+        name    : String;
+}
+
+entity KPI_ENUM_COUNTRY_CODES {
+    key isoCode     : String(2);
+        latitude    : Double;
+        longitude   : Double;
+        name        : String;
+}
+
 /* Confiugration Entites */
 entity KPI_STREAM_TYPE_CONFIG {
     key topic                       : String;
@@ -60,12 +73,6 @@ entity KPI_G_RICH_ACC {
                              on coin = coinInfo.shortName;
         accountAddress : String;
         balance        : Double;
-}
-
-entity KPI_E_SMART_EXEC {
-    key timestamp       : DateTime;
-        contractAddress : String;
-        count           : Integer;
 }
 
 entity KPI_G_N_PER_TIME {
@@ -148,20 +155,34 @@ entity KPI_G_NODE_DISTRIBUTION {
         nodes     : Integer;
 }
 
+
 entity KPI_G_RECOMM {
     key timestamp : DateTime;
         token     : String;
-        score     : Decimal;
-        price     : Decimal;
+        score     : Double;
+        price     : Double;
 }
 
-entity KPI_G_CREDITS {
-    key timestamp        : DateTime;
+entity KPI_E_TOKEN {
+    key timestamp       : DateTime;
+    key token           : String;
+        tokenInfo       : Association to one KPI_ENUM_ETHEREUM_TOKEN
+                               on token = tokenInfo.symbol;
+        holdersCount    : Integer;
+        issuancesCount  : Integer;
+        txsCount        : Integer;
+        marketCapUsd    : Double;
+        availableSupply : Double;
+        rate            : Double;
+        volume24h       : Double;
+}
+
+entity KPI_G_GINI {
+    key date             : Date;
     key coin             : String(3);
         coinInfo         : Association to one KPI_ENUM_COIN
                                on coin = coinInfo.shortName;
-        noOfCredits      : Integer;
-        noOfTransactions : Integer;
+        gini             : Double;
 }
 
 view KPI_AGGREGATE_REQUIRED as

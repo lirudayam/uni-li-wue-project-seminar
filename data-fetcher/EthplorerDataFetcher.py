@@ -9,20 +9,20 @@ from requests.exceptions import ConnectionError, Timeout, TooManyRedirects
 
 from DWConfigs import DWConfigs
 from ErrorTypes import ErrorTypes
+from HashiVaultCredentialStorage import HashiVaultCredentialStorage
 from KafkaConnector import catch_request_error, get_unix_timestamp, KafkaConnector
 
 
-class ETHGasStationDataFetcher:
-    fetcher_name = "Eth Gas Station Data Fetcher"
-    kafka_topic = "RAW_E_GASSTATION"
+class EthplorerDataFetcher:
+    fetcher_name = "Ethplorer Data Fetcher"
+    kafka_topic = "RAW_E_TOKEN"
 
     def __init__(self):
-        self.url = "https://ethgasstation.info/api/ethgasAPI.json"
+        api_key = HashiVaultCredentialStorage().get_credentials("Ethplorer", "API_KEY")[0]
+        self.url = "https://api.ethplorer.io/getTopTokens?apiKey=" + api_key
         self.session = Session()
         self.trigger_health_pings()
         self.process_data_fetch()
-        self.x10Gwei = None
-        self.request_output = None
         logging.info('Successful init')
 
     # Supporting methods
@@ -34,10 +34,10 @@ class ETHGasStationDataFetcher:
         s = threading.Timer(DWConfigs().get_health_ping_interval(self.kafka_topic), self.send_health_pings, [], {})
         s.start()
 
-    def get_data_from_gasstation(self):
+    def get_data_from_api(self):
         try:
             response = self.session.get(self.url)
-            self.request_output = json.loads(response.text)
+            return json.loads(response.text)["tokens"]
         except (ConnectionError, Timeout, TooManyRedirects) as e:
             catch_request_error({
                 "type": ErrorTypes.API_LIMIT_EXCEED,
@@ -52,14 +52,30 @@ class ETHGasStationDataFetcher:
             pass
 
     def process_data_fetch(self):
-        self.get_data_from_gasstation()
+        tokens = self.get_data_from_api()
         try:
-            KafkaConnector().send_to_kafka(self.kafka_topic, {
-                "safeGasPrice": self.request_output["safeLow"],
-                # this unit divided by 10 = Gwei (Gwei to Ether = divide by 10^9) --> then convert to USD according to current rate
-                "blockNumber": self.request_output["blockNum"],
-                "blockTime": self.request_output["block_time"]
-            })
+            for token in tokens:
+                if token["price"] is not False:
+                    try:
+                        KafkaConnector().send_to_kafka(self.kafka_topic, {
+                            "timestamp": token["price"]["ts"],
+                            "token": token["symbol"],
+                            "address": token["address"],
+                            "name": token["name"],
+                            "holdersCount": token["holdersCount"],
+                            "issuancesCount": token["issuancesCount"],
+                            "txsCount": token["txsCount"],
+                            "marketCapUsd": token["price"]["marketCapUsd"],
+                            "availableSupply": token["price"]["availableSupply"],
+                            "rate": token["price"]["rate"],
+                            "volume24h": token["price"]["volume24h"]
+                        })
+                    except:
+                        catch_request_error({
+                            "type": ErrorTypes.FETCH_ERROR,
+                            "error": sys.exc_info()[0]
+                        }, self.kafka_topic)
+                        pass
         except:
             catch_request_error({
                 "type": ErrorTypes.FETCH_ERROR,
@@ -70,4 +86,4 @@ class ETHGasStationDataFetcher:
             s.start()
 
 
-ETHGasStationDataFetcher()
+EthplorerDataFetcher()

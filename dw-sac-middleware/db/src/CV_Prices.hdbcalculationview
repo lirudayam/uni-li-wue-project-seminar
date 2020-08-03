@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Calculation:scenario xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:Calculation="http://www.sap.com/ndb/BiModelCalculation.ecore" id="CV_Price" outputViewType="Projection" applyPrivilegeType="NONE" dataCategory="CUBE" schemaVersion="3.0" cacheInvalidationPeriod="NONE" enforceSqlExecution="false" propagateInstantiation="true">
+  <descriptions defaultDescription="Prices"/>
+  <localVariables/>
+  <variableMappings/>
+  <dataSources>
+    <DataSource id="KPI_G_PRICES">
+      <resourceUri>UNI_LI_WUE_DW_KPI_G_PRICES</resourceUri>
+    </DataSource>
+  </dataSources>
+<calculationViews>
+  <calculationView xsi:type="Calculation:ProjectionView" id="Projection_1">
+    <viewAttributes>
+      
+        <viewAttribute id="TIMESTAMP"/>
+        <viewAttribute id="COIN"/>
+        <viewAttribute id="PRICE"/>
+        <viewAttribute id="MARKETCAP"/>
+        <viewAttribute id="VOLUME24H"/>
+        <viewAttribute id="CHANGE24H"/>
+      
+    </viewAttributes>
+    <calculatedViewAttributes />
+      <input node="KPI_G_PRICES">
+        <mapping xsi:type="Calculation:AttributeMapping" target="TIMESTAMP" source="TIMESTAMP"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="COIN" source="COIN"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="PRICE" source="PRICE"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="MARKETCAP" source="MARKETCAP"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="VOLUME24H" source="VOLUME24H"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="CHANGE24H" source="CHANGE24H"/>
+      </input>
+    </calculationView>
+</calculationViews>
+  <logicalModel id="Projection_1" ignoreMultipleOutputsForFilter="true">
+    <attributes>
+      <attribute id="timestamp" order="1" displayAttribute="false" attributeHierarchyActive="false">
+        <keyMapping columnObjectName="Projection_1" columnName="TIMESTAMP"/>
+      </attribute>
+      <attribute id="identifier" order="2" displayAttribute="false" attributeHierarchyActive="false">
+        <keyMapping columnObjectName="Projection_1" columnName="COIN"/>
+      </attribute>
+    </attributes>
+    <calculatedAttributes/>
+    <baseMeasures>
+    	<measure id="price" order="3" measureType="simple">
+    		<descriptions defaultDescription="PRICE"/>
+    		<measureMapping columnObjectName="Projection_1" columnName="PRICE"/>
+    	</measure>
+    	<measure id="marketcap" order="4" measureType="simple">
+    		<descriptions defaultDescription="MARKETCAP"/>
+    		<measureMapping columnObjectName="Projection_1" columnName="MARKETCAP"/>
+    	</measure>
+    	<measure id="volume24h" order="5" measureType="simple">
+    		<descriptions defaultDescription="VOLUME24H"/>
+    		<measureMapping columnObjectName="Projection_1" columnName="VOLUME24H"/>
+    	</measure>
+    	<measure id="change24h" order="6" measureType="simple">
+    		<descriptions defaultDescription="CHANGE24H"/>
+    		<measureMapping columnObjectName="Projection_1" columnName="CHANGE24H"/>
+    	</measure>
+    </baseMeasures>
+    <calculatedMeasures/>
+    <restrictedMeasures/>
+  </logicalModel>
+<layout>
+  <shapes>
+    <shape modelObjectName="Output" modelObjectNameSpace="MeasureGroup">
+      <upperLeftCorner x="92" y="112"/>
+      <rectangleSize width="160"/>
+    </shape>
+    <shape modelObjectName="Projection_1" modelObjectNameSpace="CalculationView">
+      <upperLeftCorner x="92" y="217"/>
+      <rectangleSize width="160"/>
+    </shape>
+  </shapes>
+</layout>
+</Calculation:scenario>

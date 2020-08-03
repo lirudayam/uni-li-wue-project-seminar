@@ -79,17 +79,20 @@ class CryptowatDataFetcher:
                         catch_request_error({
                             "error": "Stock Market not found in result"
                         })
+                        pass
             return items
         except (ConnectionError, Timeout, TooManyRedirects) as e:
             catch_request_error({
                 "type": ErrorTypes.API_LIMIT_EXCEED,
                 "error": e
             }, self.kafka_topic)
+            pass
         except (TypeError, JSONDecodeError) as e:
             catch_request_error({
                 "type": ErrorTypes.FETCH_ERROR,
                 "error": e
             }, self.kafka_topic)
+            pass
 
     def process_data_fetch(self):
         items = self.get_data_from_cryptowat()
@@ -100,9 +103,9 @@ class CryptowatDataFetcher:
             catch_request_error({
                 "error": "msg"
             })
-
-        s = threading.Timer(DWConfigs().get_fetch_interval(self.kafka_topic), self.process_data_fetch, [], {})
-        s.start()
+        finally:
+            s = threading.Timer(DWConfigs().get_fetch_interval(self.kafka_topic), self.process_data_fetch, [], {})
+            s.start()
 
 
 CryptowatDataFetcher()

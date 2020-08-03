@@ -50,6 +50,7 @@ class BitcoinNodeDataFetcher:
                         "type": ErrorTypes.FETCH_ERROR,
                         "error": "No snapshot available"
                     }, self.kafka_topic)
+                    pass
 
             self.node_list = self.response.json()
             self.only_nodes = self.node_list["nodes"]
@@ -71,6 +72,7 @@ class BitcoinNodeDataFetcher:
                 "type": ErrorTypes.FETCH_ERROR,
                 "error": sys.exc_info()[0]
             }, self.kafka_topic)
+            pass
 
     def process_data_fetch(self):
         self.request_data_from_bitcoinnode()
@@ -86,9 +88,9 @@ class BitcoinNodeDataFetcher:
                 "type": ErrorTypes.FETCH_ERROR,
                 "error": sys.exc_info()[0]
             }, self.kafka_topic)
-
-        s = threading.Timer(DWConfigs().get_fetch_interval(self.kafka_topic), self.process_data_fetch, [], {})
-        s.start()
+        finally:
+            s = threading.Timer(DWConfigs().get_fetch_interval(self.kafka_topic), self.process_data_fetch, [], {})
+            s.start()
 
 
 BitcoinNodeDataFetcher()

@@ -4,7 +4,7 @@ import sys
 import threading
 from json import JSONDecodeError
 
-from requests import Session
+import cfscrape
 from requests.exceptions import ConnectionError, Timeout, TooManyRedirects
 
 from DWConfigs import DWConfigs
@@ -12,17 +12,14 @@ from ErrorTypes import ErrorTypes
 from KafkaConnector import catch_request_error, get_unix_timestamp, KafkaConnector
 
 
-class ETHGasStationDataFetcher:
-    fetcher_name = "Eth Gas Station Data Fetcher"
-    kafka_topic = "RAW_E_GASSTATION"
+class EtherscanDataFetcher:
+    fetcher_name = "Etherscan Data Fetcher"
+    kafka_topic = "RAW_G_NODE_DISTRIBUTION"
 
     def __init__(self):
-        self.url = "https://ethgasstation.info/api/ethgasAPI.json"
-        self.session = Session()
+        self.url = "https://etherscan.io/stats_nodehandler.ashx?t=1&code=&range=1&additional="
         self.trigger_health_pings()
         self.process_data_fetch()
-        self.x10Gwei = None
-        self.request_output = None
         logging.info('Successful init')
 
     # Supporting methods
@@ -34,10 +31,17 @@ class ETHGasStationDataFetcher:
         s = threading.Timer(DWConfigs().get_health_ping_interval(self.kafka_topic), self.send_health_pings, [], {})
         s.start()
 
-    def get_data_from_gasstation(self):
+    def get_data_from_node_dist_endpoint(self):
         try:
-            response = self.session.get(self.url)
-            self.request_output = json.loads(response.text)
+            response = cfscrape.CloudflareScraper().get(self.url)
+            list = json.loads(response.content)
+            countries_list = {}
+            node_count = 0
+            for country in list:
+                if country["value"] is not 0:
+                    countries_list[country["code"]] = country["value"]
+                    node_count += country["value"]
+            return countries_list, node_count
         except (ConnectionError, Timeout, TooManyRedirects) as e:
             catch_request_error({
                 "type": ErrorTypes.API_LIMIT_EXCEED,
@@ -52,13 +56,13 @@ class ETHGasStationDataFetcher:
             pass
 
     def process_data_fetch(self):
-        self.get_data_from_gasstation()
+        countries_list, node_count = self.get_data_from_node_dist_endpoint()
         try:
             KafkaConnector().send_to_kafka(self.kafka_topic, {
-                "safeGasPrice": self.request_output["safeLow"],
-                # this unit divided by 10 = Gwei (Gwei to Ether = divide by 10^9) --> then convert to USD according to current rate
-                "blockNumber": self.request_output["blockNum"],
-                "blockTime": self.request_output["block_time"]
+                "timestamp": get_unix_timestamp(),
+                "nodeCount": node_count,
+                "countries": countries_list,
+                "coin": 'ETH'
             })
         except:
             catch_request_error({
@@ -70,4 +74,4 @@ class ETHGasStationDataFetcher:
             s.start()
 
 
-ETHGasStationDataFetcher()
+EtherscanDataFetcher()

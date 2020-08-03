@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Calculation:scenario xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:Calculation="http://www.sap.com/ndb/BiModelCalculation.ecore" id="CV_Ethereum_Blocks" outputViewType="Projection" applyPrivilegeType="NONE" dataCategory="CUBE" schemaVersion="3.0" cacheInvalidationPeriod="NONE" enforceSqlExecution="false" propagateInstantiation="true">
+  <descriptions defaultDescription="EthereumBlocks"/>
+  <localVariables/>
+  <variableMappings/>
+  <dataSources>
+    <DataSource id="KPI_E_BLOCK">
+      <resourceUri>UNI_LI_WUE_DW_KPI_E_BLOCK</resourceUri>
+    </DataSource>
+  </dataSources>
+<calculationViews>
+  <calculationView xsi:type="Calculation:ProjectionView" id="Projection_1">
+    <viewAttributes>
+      
+        <viewAttribute id="TIMESTAMP"/>
+        <viewAttribute id="IDENTIFIER"/>
+        <viewAttribute id="SIZE"/>
+        <viewAttribute id="DIFFICULTY"/>
+        <viewAttribute id="GASLIMIT"/>
+        <viewAttribute id="GASUSED"/>
+        <viewAttribute id="NOOFTRANSACTIONS"/>
+      
+    </viewAttributes>
+    <calculatedViewAttributes />
+      <input node="KPI_E_BLOCK">
+        <mapping xsi:type="Calculation:AttributeMapping" target="TIMESTAMP" source="TIMESTAMP"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="IDENTIFIER" source="IDENTIFIER"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="SIZE" source="SIZE"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="DIFFICULTY" source="DIFFICULTY"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="GASLIMIT" source="GASLIMIT"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="GASUSED" source="GASUSED"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="NOOFTRANSACTIONS" source="NOOFTRANSACTIONS"/>
+      </input>
+    </calculationView>
+</calculationViews>
+  <logicalModel id="Projection_1" ignoreMultipleOutputsForFilter="true">
+    <attributes>
+      <attribute id="timestamp" order="1" displayAttribute="false" attributeHierarchyActive="false">
+        <keyMapping columnObjectName="Projection_1" columnName="TIMESTAMP"/>
+      </attribute>
+      <attribute id="identifier" order="2" displayAttribute="false" attributeHierarchyActive="false">
+        <keyMapping columnObjectName="Projection_1" columnName="IDENTIFIER"/>
+      </attribute>
+    </attributes>
+    <calculatedAttributes/>
+    <baseMeasures>
+    	<measure id="size" order="3" measureType="simple">
+    		<descriptions defaultDescription="SIZE"/>
+    		<measureMapping columnObjectName="Projection_1" columnName="SIZE"/>
+    	</measure>
+    	<measure id="difficulty" order="4" measureType="simple">
+    		<descriptions defaultDescription="DIFFICULTY"/>
+    		<measureMapping columnObjectName="Projection_1" columnName="DIFFICULTY"/>
+    	</measure>
+    	<measure id="gasLimit" order="5" measureType="simple">
+    		<descriptions defaultDescription="GASLIMIT"/>
+    		<measureMapping columnObjectName="Projection_1" columnName="GASLIMIT"/>
+    	</measure>
+    	<measure id="gasUsed" order="6" measureType="simple">
+    		<descriptions defaultDescription="GASUSED"/>
+    		<measureMapping columnObjectName="Projection_1" columnName="GASUSED"/>
+    	</measure>
+    	<measure id="noOfTransactions" order="7" measureType="simple">
+    		<descriptions defaultDescription="NOOFTRANSACTIONS"/>
+    		<measureMapping columnObjectName="Projection_1" columnName="NOOFTRANSACTIONS"/>
+    	</measure>
+    </baseMeasures>
+    <calculatedMeasures/>
+    <restrictedMeasures/>
+  </logicalModel>
+<layout>
+  <shapes>
+    <shape modelObjectName="Output" modelObjectNameSpace="MeasureGroup">
+      <upperLeftCorner x="92" y="112"/>
+      <rectangleSize width="160"/>
+    </shape>
+    <shape modelObjectName="Projection_1" modelObjectNameSpace="CalculationView">
+      <upperLeftCorner x="92" y="217"/>
+      <rectangleSize width="160"/>
+    </shape>
+  </shapes>
+</layout>
+</Calculation:scenario>
