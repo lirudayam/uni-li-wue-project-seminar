@@ -11,6 +11,11 @@ Die csn.json Datei ist eine Metadatei resultierend aus dem srv-Modul. Dieses mus
 
 cf push
 
+## Typical Errors
+
+Bei Kafkafehlverbindung folgendes probieren:
+bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --delete --group dw-consumer
+
 ## Coding Style
 
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
