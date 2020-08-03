@@ -1,10 +1,10 @@
 "use strict";
 
-const express = require('express');
-const app = express();
-const xsenv = require("@sap/xsenv");
+import express from 'express';
+import { filterCFServices } from "@sap/xsenv";
+import { initializeDBConnection, getSchema, getDBConnection } from "./db";
 
-const db = require("./db");
+const app = express();
 
 app.get('/runjob', function (req, res) {
     res.send(findAndAggregateData());
@@ -13,14 +13,14 @@ app.get('/runjob', function (req, res) {
 const port = process.env.PORT || 3000;
 app.listen(port, function () {
     try {
-        let hanaOptions = xsenv.filterCFServices({
+        let hanaOptions = filterCFServices({
             plan: "hdi-shared"
         })[0].credentials;
         hanaOptions = {
             "hana": hanaOptions
         };
         hanaOptions.hana.pooling = true;
-        db.initializeDBConnection(hanaOptions);
+        initializeDBConnection(hanaOptions);
     } catch (error) {
         console.error(error);
     }
@@ -28,7 +28,7 @@ app.listen(port, function () {
 });
 
 async function findAndAggregateData() {
-    const schema = db.getSchema();
+    const schema = getSchema();
 
     // get kpi-specific configs and the general aggregation delay
     const selectSQL = `SELECT * FROM ${schema}.UNI_LI_WUE_DW_KPI_STREAM_TYPE_CONFIG`;
@@ -38,7 +38,7 @@ async function findAndAggregateData() {
     let sAggregationQuery, sDeletionQuery, sInsertQuery;
 
     try {
-        const conn = db.getDBConnection();
+        const conn = getDBConnection();
         if (!conn) {
             throw new Error('Failed to retreive connection.');
         }
