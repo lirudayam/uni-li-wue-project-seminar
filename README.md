@@ -5,17 +5,11 @@
 
 Jeder ab dem Focus Day geschriebene Code sollten immer zu diesem GitHub Repository gepushed werden. Es wird kein Branching-/Deployment Konzept genutzt, sondern jeglicher Code wird zu Beginn in den *master* branch deployed, so lange bis es eine stabile Version gibt.
 
-### Code Guidelines
+### Programming Guidelines
 
-Jeder Data Fetcher hat sich vom Schema her an das Data Fetcher Skelet (RawFetcherSkeleton.py) zu halten. Ebenso sollten Variablen klar definiert werden (inklusive Bedeutung in snake_case). Der Code sollte ausführlich dokumentiert werden, wobei triviale Kommenatare gespart werden sollten. Aus Gründen der Commit-History, sollte jeder Commit eine eindeutige Message haben und jeder selbst sollte commiten.
+Coding Guidelines sind in jedem Modul in diesem Repo eigenständig notiert und dokumentiert. Aus Gründen der Commit-History, sollte jeder Commit eine eindeutige Message haben und jeder selbst sollte commiten.
 
-Prinzip vor einem Commit:
-
-- git pull
-- git commit -a -m "message"
-- git push
-
-In PyCharm: https://www.jetbrains.com/help/pycharm/set-up-a-git-repository.html
+Neuste Änderungen sollten nur im dev-Branch erfolgen. Nach erfolgreichem Versionabschluss wird ein Pull-Request von dev auf den master eröffnet und nach Approval gemerged.
 
 ## Architektur
 
