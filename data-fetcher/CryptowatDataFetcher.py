@@ -75,10 +75,10 @@ class CryptowatDataFetcher:
                             "stockMarket": self.stock_market_mappings[stock_market],
                             "price": json_payload["result"][self.request_endpoints[coin][stock_market]]
                         })
-                    except KeyError as e:
+                    except KeyError:
                         catch_request_error({
                             "error": "Stock Market not found in result"
-                        })
+                        }, self.kafka_topic)
                         pass
             return items
         except (ConnectionError, Timeout, TooManyRedirects) as e:
@@ -99,10 +99,10 @@ class CryptowatDataFetcher:
         try:
             for entry in items:
                 KafkaConnector().send_to_kafka(self.kafka_topic, entry)
-        except:
+        except Exception:
             catch_request_error({
                 "error": "msg"
-            })
+            }, self.kafka_topic)
         finally:
             s = threading.Timer(DWConfigs().get_fetch_interval(self.kafka_topic), self.process_data_fetch, [], {})
             s.start()

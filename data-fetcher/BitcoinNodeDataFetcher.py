@@ -13,6 +13,7 @@ headers = {
     'Accept': 'application/json; indent=4',
 }
 
+
 class BitcoinNodeDataFetcher:
     fetcher_name = "Bitcoin Node Data Fetcher"
     kafka_topic = "RAW_G_NODE_DISTRIBUTION"
@@ -45,7 +46,7 @@ class BitcoinNodeDataFetcher:
                     snapshot_request = requests.get("https://bitnodes.io/api/v1/snapshots/", headers=headers)
                     latest_snapshot_url = snapshot_request.json()["results"][0]["url"]
                     self.response = requests.get(latest_snapshot_url, headers=headers)
-                except:
+                except Exception:
                     catch_request_error({
                         "type": ErrorTypes.FETCH_ERROR,
                         "error": "No snapshot available"
@@ -67,7 +68,7 @@ class BitcoinNodeDataFetcher:
                     self.countries_nodes[i[7]] = 1
             del self.countries_nodes[None]
 
-        except(ConnectionError, Timeout, TooManyRedirects) as e:
+        except(ConnectionError, Timeout, TooManyRedirects):
             catch_request_error({
                 "type": ErrorTypes.FETCH_ERROR,
                 "error": sys.exc_info()[0]
@@ -83,7 +84,7 @@ class BitcoinNodeDataFetcher:
                 "countries": self.countries_nodes,
                 "coin": 'BTC'
             })
-        except:
+        except Exception:
             catch_request_error({
                 "type": ErrorTypes.FETCH_ERROR,
                 "error": sys.exc_info()[0]

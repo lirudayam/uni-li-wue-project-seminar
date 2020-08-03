@@ -10,7 +10,7 @@ from requests.exceptions import ConnectionError, Timeout, TooManyRedirects
 from DWConfigs import DWConfigs
 from ErrorTypes import ErrorTypes
 from HashiVaultCredentialStorage import HashiVaultCredentialStorage
-from KafkaConnector import catch_request_error, get_unix_timestamp, KafkaConnector
+from KafkaConnector import catch_request_error, KafkaConnector
 
 
 class EthplorerDataFetcher:
@@ -70,13 +70,13 @@ class EthplorerDataFetcher:
                             "rate": token["price"]["rate"],
                             "volume24h": token["price"]["volume24h"]
                         })
-                    except:
+                    except Exception:
                         catch_request_error({
                             "type": ErrorTypes.FETCH_ERROR,
                             "error": sys.exc_info()[0]
                         }, self.kafka_topic)
                         pass
-        except:
+        except Exception:
             catch_request_error({
                 "type": ErrorTypes.FETCH_ERROR,
                 "error": sys.exc_info()[0]

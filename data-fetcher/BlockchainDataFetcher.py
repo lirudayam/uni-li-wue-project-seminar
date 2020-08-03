@@ -1,14 +1,14 @@
+import json
 import logging
 import threading
+
+from requests import Session
+from requests.exceptions import ConnectionError, Timeout, TooManyRedirects
 
 from DWConfigs import DWConfigs
 from ErrorTypes import ErrorTypes
 from HashiVaultCredentialStorage import HashiVaultCredentialStorage
 from KafkaConnector import catch_request_error, get_unix_timestamp, KafkaConnector
-
-from requests import Session, Request
-from requests.exceptions import ConnectionError, Timeout, TooManyRedirects
-import json
 
 
 class BlockchainDataFetcher:
@@ -58,10 +58,10 @@ class BlockchainDataFetcher:
                 "estimatedSent": self.output['estimated_btc_sent'],
                 "minersRevenue": self.output['miners_revenue_btc'],
             })
-        except:
+        except Exception:
             catch_request_error({
                 "error": "ERROR"
-            })
+            }, self.kafka_topic)
         finally:
             s = threading.Timer(DWConfigs().get_fetch_interval(self.kafka_topic), self.process_data_fetch, [], {})
             s.start()

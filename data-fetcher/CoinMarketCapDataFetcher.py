@@ -26,9 +26,9 @@ class CoinMarketCapDataFetcher:
         })
         self.trigger_health_pings()
         self.process_data_fetch()
-        self.Bitcoin = None
-        self.Ethereum = None
-        self.Ren = None
+        self.bitcoin = None
+        self.ethereum = None
+        self.ren = None
         logging.info('Successful init')
 
     # Supporting methods
@@ -44,12 +44,13 @@ class CoinMarketCapDataFetcher:
         try:
             response = self.session.get(self.url, params=self.parameters)
             output = json.loads(response.text)
-            BitcoinRaw = output["data"]["1"]
-            EthereumRaw = output["data"]["1027"]
-            RenRaw = output["data"]["2539"]
-            self.Bitcoin = BitcoinRaw["quote"]
-            self.Ethereum = EthereumRaw["quote"]
-            self.Ren = RenRaw["quote"]
+            btc_raw = output["data"]["1"]
+            eth_raw = output["data"]["1027"]
+            ren_raw = output["data"]["2539"]
+
+            self.bitcoin = btc_raw["quote"]
+            self.ethereum = eth_raw["quote"]
+            self.ren = ren_raw["quote"]
 
         except (ConnectionError, Timeout, TooManyRedirects) as e:
             catch_request_error({
@@ -64,28 +65,28 @@ class CoinMarketCapDataFetcher:
             KafkaConnector().send_to_kafka(self.kafka_topic, {
                 "timestamp": get_unix_timestamp(),
                 "coin": "BTC",
-                "price": self.Bitcoin["USD"]["price"],
-                "marketCap": self.Bitcoin["USD"]["market_cap"],
-                "volume24h": self.Bitcoin["USD"]["volume_24h"],
-                "change24h": self.Bitcoin["USD"]["percent_change_24h"] / 100
+                "price": self.bitcoin["USD"]["price"],
+                "marketCap": self.bitcoin["USD"]["market_cap"],
+                "volume24h": self.bitcoin["USD"]["volume_24h"],
+                "change24h": self.bitcoin["USD"]["percent_change_24h"] / 100
             })
             KafkaConnector().send_to_kafka(self.kafka_topic, {
                 "timestamp": get_unix_timestamp(),
                 "coin": "ETH",
-                "price": self.Ethereum["USD"]["price"],
-                "marketCap": self.Ethereum["USD"]["market_cap"],
-                "volume24h": self.Ethereum["USD"]["volume_24h"],
-                "change24h": self.Ethereum["USD"]["percent_change_24h"] / 100
+                "price": self.ethereum["USD"]["price"],
+                "marketCap": self.ethereum["USD"]["market_cap"],
+                "volume24h": self.ethereum["USD"]["volume_24h"],
+                "change24h": self.ethereum["USD"]["percent_change_24h"] / 100
             })
             KafkaConnector().send_to_kafka(self.kafka_topic, {
                 "timestamp": get_unix_timestamp(),
                 "coin": "REN",
-                "price": self.Ren["USD"]["price"],
-                "marketCap": self.Ren["USD"]["market_cap"],
-                "volume24h": self.Ren["USD"]["volume_24h"],
-                "change24h": self.Ren["USD"]["percent_change_24h"] / 100
+                "price": self.ren["USD"]["price"],
+                "marketCap": self.ren["USD"]["market_cap"],
+                "volume24h": self.ren["USD"]["volume_24h"],
+                "change24h": self.ren["USD"]["percent_change_24h"] / 100
             })
-        except:
+        except Exception:
             catch_request_error({
                 "type": ErrorTypes.FETCH_ERROR,
                 "error": sys.exc_info()[0]

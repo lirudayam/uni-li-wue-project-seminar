@@ -35,7 +35,7 @@ while (( "$#" )); do
   SCRIPT_FILE="${FILE_TO_BE_DEPLOYED}"
   SCRIPT_FILE+="DataFetcher.py"
   cp "${SCRIPT_FILE}" "tmp_deploy/${FILE_TO_BE_DEPLOYED}"
-  cd tmp_deploy
+  cd tmp_deploy || exit
   touch README.md
   touch __init__.py
   cat <<EOT >> __init__.py
@@ -48,7 +48,7 @@ EOT
   sed -i '' "s/FETCHER_NAME/$FILE_TO_BE_DEPLOYED/g" setup.py
   python3 setup.py sdist bdist_wheel
 
-  cd dist
+  cd dist || exit
   DIST="uniliwue.datafetchers"
   DIST+="${FILE_TO_BE_DEPLOYED}"
   DIST+="-0.0.1"

@@ -33,7 +33,7 @@ class KafkaConnector:
         try:
             self.producer.send(topic, dict_elm).add_callback(on_send_success).add_errback(on_send_error)
             self.producer.flush()
-        except JSONDecodeError as e:
+        except JSONDecodeError:
             self.forward_error({
                 "error": "Failed to send to Kafka"
             })

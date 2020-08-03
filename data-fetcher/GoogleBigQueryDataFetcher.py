@@ -1,7 +1,7 @@
 import logging
 import os
+import re
 import threading
-from typing import re
 
 from google.cloud import bigquery
 from requests import Session
@@ -117,10 +117,10 @@ order by date asc""")
                     "coin": "ETH",
                     "gini": row.gini * 1.0
                 })
-            except:
+            except Exception:
                 catch_request_error({
                     "error": "Couldn't calculate Gini for Ethereum"
-                })
+                }, self.kafka_topic)
 
     def calc_btc_gini(self):
         query_job = self.client.query("""with
@@ -195,12 +195,12 @@ order by date asc""")
                 KafkaConnector().send_to_kafka(self.kafka_topic, {
                     "date": row.date.strftime("%Y-%m-%d"),
                     "coin": "BTC",
-                    "gini": row.gini * 1.0  # avoid decimal object
+                    "gini": float(row.gini)  # avoid decimal object
                 })
-            except:
+            except Exception:
                 catch_request_error({
                     "error": "Couldn't calculate Gini for Bitcoin"
-                })
+                }, self.kafka_topic)
                 pass
 
     def get_richest_eth_account(self):
@@ -241,19 +241,20 @@ order by date asc""")
                     "timestamp": get_unix_timestamp(),
                     "coin": "ETH",
                     "accountAddress": row.address,
-                    "balance": row.balance * 1.0
+                    "balance": float(row.balance)
                 })
-            except:
+            except Exception:
                 catch_request_error({
                     "error": "Couldn't get richest ETH account"
-                })
+                }, self.sub_kafka_topic)
                 pass
 
     def get_richest_btc_account(self):
         session = Session()
         response = session.get("https://bitinfocharts.com/de/top-100-richest-bitcoin-addresses.html")
         m = re.match(
-            r"id=\"tblOne\"(.+)>((.|\s)+?(?=tbody))((.|\s)+?(?=<a href))((.|\s)+?(?=>))>(.+)<\/a>((.|\s)+?(?=<td ))<td (.+)data-val=\"(.+)\">",
+            r"id=\"tblOne\"(.+)>((.|\s)+?(?=tbody))((.|\s)+?(?=<a href))((.|\s)+?(?=>))>(.+)</a>((.|\s)+?(?=<td "
+            r"))<td (.+)data-val=\"(.+)\">",
             response.text)
         address = m[8]
         balance = m[12]
@@ -263,12 +264,12 @@ order by date asc""")
                     "timestamp": get_unix_timestamp(),
                     "coin": "BTC",
                     "accountAddress": address,
-                    "balance": balance * 1.0
+                    "balance": float(balance)
                 })
-            except:
+            except Exception:
                 catch_request_error({
                     "error": "Couldn't get richest BTC account"
-                })
+                }, self.sub_kafka_topic)
                 pass
 
     def process_data_fetch(self):

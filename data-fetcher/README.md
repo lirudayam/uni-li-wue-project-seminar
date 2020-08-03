@@ -21,3 +21,15 @@ Funktionsweise:
 
 Beispiel:
 ./deploy.sh Infura CoinMarketCap
+
+## Coding Style
+
+* Orientierung: Objektorientiert
+* Style guide: PEP8
+    * Ausnahmen:
+        * E402 ist akzeptabel, wenn notwendig
+        * E501 ist wichtig, darf aber in Tripelquotierung oder nach Zeilenumbruch ignoriert werden
+        * W605 ist ignorierbar, wenn die RegEx stimmt
+        * Methoden, die statisch sein können, aber semantisch einer Klasse zuordbar sind, gehören der Klasse weiterhin an
+* Kommentierierung erfolgt funktionsweise und nach Bedarf
+* Keine JavaDoc-ähnliche Kommentierung notwendig

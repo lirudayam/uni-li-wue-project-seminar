@@ -1,7 +1,6 @@
-import sys
+import requests
 
 from HashiVaultCredentialStorage import HashiVaultCredentialStorage
-import requests
 
 
 class DWConfigs:
@@ -23,12 +22,12 @@ class DWConfigs:
 
     def get_interval_data(self, topic):
         try:
-            SERVICE_URL = HashiVaultCredentialStorage().get_credentials("DWConfigs", "ODataServiceURL")[0]
-            result = requests.get(SERVICE_URL + "/KPI_CONFIG('" + topic + "')").json()
+            service_url = HashiVaultCredentialStorage().get_credentials("DWConfigs", "ODataServiceURL")[0]
+            result = requests.get(service_url + "/KPI_CONFIG('" + topic + "')").json()
             if result is None:
                 raise ValueError('Error')
             return result
-        except:
+        except Exception:
             return {
                 "aggregationInterval": self.fallback_aggregation_interval,
                 "fetchInterval": self.fallback_fetch_interval
@@ -42,8 +41,9 @@ class DWConfigs:
 
     def get_health_ping_interval(self, topic):
         try:
-            SERVICE_URL = HashiVaultCredentialStorage().get_credentials("DWConfigs", "ODataServiceURL")[0]
-            result = requests.get(SERVICE_URL + "/API_CONFIG('health_ping_interval')").json()
-            return result['health_ping_interval']
-        except:
+            if topic is not "":
+                service_url = HashiVaultCredentialStorage().get_credentials("DWConfigs", "ODataServiceURL")[0]
+                result = requests.get(service_url + "/API_CONFIG('health_ping_interval')").json()
+                return result['health_ping_interval']
+        except Exception:
             return self.fallback_health_ping_interval

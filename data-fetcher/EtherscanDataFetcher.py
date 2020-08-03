@@ -34,10 +34,10 @@ class EtherscanDataFetcher:
     def get_data_from_node_dist_endpoint(self):
         try:
             response = cfscrape.CloudflareScraper().get(self.url)
-            list = json.loads(response.content)
+            json_content = json.loads(response.content)
             countries_list = {}
             node_count = 0
-            for country in list:
+            for country in json_content:
                 if country["value"] is not 0:
                     countries_list[country["code"]] = country["value"]
                     node_count += country["value"]
@@ -64,7 +64,7 @@ class EtherscanDataFetcher:
                 "countries": countries_list,
                 "coin": 'ETH'
             })
-        except:
+        except Exception:
             catch_request_error({
                 "type": ErrorTypes.FETCH_ERROR,
                 "error": sys.exc_info()[0]
