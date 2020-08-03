@@ -37,3 +37,7 @@ Beispiel:
         * Methoden, die statisch sein können, aber semantisch einer Klasse zuordbar sind, gehören der Klasse weiterhin an
 * Kommentierierung erfolgt funktionsweise und nach Bedarf
 * Keine JavaDoc-ähnliche Kommentierung notwendig
+
+## Credential Management
+
+Alle Token, Secrets und Keys werden in einem HashiVault Storage abgelegt. Der Zugriff findet über die HashiVaultCredentailStorage Klasse statt. Wenn ein neuer Token angelegt werden soll, kann via http://< IP-Addresse >:8200 auf das Web-UI von HashiVault zugegriffen werden und dort ein Token angelegt werden.
