@@ -10,12 +10,12 @@ sap.ui.define(["sap/ui/core/mvc/Controller"], function (Controller) {
 
     onRefreshHealthStatus: function () {
       var oTable = this.getView().byId("health_table");
-      oTable.getModel().refresh();
+      oTable.getBinding("items").refresh()
     },
 
     onRefreshErrors: function () {
       var oTable = this.getView().byId("error_table");
-      oTable.getModel().refresh();
+      oTable.getBinding("items").refresh()
     }
   });
 });
