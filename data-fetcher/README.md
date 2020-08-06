@@ -26,6 +26,11 @@ Funktionsweise:
 Beispiel:
 ./deploy.sh Infura CoinMarketCap
 
+### Terminierung
+
+* einzelner Data Fetcher via ps aux | grep \<Fetcher> und dann kill -9 \<PID>
+* alle Data Fetcher via kill $(ps aux | grep 'Fetcher' | awk '{print $2}')
+
 ## Coding Style
 
 * Orientierung: Objektorientiert

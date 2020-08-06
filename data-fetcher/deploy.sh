@@ -26,6 +26,7 @@ while (("$#")); do
   FILE_TO_BE_DEPLOYED=$1
   mkdir "tmp_deploy"
   mkdir "tmp_deploy/${FILE_TO_BE_DEPLOYED}"
+  cp BaseFetcher.py "tmp_deploy/${FILE_TO_BE_DEPLOYED}"
   cp DWConfigs.py "tmp_deploy/${FILE_TO_BE_DEPLOYED}"
   cp KafkaConnector.py "tmp_deploy/${FILE_TO_BE_DEPLOYED}"
   cp ErrorTypes.py "tmp_deploy/${FILE_TO_BE_DEPLOYED}"
