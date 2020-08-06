@@ -1,15 +1,13 @@
 import logging
 import os
-import threading
 
 from BaseFetcher import BaseFetcher
-from DWConfigs import DWConfigs
 from ErrorTypes import ErrorTypes
 from HashiVaultCredentialStorage import HashiVaultCredentialStorage
 from KafkaConnector import KafkaConnector, catch_request_error, get_unix_timestamp
 
 os.environ["WEB3_INFURA_PROJECT_ID"] = \
-HashiVaultCredentialStorage().get_credentials("Infura", "WEB3_INFURA_PROJECT_ID")[0]
+    HashiVaultCredentialStorage().get_credentials("Infura", "WEB3_INFURA_PROJECT_ID")[0]
 
 from web3 import Web3
 from web3.auto.infura import w3
@@ -23,9 +21,6 @@ class InfuraDataFetcher(BaseFetcher):
     kafka_topic = "RAW_E_BLOCK"
 
     def __init__(self):
-        self.url = "wss://mainnet.infura.io/ws/v3/" + HashiVaultCredentialStorage().get_credentials("Infura",
-                                                                                                    "WEB3_INFURA_PROJECT_ID")[
-            0]
         self.web3 = False
         self.get_connection()
         BaseFetcher.__init__(self, self.kafka_topic, self.send_health_pings, self.process_data_fetch)
@@ -38,7 +33,10 @@ class InfuraDataFetcher(BaseFetcher):
     def get_connection(self):
         # init connection
         if not self.web3:
-            self.web3 = Web3(Web3.WebsocketProvider(self.url))
+            self.web3 = Web3(Web3.WebsocketProvider(
+                "wss://mainnet.infura.io/ws/v3/" + HashiVaultCredentialStorage().get_credentials("Infura",
+                                                                                                 "WEB3_INFURA_PROJECT_ID")[
+                    0]))
 
         # check for connection
         if self.web3.isConnected():

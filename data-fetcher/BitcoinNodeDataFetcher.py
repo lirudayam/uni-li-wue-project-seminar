@@ -1,12 +1,10 @@
 import logging
 import sys
-import threading
 
 import requests
 from requests.exceptions import ConnectionError, Timeout, TooManyRedirects
 
 from BaseFetcher import BaseFetcher
-from DWConfigs import DWConfigs
 from ErrorTypes import ErrorTypes
 from KafkaConnector import catch_request_error, KafkaConnector
 

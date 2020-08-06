@@ -33,4 +33,3 @@ class BaseFetcher:
         self.app_timer = threading.Timer(
             DWConfigs().get_fetch_interval(self._kafka_topic), self._process_fn, [], {})
         self.app_timer.start()
-

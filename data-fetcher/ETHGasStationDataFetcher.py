@@ -1,14 +1,12 @@
 import json
 import logging
 import sys
-import threading
 from json import JSONDecodeError
 
 from requests import Session
 from requests.exceptions import ConnectionError, Timeout, TooManyRedirects
 
 from BaseFetcher import BaseFetcher
-from DWConfigs import DWConfigs
 from ErrorTypes import ErrorTypes
 from KafkaConnector import catch_request_error, KafkaConnector
 

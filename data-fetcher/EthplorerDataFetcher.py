@@ -1,14 +1,12 @@
 import json
 import logging
 import sys
-import threading
 from json import JSONDecodeError
 
 from requests import Session
 from requests.exceptions import ConnectionError, Timeout, TooManyRedirects
 
 from BaseFetcher import BaseFetcher
-from DWConfigs import DWConfigs
 from ErrorTypes import ErrorTypes
 from HashiVaultCredentialStorage import HashiVaultCredentialStorage
 from KafkaConnector import catch_request_error, KafkaConnector
@@ -21,8 +19,7 @@ class EthplorerDataFetcher(BaseFetcher):
     kafka_topic = "RAW_E_TOKEN"
 
     def __init__(self):
-        api_key = HashiVaultCredentialStorage().get_credentials("Ethplorer", "API_KEY")[0]
-        self.url = "https://api.ethplorer.io/getTopTokens?apiKey=" + api_key
+        self.url = "https://api.ethplorer.io/getTopTokens?apiKey="
         self.session = Session()
         BaseFetcher.__init__(self, self.kafka_topic, self.send_health_pings, self.process_data_fetch)
 
@@ -33,7 +30,8 @@ class EthplorerDataFetcher(BaseFetcher):
 
     def get_data_from_api(self):
         try:
-            response = self.session.get(self.url)
+            api_key = HashiVaultCredentialStorage().get_credentials("Ethplorer", "API_KEY")[0]
+            response = self.session.get(self.url + api_key)
             return json.loads(response.text)["tokens"]
         except (ConnectionError, Timeout, TooManyRedirects) as e:
             catch_request_error({

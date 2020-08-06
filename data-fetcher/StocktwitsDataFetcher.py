@@ -1,14 +1,11 @@
 import json
-import logging
 import re
 import sys
-import threading
 
 import requests
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 
 from BaseFetcher import BaseFetcher
-from DWConfigs import DWConfigs
 from ErrorTypes import ErrorTypes
 from KafkaConnector import catch_request_error, get_unix_timestamp, KafkaConnector
 

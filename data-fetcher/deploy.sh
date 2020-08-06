@@ -5,15 +5,14 @@ pip3 install setuptools
 ################################################################################
 # Help                                                                         #
 ################################################################################
-Help()
-{
-   # Display Help
-   echo "Manual Deployment for a single data fetcher."
-   echo
-   echo "Syntax: ./deploy.sh [fetcher_name...]"
-   echo "arguments:"
-   echo "fetcher_name     The name of the data fetcher to be deployed, space-separated (e.g. Infura ETHGasStation)"
-   echo
+Help() {
+  # Display Help
+  echo "Manual Deployment for a single data fetcher."
+  echo
+  echo "Syntax: ./deploy.sh [fetcher_name...]"
+  echo "arguments:"
+  echo "fetcher_name     The name of the data fetcher to be deployed, space-separated (e.g. Infura ETHGasStation)"
+  echo
 }
 
 ################################################################################
@@ -23,7 +22,7 @@ Help()
 #############################################################################
 Help
 
-while (( "$#" )); do
+while (("$#")); do
   FILE_TO_BE_DEPLOYED=$1
   mkdir "tmp_deploy"
   mkdir "tmp_deploy/${FILE_TO_BE_DEPLOYED}"
@@ -38,7 +37,7 @@ while (( "$#" )); do
   cd tmp_deploy || exit
   touch README.md
   touch __init__.py
-  cat <<EOT >> __init__.py
+  cat <<EOT >>__init__.py
 import ${FILE_TO_BE_DEPLOYED}DataFetcher
 def main():
   ${FILE_TO_BE_DEPLOYED}DataFetcher()
@@ -60,7 +59,7 @@ EOT
 
   echo "Insert password for VM to install:"
   #ps ax | grep "${DIST}" | grep -v grep | awk '{print $1}' | xargs kill
-  ssh -p 64526 pjs@wrzh020.rzhousing.uni-wuerzburg.de /bin/bash << EOF
+  ssh -p 64526 pjs@wrzh020.rzhousing.uni-wuerzburg.de /bin/bash <<EOF
     cd python_fetchers
     kill $(ps aux | grep "${FOLDER_NAME}" | awk '{print $2}')
     tar -xvzf "${DIST}"
@@ -77,7 +76,7 @@ EOF
 
   cd ../..
   rm -r tmp_deploy
-shift
+  shift
 done
 
 exit

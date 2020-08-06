@@ -1,13 +1,11 @@
 import json
 import logging
 import sys
-import threading
 
 from requests import Session
 from requests.exceptions import ConnectionError, Timeout, TooManyRedirects
 
 from BaseFetcher import BaseFetcher
-from DWConfigs import DWConfigs
 from ErrorTypes import ErrorTypes
 from HashiVaultCredentialStorage import HashiVaultCredentialStorage
 from KafkaConnector import catch_request_error, get_unix_timestamp, KafkaConnector
@@ -23,10 +21,6 @@ class CoinMarketCapDataFetcher(BaseFetcher):
         self.url = 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest'
         self.parameters = {'slug': "bitcoin,ethereum,ren"}
         self.session = Session()
-        self.session.headers.update({
-            'Accepts': 'application/json',
-            'X-CMC_PRO_API_KEY': HashiVaultCredentialStorage().get_credentials("CoinMarketCap", "X-CMC_PRO_API_KEY")[0]
-        })
         self.bitcoin = None
         self.ethereum = None
         self.ren = None
@@ -39,6 +33,11 @@ class CoinMarketCapDataFetcher(BaseFetcher):
 
     def get_data_from_coinmarketcap(self):
         try:
+            self.session.headers.update({
+                'Accepts': 'application/json',
+                'X-CMC_PRO_API_KEY':
+                    HashiVaultCredentialStorage().get_credentials("CoinMarketCap", "X-CMC_PRO_API_KEY")[0]
+            })
             response = self.session.get(self.url, params=self.parameters)
             output = json.loads(response.text)
             btc_raw = output["data"]["1"]

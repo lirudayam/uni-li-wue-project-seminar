@@ -1,12 +1,10 @@
 import json
 import logging
-import threading
 
 from requests import Session
 from requests.exceptions import ConnectionError, Timeout, TooManyRedirects
 
 from BaseFetcher import BaseFetcher
-from DWConfigs import DWConfigs
 from ErrorTypes import ErrorTypes
 from HashiVaultCredentialStorage import HashiVaultCredentialStorage
 from KafkaConnector import catch_request_error, get_unix_timestamp, KafkaConnector
@@ -21,10 +19,6 @@ class BlockchainDataFetcher(BaseFetcher):
     def __init__(self):
         self.url = 'https://api.blockchain.info/stats'
         self.session = Session()
-        self.session.headers.update({
-            'Accepts': 'application/json',
-            'X-CMC_PRO_API_KEY': HashiVaultCredentialStorage().get_credentials("Bitcoin", "X-CMC_PRO_API_KEY")[0]
-        })
         self.output = None
         BaseFetcher.__init__(self, self.kafka_topic, self.send_health_pings, self.process_data_fetch)
 
@@ -35,6 +29,10 @@ class BlockchainDataFetcher(BaseFetcher):
 
     def get_data_from_blockchain(self):
         try:
+            self.session.headers.update({
+                'Accepts': 'application/json',
+                'X-CMC_PRO_API_KEY': HashiVaultCredentialStorage().get_credentials("Bitcoin", "X-CMC_PRO_API_KEY")[0]
+            })
             response = self.session.get(self.url)
             self.output = json.loads(response.text)
         except (ConnectionError, Timeout, TooManyRedirects) as e:
