@@ -1,13 +1,11 @@
 import logging
 import os
 import re
-import threading
 
 from google.cloud import bigquery
 from requests import Session
 
 from BaseFetcher import BaseFetcher
-from DWConfigs import DWConfigs
 from KafkaConnector import catch_request_error, KafkaConnector, get_unix_timestamp
 
 os.environ[
