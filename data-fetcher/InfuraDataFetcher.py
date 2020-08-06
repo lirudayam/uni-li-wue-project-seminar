@@ -7,10 +7,13 @@ from ErrorTypes import ErrorTypes
 from HashiVaultCredentialStorage import HashiVaultCredentialStorage
 from KafkaConnector import KafkaConnector, catch_request_error, get_unix_timestamp
 
-os.environ["WEB3_INFURA_PROJECT_ID"] = HashiVaultCredentialStorage().get_credentials("Infura", "WEB3_INFURA_PROJECT_ID")[0]
+os.environ["WEB3_INFURA_PROJECT_ID"] = \
+HashiVaultCredentialStorage().get_credentials("Infura", "WEB3_INFURA_PROJECT_ID")[0]
 
 from web3 import Web3
 from web3.auto.infura import w3
+
+logging.basicConfig(filename='output.log', level=logging.INFO)
 
 
 class InfuraDataFetcher:
@@ -20,7 +23,8 @@ class InfuraDataFetcher:
 
     def __init__(self):
         self.url = "wss://mainnet.infura.io/ws/v3/" + HashiVaultCredentialStorage().get_credentials("Infura",
-                                                                                                    "WEB3_INFURA_PROJECT_ID")[0]
+                                                                                                    "WEB3_INFURA_PROJECT_ID")[
+            0]
         self.web3 = False
 
         self.trigger_health_pings()

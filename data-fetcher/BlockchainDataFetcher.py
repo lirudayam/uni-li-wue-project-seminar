@@ -10,6 +10,8 @@ from ErrorTypes import ErrorTypes
 from HashiVaultCredentialStorage import HashiVaultCredentialStorage
 from KafkaConnector import catch_request_error, get_unix_timestamp, KafkaConnector
 
+logging.basicConfig(filename='output.log', level=logging.INFO)
+
 
 class BlockchainDataFetcher:
     fetcher_name = "BlockchainCom Data Fetcher"

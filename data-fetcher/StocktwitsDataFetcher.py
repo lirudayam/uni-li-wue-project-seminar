@@ -15,6 +15,7 @@ from KafkaConnector import catch_request_error, get_unix_timestamp, KafkaConnect
 # nltk.downloader.download('vader_lexicon')
 
 
+# noinspection PyMethodMayBeStatic
 class StocktwitsDataFetcher:
     fetcher_name = "Stocktwits Fetcher Skeleton"
     kafka_topic = "RAW_G_STOCKTWITS_FETCHER"

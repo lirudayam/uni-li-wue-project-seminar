@@ -52,7 +52,8 @@ def get_unix_timestamp():
 
 
 def catch_request_error(error, kafka_topic):
-    logging.error('Error while fetching', exc_info=error)
+    logging.error('Error while fetching for %s', kafka_topic)
+    logging.error(error)
     error['topic'] = kafka_topic
     error['timestamp'] = get_unix_timestamp()
     KafkaConnector().forward_error(error)
@@ -65,6 +66,3 @@ def on_send_success(record_metadata):
 def on_send_error(exception):
     logging.error('Error while sending to Kafka', exc_info=exception)
     KafkaConnector().forward_error(exception)
-
-# Sample how to use it
-# KafkaConnector().send_to_kafka("my-test-kafka", {"abc": "def"})

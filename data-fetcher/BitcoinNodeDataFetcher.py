@@ -12,6 +12,7 @@ from KafkaConnector import catch_request_error, KafkaConnector
 headers = {
     'Accept': 'application/json; indent=4',
 }
+logging.basicConfig(filename='output.log', level=logging.INFO)
 
 
 class BitcoinNodeDataFetcher:
@@ -52,6 +53,8 @@ class BitcoinNodeDataFetcher:
                         "error": "No snapshot available"
                     }, self.kafka_topic)
                     pass
+                except:
+                    pass
 
             self.node_list = self.response.json()
             self.only_nodes = self.node_list["nodes"]
@@ -73,6 +76,8 @@ class BitcoinNodeDataFetcher:
                 "type": ErrorTypes.FETCH_ERROR,
                 "error": sys.exc_info()[0]
             }, self.kafka_topic)
+            pass
+        except:
             pass
 
     def process_data_fetch(self):

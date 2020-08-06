@@ -11,6 +11,8 @@ from ErrorTypes import ErrorTypes
 from HashiVaultCredentialStorage import HashiVaultCredentialStorage
 from KafkaConnector import catch_request_error, get_unix_timestamp, KafkaConnector
 
+logging.basicConfig(filename='output.log', level=logging.INFO)
+
 
 class CoinMarketCapDataFetcher:
     fetcher_name = "CoinMarketCap Data Fetcher"
@@ -57,6 +59,8 @@ class CoinMarketCapDataFetcher:
                 "type": ErrorTypes.API_LIMIT_EXCEED,
                 "error": e
             }, self.kafka_topic)
+            pass
+        except:
             pass
 
     def process_data_fetch(self):

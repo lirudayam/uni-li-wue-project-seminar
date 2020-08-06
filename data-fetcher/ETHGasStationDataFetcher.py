@@ -11,6 +11,8 @@ from DWConfigs import DWConfigs
 from ErrorTypes import ErrorTypes
 from KafkaConnector import catch_request_error, KafkaConnector
 
+logging.basicConfig(filename='output.log', level=logging.INFO)
+
 
 class ETHGasStationDataFetcher:
     fetcher_name = "Eth Gas Station Data Fetcher"

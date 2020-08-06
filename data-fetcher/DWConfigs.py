@@ -1,6 +1,10 @@
+import logging
+
 import requests
 
 from HashiVaultCredentialStorage import HashiVaultCredentialStorage
+
+logging.basicConfig(filename='output.log', level=logging.INFO)
 
 
 class DWConfigs:
@@ -24,8 +28,12 @@ class DWConfigs:
         try:
             service_url = HashiVaultCredentialStorage().get_credentials("DWConfigs", "ODataServiceURL")[0]
             result = requests.get(service_url + "/KPI_CONFIG('" + topic + "')").json()
+
             if result is None:
+                logging.error("Using fallback values")
                 raise ValueError('Error')
+
+            logging.info("Using real values")
             return result
         except Exception:
             return {
@@ -40,10 +48,14 @@ class DWConfigs:
         return self.get_interval_data(topic)['aggregationInterval']
 
     def get_health_ping_interval(self, topic):
+        val = self.fallback_health_ping_interval
         try:
             if topic is not "":
                 service_url = HashiVaultCredentialStorage().get_credentials("DWConfigs", "ODataServiceURL")[0]
                 result = requests.get(service_url + "/API_CONFIG('health_ping_interval')").json()
-                return result['health_ping_interval']
+                val = result['health_ping_interval']
         except Exception:
-            return self.fallback_health_ping_interval
+            val = self.fallback_health_ping_interval
+            logging.error("Failed to receive health ping interval")
+        finally:
+            return val

@@ -11,8 +11,10 @@ from KafkaConnector import catch_request_error, KafkaConnector, get_unix_timesta
 
 os.environ[
     "GOOGLE_APPLICATION_CREDENTIALS"] = "/home/pjs/python_fetchers/googlebigquerytoken.json"
+logging.basicConfig(filename='output.log', level=logging.INFO)
 
 
+# noinspection PyPep8,PyPep8,PyPep8,PyPep8
 class GoogleBigQueryDataFetcher:
     fetcher_name = "Google Big Query Data Fetcher"
     kafka_topic = "RAW_G_GINI"
