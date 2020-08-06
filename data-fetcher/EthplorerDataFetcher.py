@@ -7,6 +7,7 @@ from json import JSONDecodeError
 from requests import Session
 from requests.exceptions import ConnectionError, Timeout, TooManyRedirects
 
+from BaseFetcher import BaseFetcher
 from DWConfigs import DWConfigs
 from ErrorTypes import ErrorTypes
 from HashiVaultCredentialStorage import HashiVaultCredentialStorage
@@ -15,7 +16,7 @@ from KafkaConnector import catch_request_error, KafkaConnector
 logging.basicConfig(filename='output.log', level=logging.INFO)
 
 
-class EthplorerDataFetcher:
+class EthplorerDataFetcher(BaseFetcher):
     fetcher_name = "Ethplorer Data Fetcher"
     kafka_topic = "RAW_E_TOKEN"
 
@@ -23,18 +24,12 @@ class EthplorerDataFetcher:
         api_key = HashiVaultCredentialStorage().get_credentials("Ethplorer", "API_KEY")[0]
         self.url = "https://api.ethplorer.io/getTopTokens?apiKey=" + api_key
         self.session = Session()
-        self.trigger_health_pings()
-        self.process_data_fetch()
-        logging.info('Successful init')
+        BaseFetcher.__init__(self, self.kafka_topic, self.send_health_pings, self.process_data_fetch)
 
     # Supporting methods
     def send_health_pings(self):
         KafkaConnector().send_health_ping(self.fetcher_name)
-        self.trigger_health_pings()
-
-    def trigger_health_pings(self):
-        s = threading.Timer(DWConfigs().get_health_ping_interval(self.kafka_topic), self.send_health_pings, [], {})
-        s.start()
+        self.run_health()
 
     def get_data_from_api(self):
         try:
@@ -84,8 +79,7 @@ class EthplorerDataFetcher:
                 "error": sys.exc_info()[0]
             }, self.kafka_topic)
         finally:
-            s = threading.Timer(DWConfigs().get_fetch_interval(self.kafka_topic), self.process_data_fetch, [], {})
-            s.start()
+            self.run_app()
 
 
 EthplorerDataFetcher()

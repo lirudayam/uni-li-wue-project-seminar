@@ -7,6 +7,7 @@ import threading
 import requests
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 
+from BaseFetcher import BaseFetcher
 from DWConfigs import DWConfigs
 from ErrorTypes import ErrorTypes
 from KafkaConnector import catch_request_error, get_unix_timestamp, KafkaConnector
@@ -16,7 +17,7 @@ from KafkaConnector import catch_request_error, get_unix_timestamp, KafkaConnect
 
 
 # noinspection PyMethodMayBeStatic
-class StocktwitsDataFetcher:
+class StocktwitsDataFetcher(BaseFetcher):
     fetcher_name = "Stocktwits Fetcher Skeleton"
     kafka_topic = "RAW_G_STOCKTWITS_FETCHER"
 
@@ -25,18 +26,12 @@ class StocktwitsDataFetcher:
         self.list_ids_eth = []
         self.complete_btcdataset = []
         self.complete_ethdataset = []
-        self.trigger_health_pings()
-        self.process_data_fetch()
-        logging.info('Successful init')
+        BaseFetcher.__init__(self, self.kafka_topic, self.send_health_pings, self.process_data_fetch)
 
     # Supporting methods
     def send_health_pings(self):
         KafkaConnector().send_health_ping(self.fetcher_name)
-        self.trigger_health_pings()
-
-    def trigger_health_pings(self):
-        s = threading.Timer(DWConfigs().get_health_ping_interval(self.kafka_topic), self.send_health_pings, [], {})
-        s.start()
+        self.run_health()
 
     def process_data_fetch(self):
         self.get_data()
@@ -66,8 +61,7 @@ class StocktwitsDataFetcher:
                 "error": sys.exc_info()[0]
             }, self.kafka_topic)
         finally:
-            s = threading.Timer(DWConfigs().get_fetch_interval(self.kafka_topic), self.process_data_fetch, [], {})
-            s.start()
+            self.run_app()
 
     # -------------------------------------------------------------
 

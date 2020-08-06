@@ -6,6 +6,7 @@ import threading
 from requests import Session
 from requests.exceptions import ConnectionError, Timeout, TooManyRedirects
 
+from BaseFetcher import BaseFetcher
 from DWConfigs import DWConfigs
 from ErrorTypes import ErrorTypes
 from HashiVaultCredentialStorage import HashiVaultCredentialStorage
@@ -14,7 +15,7 @@ from KafkaConnector import catch_request_error, get_unix_timestamp, KafkaConnect
 logging.basicConfig(filename='output.log', level=logging.INFO)
 
 
-class CoinMarketCapDataFetcher:
+class CoinMarketCapDataFetcher(BaseFetcher):
     fetcher_name = "CoinMarketCap Data Fetcher"
     kafka_topic = "RAW_G_PRICES"
 
@@ -26,21 +27,15 @@ class CoinMarketCapDataFetcher:
             'Accepts': 'application/json',
             'X-CMC_PRO_API_KEY': HashiVaultCredentialStorage().get_credentials("CoinMarketCap", "X-CMC_PRO_API_KEY")[0]
         })
-        self.trigger_health_pings()
-        self.process_data_fetch()
         self.bitcoin = None
         self.ethereum = None
         self.ren = None
-        logging.info('Successful init')
+        BaseFetcher.__init__(self, self.kafka_topic, self.send_health_pings, self.process_data_fetch)
 
     # Supporting methods
     def send_health_pings(self):
         KafkaConnector().send_health_ping(self.fetcher_name)
-        self.trigger_health_pings()
-
-    def trigger_health_pings(self):
-        s = threading.Timer(DWConfigs().get_health_ping_interval(self.kafka_topic), self.send_health_pings, [], {})
-        s.start()
+        self.run_health()
 
     def get_data_from_coinmarketcap(self):
         try:
@@ -97,8 +92,7 @@ class CoinMarketCapDataFetcher:
             }, self.kafka_topic)
             pass
         finally:
-            s = threading.Timer(DWConfigs().get_fetch_interval(self.kafka_topic), self.process_data_fetch, [], {})
-            s.start()
+            self.run_app()
 
 
 CoinMarketCapDataFetcher()

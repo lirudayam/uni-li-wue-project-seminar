@@ -6,6 +6,7 @@ import threading
 from google.cloud import bigquery
 from requests import Session
 
+from BaseFetcher import BaseFetcher
 from DWConfigs import DWConfigs
 from KafkaConnector import catch_request_error, KafkaConnector, get_unix_timestamp
 
@@ -15,25 +16,19 @@ logging.basicConfig(filename='output.log', level=logging.INFO)
 
 
 # noinspection PyPep8,PyPep8,PyPep8,PyPep8
-class GoogleBigQueryDataFetcher:
+class GoogleBigQueryDataFetcher(BaseFetcher):
     fetcher_name = "Google Big Query Data Fetcher"
     kafka_topic = "RAW_G_GINI"
     sub_kafka_topic = "RAW_G_RICH_ACC"
 
     def __init__(self):
         self.client = bigquery.Client()
-        self.trigger_health_pings()
-        self.process_data_fetch()
-        logging.info('Successful init')
+        BaseFetcher.__init__(self, self.kafka_topic, self.send_health_pings, self.process_data_fetch)
 
     # Supporting methods
     def send_health_pings(self):
         KafkaConnector().send_health_ping(self.fetcher_name)
-        self.trigger_health_pings()
-
-    def trigger_health_pings(self):
-        s = threading.Timer(DWConfigs().get_health_ping_interval(self.kafka_topic), self.send_health_pings, [], {})
-        s.start()
+        self.run_health()
 
     def calc_eth_gini(self):
         query_job = self.client.query("""with
@@ -280,8 +275,7 @@ order by date asc""")
         self.get_richest_eth_account()
         self.get_richest_btc_account()
 
-        s = threading.Timer(DWConfigs().get_fetch_interval(self.kafka_topic), self.process_data_fetch, [], {})
-        s.start()
+        self.run_app()
 
 
 GoogleBigQueryDataFetcher()
