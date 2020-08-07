@@ -13,6 +13,16 @@ sap.ui.define(["sap/ui/core/mvc/Controller"], function (Controller) {
       oTable.getBinding("items").refresh()
     },
 
+    onRefreshDataStatus: function () {
+      var oTable = this.getView().byId("data_table");
+      oTable.getBinding("items").refresh()
+    },
+
+    onRefreshAPIConfig: function() {
+      var oTable = this.getView().byId("config_table");
+      oTable.getBinding("items").refresh()
+    },
+
     onRefreshErrors: function () {
       var oTable = this.getView().byId("error_table");
       oTable.getBinding("items").refresh()
