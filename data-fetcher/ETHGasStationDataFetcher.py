@@ -1,7 +1,7 @@
 import json
 import logging
 import sys
-from json import JSONDecodeError
+from json.decoder import JSONDecodeError
 
 from requests import Session
 from requests.exceptions import ConnectionError, Timeout, TooManyRedirects
