@@ -3,7 +3,10 @@ import logging
 from json import JSONDecodeError
 
 from requests import Session
+from requests.adapters import HTTPAdapter
 from requests.exceptions import ConnectionError, Timeout, TooManyRedirects
+from urllib3 import Retry
+from urllib3.exceptions import NewConnectionError
 
 from BaseFetcher import BaseFetcher
 from ErrorTypes import ErrorTypes
@@ -45,7 +48,13 @@ class CryptowatDataFetcher(BaseFetcher):
         }
 
         self.request_url = 'https://api.cryptowat.ch/markets/prices'
+
         self.session = Session()
+        retries = Retry(total=2,
+                        backoff_factor=0.1,
+                        status_forcelist=[500, 502, 503, 504])
+        self.session.mount('https://', HTTPAdapter(max_retries=retries))
+
         BaseFetcher.__init__(self, self.kafka_topic, self.send_health_pings, self.process_data_fetch)
 
     # Supporting methods
@@ -75,7 +84,7 @@ class CryptowatDataFetcher(BaseFetcher):
                         }, self.kafka_topic)
                         pass
             return items
-        except (ConnectionError, Timeout, TooManyRedirects) as e:
+        except (NewConnectionError, ConnectionError, Timeout, TooManyRedirects) as e:
             catch_request_error({
                 "type": ErrorTypes.API_LIMIT_EXCEED,
                 "error": e
