@@ -1,19 +1,20 @@
-import logging
-import sys
-import threading
-import nltk
-import requests
 import json
 import re
+import sys
 
-from DWConfigs import DWConfigs
+import requests
+from nltk.sentiment.vader import SentimentIntensityAnalyzer
+
+from BaseFetcher import BaseFetcher
 from ErrorTypes import ErrorTypes
 from KafkaConnector import catch_request_error, get_unix_timestamp, KafkaConnector
-from nltk.sentiment.vader import SentimentIntensityAnalyzer
-#nltk.downloader.download('vader_lexicon')
 
 
-class StocktwitsDataFetcher:
+# nltk.downloader.download('vader_lexicon')
+
+
+# noinspection PyMethodMayBeStatic
+class StocktwitsDataFetcher(BaseFetcher):
     fetcher_name = "Stocktwits Fetcher Skeleton"
     kafka_topic = "RAW_G_STOCKTWITS_FETCHER"
 
@@ -22,18 +23,12 @@ class StocktwitsDataFetcher:
         self.list_ids_eth = []
         self.complete_btcdataset = []
         self.complete_ethdataset = []
-        self.trigger_health_pings()
-        self.process_data_fetch()
-        logging.info('Successful init')
+        BaseFetcher.__init__(self, self.kafka_topic, self.send_health_pings, self.process_data_fetch)
 
     # Supporting methods
     def send_health_pings(self):
         KafkaConnector().send_health_ping(self.fetcher_name)
-        self.trigger_health_pings()
-
-    def trigger_health_pings(self):
-        s = threading.Timer(DWConfigs().get_health_ping_interval(self.kafka_topic), self.send_health_pings, [], {})
-        s.start()
+        self.run_health()
 
     def process_data_fetch(self):
         self.get_data()
@@ -57,16 +52,15 @@ class StocktwitsDataFetcher:
                     "weightedScore": self.complete_ethdataset[i]["weighted_score"],
                     "coin": "ETH"
                 })
-        except:
+        except Exception:
             catch_request_error({
                 "type": ErrorTypes.FETCH_ERROR,
                 "error": sys.exc_info()[0]
             }, self.kafka_topic)
         finally:
-            s = threading.Timer(DWConfigs().get_fetch_interval(self.kafka_topic), self.process_data_fetch, [], {})
-            s.start()
+            self.run_app()
 
-    #-------------------------------------------------------------
+    # -------------------------------------------------------------
 
     def query_request(self, ticker):
         url = "https://api.stocktwits.com/api/2/streams/symbol/%s.json" % ticker
@@ -80,7 +74,7 @@ class StocktwitsDataFetcher:
                 sentiment_value = 1
             else:
                 sentiment_value = -1
-        except:
+        except Exception:
             sentiment_value = 0
         return sentiment_value
 
@@ -114,8 +108,6 @@ class StocktwitsDataFetcher:
 
     def get_data_line(self, ticker):
         data = self.query_request(ticker)
-        sum_score = 0
-        length = len(data['messages'])
 
         # nested dictionary
         complete_dataset = []
@@ -147,22 +139,15 @@ class StocktwitsDataFetcher:
                 complete_dataset.append(dataset)
             else:
                 print("nope")
-                #check whether deletion of list is accurate
+                # check whether deletion of list is accurate
 
-        #if within for or not - to be checked
+        # if within for or not - to be checked
         if ticker == "BTC.X":
             self.complete_btcdataset = complete_dataset
             self.list_ids_btc = list_ids
         elif ticker == "ETH.X":
             self.complete_ethdataset = complete_dataset
             self.list_ids_eth = list_ids
-
-        #print(list_ids)
-        #print(complete_dataset[0]["id"])
-        #print(complete_dataset)
-        # Return of every element
-        # for i in range(complete_dataset):
-        # print(complete_dataset[i]["id"])
 
     def sentiment_results(self, tickers):
         for ticker in tickers:

@@ -15,7 +15,7 @@
     "@sap/hana-client": "^2.4.194",
     "@sap/xsenv": "^3.0.0",
     "cf-nodejs-logging-support": "^6.4.3",
-    "client-oauth2": "^4.3.0",
+    "client-oauth2": "^4.3.2",
     "express": "^4.17.1",
     "kafkajs": "^1.12.0",
     "moment": "^2.27.0",

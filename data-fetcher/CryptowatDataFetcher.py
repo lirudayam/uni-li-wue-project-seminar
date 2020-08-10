@@ -1,17 +1,21 @@
 import json
 import logging
-import threading
 from json import JSONDecodeError
 
 from requests import Session
+from requests.adapters import HTTPAdapter
 from requests.exceptions import ConnectionError, Timeout, TooManyRedirects
+from urllib3 import Retry
+from urllib3.exceptions import NewConnectionError
 
-from DWConfigs import DWConfigs
+from BaseFetcher import BaseFetcher
 from ErrorTypes import ErrorTypes
 from KafkaConnector import catch_request_error, get_unix_timestamp, KafkaConnector
 
+logging.basicConfig(filename='output.log', level=logging.INFO)
 
-class CryptowatDataFetcher:
+
+class CryptowatDataFetcher(BaseFetcher):
     fetcher_name = "CRYPTOWATCH API"
     kafka_topic = "RAW_G_PRICE_VOLA"
 
@@ -45,19 +49,18 @@ class CryptowatDataFetcher:
 
         self.request_url = 'https://api.cryptowat.ch/markets/prices'
 
-        self.trigger_health_pings()
-        self.process_data_fetch()
         self.session = Session()
-        logging.info('Successful init')
+        retries = Retry(total=2,
+                        backoff_factor=0.1,
+                        status_forcelist=[500, 502, 503, 504])
+        self.session.mount('https://', HTTPAdapter(max_retries=retries))
+
+        BaseFetcher.__init__(self, self.kafka_topic, self.send_health_pings, self.process_data_fetch)
 
     # Supporting methods
     def send_health_pings(self):
         KafkaConnector().send_health_ping(self.fetcher_name)
-        self.trigger_health_pings()
-
-    def trigger_health_pings(self):
-        s = threading.Timer(DWConfigs().get_health_ping_interval(self.kafka_topic), self.send_health_pings, [], {})
-        s.start()
+        self.run_health()
 
     def get_data_from_cryptowat(self):
         try:
@@ -75,13 +78,13 @@ class CryptowatDataFetcher:
                             "stockMarket": self.stock_market_mappings[stock_market],
                             "price": json_payload["result"][self.request_endpoints[coin][stock_market]]
                         })
-                    except KeyError as e:
+                    except KeyError:
                         catch_request_error({
                             "error": "Stock Market not found in result"
-                        })
+                        }, self.kafka_topic)
                         pass
             return items
-        except (ConnectionError, Timeout, TooManyRedirects) as e:
+        except (NewConnectionError, ConnectionError, Timeout, TooManyRedirects) as e:
             catch_request_error({
                 "type": ErrorTypes.API_LIMIT_EXCEED,
                 "error": e
@@ -99,13 +102,12 @@ class CryptowatDataFetcher:
         try:
             for entry in items:
                 KafkaConnector().send_to_kafka(self.kafka_topic, entry)
-        except:
+        except Exception:
             catch_request_error({
                 "error": "msg"
-            })
+            }, self.kafka_topic)
         finally:
-            s = threading.Timer(DWConfigs().get_fetch_interval(self.kafka_topic), self.process_data_fetch, [], {})
-            s.start()
+            self.run_app()
 
 
 CryptowatDataFetcher()

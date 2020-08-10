@@ -1,81 +1,51 @@
 import logging
 import os
-import threading
 
-from DWConfigs import DWConfigs
-from ErrorTypes import ErrorTypes
+from BaseFetcher import BaseFetcher
 from HashiVaultCredentialStorage import HashiVaultCredentialStorage
-from KafkaConnector import KafkaConnector, catch_request_error, get_unix_timestamp
+from KafkaConnector import KafkaConnector, get_unix_timestamp
 
-os.environ["WEB3_INFURA_PROJECT_ID"] = HashiVaultCredentialStorage().get_credentials("Infura", "WEB3_INFURA_PROJECT_ID")[0]
+os.environ["WEB3_INFURA_PROJECT_ID"] = \
+    HashiVaultCredentialStorage().get_credentials("Infura", "WEB3_INFURA_PROJECT_ID")[0]
+os.environ["WEB3_INFURA_API_SECRET"] = \
+    HashiVaultCredentialStorage().get_credentials("InfuraSecret", "WEB3_INFURA_API_SECRET")[0]
 
-from web3 import Web3
 from web3.auto.infura import w3
 
+logging.basicConfig(filename='output.log', level=logging.INFO)
 
-class InfuraDataFetcher:
+
+class InfuraDataFetcher(BaseFetcher):
     latest_identifier = 0
     fetcher_name = "INFURA API"
     kafka_topic = "RAW_E_BLOCK"
 
     def __init__(self):
-        self.url = "wss://mainnet.infura.io/ws/v3/" + HashiVaultCredentialStorage().get_credentials("Infura",
-                                                                                                    "WEB3_INFURA_PROJECT_ID")[0]
-        self.web3 = False
-
-        self.trigger_health_pings()
-        self.get_connection()
-        self.register_listener_for_new_block()
-        logging.info('Successful init')
+        BaseFetcher.__init__(self, self.kafka_topic, self.send_health_pings, self.process_data_fetch)
 
     # Supporting methods
     def send_health_pings(self):
         KafkaConnector().send_health_ping(self.fetcher_name)
-        self.trigger_health_pings()
+        self.run_health()
 
-    def trigger_health_pings(self):
-        s = threading.Timer(DWConfigs().get_health_ping_interval(self.kafka_topic), self.send_health_pings, [], {})
-        s.start()
+    def process_data_fetch(self):
+        if w3.isConnected():
+            latest_block = dict(w3.eth.getBlock("latest"))
 
-    def get_connection(self):
-        # init connection
-        if not self.web3:
-            self.web3 = Web3(Web3.WebsocketProvider(self.url))
-            self.register_listener_for_new_block()
+            if self.latest_identifier != latest_block['number']:
+                KafkaConnector().send_to_kafka(self.kafka_topic, {
+                    "timestamp": get_unix_timestamp(),
+                    "identifier": latest_block['number'],
+                    "size": latest_block['size'],
+                    "difficulty": latest_block['difficulty'],
+                    "gasLimit": latest_block['gasLimit'],
+                    "gasUsed": latest_block['gasUsed'],
+                    "noOfTransactions": len(latest_block["transactions"])
+                })
+                print(latest_block['number'])
+                self.latest_identifier = latest_block['number']
 
-        # check for connection
-        if self.web3.isConnected():
-            return self.web3
-        else:
-            catch_request_error({
-                "type": ErrorTypes.GENERAL_ERROR,
-                "error": "No Connection anymore"
-            }, self.kafka_topic)
-            self.web3 = False
-
-    def register_listener_for_new_block(self):
-        self.handle_new_block()
-
-    def handle_new_block(self):
-        self.get_connection()
-        latest_block = dict(w3.eth.getBlock("latest"))
-
-        if self.latest_identifier != latest_block['number']:
-            KafkaConnector().send_to_kafka(self.kafka_topic, {
-                "timestamp": get_unix_timestamp(),
-                "identifier": latest_block['number'],
-                "size": latest_block['size'],
-                "difficulty": latest_block['difficulty'],
-                "gasLimit": latest_block['gasLimit'],
-                "gasUsed": latest_block['gasUsed'],
-                "noOfTransactions": len(latest_block["transactions"])
-            })
-            print(latest_block['number'])
-            self.latest_identifier = latest_block['number']
-
-        s = threading.Timer(DWConfigs().get_fetch_interval(self.kafka_topic),
-                            self.handle_new_block, [], {})
-        s.start()
+        self.run_app()
 
 
 InfuraDataFetcher()

@@ -1,41 +1,36 @@
 import logging
 import sys
-import threading
 
 import requests
 from requests.exceptions import ConnectionError, Timeout, TooManyRedirects
 
-from DWConfigs import DWConfigs
+from BaseFetcher import BaseFetcher
 from ErrorTypes import ErrorTypes
 from KafkaConnector import catch_request_error, KafkaConnector
 
 headers = {
     'Accept': 'application/json; indent=4',
 }
+logging.basicConfig(filename='output.log', level=logging.INFO)
 
-class BitcoinNodeDataFetcher:
+
+class BitcoinNodeDataFetcher(BaseFetcher):
     fetcher_name = "Bitcoin Node Data Fetcher"
     kafka_topic = "RAW_G_NODE_DISTRIBUTION"
 
     def __init__(self):
-        self.trigger_health_pings()
-        self.process_data_fetch()
         self.response = None
         self.node_list = None
         self.only_nodes = None
         self.node_count = None
         self.timestamp = None
         self.countries_nodes = {}
-        logging.info('Successful init')
+        BaseFetcher.__init__(self, self.kafka_topic, self.send_health_pings, self.process_data_fetch)
 
     # Supporting methods
     def send_health_pings(self):
         KafkaConnector().send_health_ping(self.fetcher_name)
-        self.trigger_health_pings()
-
-    def trigger_health_pings(self):
-        s = threading.Timer(DWConfigs().get_health_ping_interval(self.kafka_topic), self.send_health_pings, [], {})
-        s.start()
+        self.run_health()
 
     def request_data_from_bitcoinnode(self):
         try:
@@ -45,11 +40,13 @@ class BitcoinNodeDataFetcher:
                     snapshot_request = requests.get("https://bitnodes.io/api/v1/snapshots/", headers=headers)
                     latest_snapshot_url = snapshot_request.json()["results"][0]["url"]
                     self.response = requests.get(latest_snapshot_url, headers=headers)
-                except:
+                except Exception:
                     catch_request_error({
                         "type": ErrorTypes.FETCH_ERROR,
                         "error": "No snapshot available"
                     }, self.kafka_topic)
+                    pass
+                except:
                     pass
 
             self.node_list = self.response.json()
@@ -67,11 +64,13 @@ class BitcoinNodeDataFetcher:
                     self.countries_nodes[i[7]] = 1
             del self.countries_nodes[None]
 
-        except(ConnectionError, Timeout, TooManyRedirects) as e:
+        except(ConnectionError, Timeout, TooManyRedirects):
             catch_request_error({
                 "type": ErrorTypes.FETCH_ERROR,
                 "error": sys.exc_info()[0]
             }, self.kafka_topic)
+            pass
+        except:
             pass
 
     def process_data_fetch(self):
@@ -83,14 +82,13 @@ class BitcoinNodeDataFetcher:
                 "countries": self.countries_nodes,
                 "coin": 'BTC'
             })
-        except:
+        except Exception:
             catch_request_error({
                 "type": ErrorTypes.FETCH_ERROR,
                 "error": sys.exc_info()[0]
             }, self.kafka_topic)
         finally:
-            s = threading.Timer(DWConfigs().get_fetch_interval(self.kafka_topic), self.process_data_fetch, [], {})
-            s.start()
+            self.run_app()
 
 
 BitcoinNodeDataFetcher()

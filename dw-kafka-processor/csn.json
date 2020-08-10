@@ -1085,6 +1085,25 @@
         }
       }
     },
+    "uni_li_wue.dw.KPI_ENUM_COUNTRY_CODES": {
+      "kind": "entity",
+      "elements": {
+        "isoCode": {
+          "key": true,
+          "type": "cds.String",
+          "length": 2
+        },
+        "latitude": {
+          "type": "cds.Double"
+        },
+        "longitude": {
+          "type": "cds.Double"
+        },
+        "name": {
+          "type": "cds.String"
+        }
+      }
+    },
     "uni_li_wue.dw.KPI_ENUM_ETHEREUM_TOKEN": {
       "kind": "entity",
       "elements": {
@@ -1170,21 +1189,6 @@
         }
       }
     },
-    "uni_li_wue.dw.KPI_E_SMART_EXEC": {
-      "kind": "entity",
-      "elements": {
-        "timestamp": {
-          "key": true,
-          "type": "cds.DateTime"
-        },
-        "contractAddress": {
-          "type": "cds.String"
-        },
-        "count": {
-          "type": "cds.Integer"
-        }
-      }
-    },
     "uni_li_wue.dw.KPI_E_TOKEN": {
       "kind": "entity",
       "elements": {
@@ -1193,6 +1197,7 @@
           "type": "cds.DateTime"
         },
         "token": {
+          "key": true,
           "type": "cds.String"
         },
         "tokenInfo": {
@@ -1236,47 +1241,6 @@
         },
         "volume24h": {
           "type": "cds.Double"
-        }
-      }
-    },
-    "uni_li_wue.dw.KPI_G_CREDITS": {
-      "kind": "entity",
-      "elements": {
-        "timestamp": {
-          "key": true,
-          "type": "cds.DateTime"
-        },
-        "coin": {
-          "key": true,
-          "type": "cds.String",
-          "length": 3
-        },
-        "coinInfo": {
-          "type": "cds.Association",
-          "cardinality": {
-            "max": 1
-          },
-          "target": "uni_li_wue.dw.KPI_ENUM_COIN",
-          "on": [
-            {
-              "ref": [
-                "coin"
-              ]
-            },
-            "=",
-            {
-              "ref": [
-                "coinInfo",
-                "shortName"
-              ]
-            }
-          ]
-        },
-        "noOfCredits": {
-          "type": "cds.Integer"
-        },
-        "noOfTransactions": {
-          "type": "cds.Integer"
         }
       }
     },
@@ -1753,7 +1717,10 @@
                             ]
                           }
                         ],
-                        "as": "delta"
+                        "as": "val",
+                        "cast": {
+                          "type": "cds.Integer"
+                        }
                       }
                     ],
                     "where": [
@@ -1910,6 +1877,384 @@
         }
       },
       "$syntax": "projection"
+    },
+    "uni_li_wue.dw.service.ConfigurationService.LAST_DATA_ARRIVAL": {
+      "kind": "entity",
+      "@readonly": true,
+      "query": {
+        "SELECT": {
+          "from": {
+            "join": "inner",
+            "args": [
+              {
+                "SET": {
+                  "op": "union",
+                  "args": [
+                    {
+                      "SELECT": {
+                        "from": {
+                          "ref": [
+                            "uni_li_wue.dw.KPI_B_BLOCK"
+                          ]
+                        },
+                        "columns": [
+                          {
+                            "func": "MAX",
+                            "args": [
+                              {
+                                "ref": [
+                                  "timestamp"
+                                ]
+                              }
+                            ],
+                            "as": "TS"
+                          },
+                          {
+                            "val": "RAW_B_BLOCK",
+                            "as": "D_Topic"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "SELECT": {
+                        "from": {
+                          "ref": [
+                            "uni_li_wue.dw.KPI_E_BLOCK"
+                          ]
+                        },
+                        "columns": [
+                          {
+                            "func": "MAX",
+                            "args": [
+                              {
+                                "ref": [
+                                  "timestamp"
+                                ]
+                              }
+                            ],
+                            "as": "TS"
+                          },
+                          {
+                            "val": "RAW_E_BLOCK",
+                            "as": "D_Topic"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "SELECT": {
+                        "from": {
+                          "ref": [
+                            "uni_li_wue.dw.KPI_E_TOKEN"
+                          ]
+                        },
+                        "columns": [
+                          {
+                            "func": "MAX",
+                            "args": [
+                              {
+                                "ref": [
+                                  "timestamp"
+                                ]
+                              }
+                            ],
+                            "as": "TS"
+                          },
+                          {
+                            "val": "RAW_E_TOKEN",
+                            "as": "D_Topic"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "SELECT": {
+                        "from": {
+                          "ref": [
+                            "uni_li_wue.dw.KPI_G_GINI"
+                          ]
+                        },
+                        "columns": [
+                          {
+                            "func": "MAX",
+                            "args": [
+                              {
+                                "ref": [
+                                  "date"
+                                ]
+                              }
+                            ],
+                            "as": "TS"
+                          },
+                          {
+                            "val": "RAW_G_GINI",
+                            "as": "D_Topic"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "SELECT": {
+                        "from": {
+                          "ref": [
+                            "uni_li_wue.dw.KPI_G_NEWS"
+                          ]
+                        },
+                        "columns": [
+                          {
+                            "func": "MAX",
+                            "args": [
+                              {
+                                "ref": [
+                                  "timestamp"
+                                ]
+                              }
+                            ],
+                            "as": "TS"
+                          },
+                          {
+                            "val": "RAW_G_NEWS",
+                            "as": "D_Topic"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "SELECT": {
+                        "from": {
+                          "ref": [
+                            "uni_li_wue.dw.KPI_G_NODE_DISTRIBUTION"
+                          ]
+                        },
+                        "columns": [
+                          {
+                            "func": "MAX",
+                            "args": [
+                              {
+                                "ref": [
+                                  "timestamp"
+                                ]
+                              }
+                            ],
+                            "as": "TS"
+                          },
+                          {
+                            "val": "RAW_G_NODE_DISTRIBUTION",
+                            "as": "D_Topic"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "SELECT": {
+                        "from": {
+                          "ref": [
+                            "uni_li_wue.dw.KPI_G_N_PER_TIME"
+                          ]
+                        },
+                        "columns": [
+                          {
+                            "func": "MAX",
+                            "args": [
+                              {
+                                "ref": [
+                                  "timestamp"
+                                ]
+                              }
+                            ],
+                            "as": "TS"
+                          },
+                          {
+                            "val": "RAW_G_N_PER_TIME",
+                            "as": "D_Topic"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "SELECT": {
+                        "from": {
+                          "ref": [
+                            "uni_li_wue.dw.KPI_G_PRICES"
+                          ]
+                        },
+                        "columns": [
+                          {
+                            "func": "MAX",
+                            "args": [
+                              {
+                                "ref": [
+                                  "timestamp"
+                                ]
+                              }
+                            ],
+                            "as": "TS"
+                          },
+                          {
+                            "val": "RAW_G_PRICES",
+                            "as": "D_Topic"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "SELECT": {
+                        "from": {
+                          "ref": [
+                            "uni_li_wue.dw.KPI_G_PRICE_VOLA"
+                          ]
+                        },
+                        "columns": [
+                          {
+                            "func": "MAX",
+                            "args": [
+                              {
+                                "ref": [
+                                  "timestamp"
+                                ]
+                              }
+                            ],
+                            "as": "TS"
+                          },
+                          {
+                            "val": "RAW_G_PRICE_VOLA",
+                            "as": "D_Topic"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "SELECT": {
+                        "from": {
+                          "ref": [
+                            "uni_li_wue.dw.KPI_G_RICH_ACC"
+                          ]
+                        },
+                        "columns": [
+                          {
+                            "func": "MAX",
+                            "args": [
+                              {
+                                "ref": [
+                                  "timestamp"
+                                ]
+                              }
+                            ],
+                            "as": "TS"
+                          },
+                          {
+                            "val": "RAW_G_RICH_ACC",
+                            "as": "D_Topic"
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                },
+                "as": "T"
+              },
+              {
+                "ref": [
+                  "uni_li_wue.dw.KPI_STREAM_TYPE_CONFIG"
+                ]
+              }
+            ],
+            "on": [
+              {
+                "ref": [
+                  "T",
+                  "D_Topic"
+                ]
+              },
+              "=",
+              {
+                "ref": [
+                  "KPI_STREAM_TYPE_CONFIG",
+                  "topic"
+                ]
+              }
+            ]
+          },
+          "columns": [
+            {
+              "key": true,
+              "ref": [
+                "T",
+                "D_Topic"
+              ],
+              "cast": {
+                "type": "cds.String"
+              }
+            },
+            {
+              "ref": [
+                "T",
+                "TS"
+              ],
+              "cast": {
+                "type": "cds.Timestamp"
+              }
+            },
+            {
+              "xpr": [
+                "case",
+                "when",
+                {
+                  "func": "SECONDS_BETWEEN",
+                  "args": [
+                    {
+                      "ref": [
+                        "T",
+                        "TS"
+                      ]
+                    },
+                    {
+                      "ref": [
+                        "$now"
+                      ]
+                    }
+                  ]
+                },
+                ">",
+                {
+                  "ref": [
+                    "KPI_STREAM_TYPE_CONFIG",
+                    "fetchInterval"
+                  ]
+                },
+                "then",
+                {
+                  "val": "late"
+                },
+                "else",
+                {
+                  "val": "on-time"
+                },
+                "end"
+              ],
+              "as": "status",
+              "cast": {
+                "type": "cds.String"
+              }
+            }
+          ]
+        }
+      },
+      "elements": {
+        "D_Topic": {
+          "key": true,
+          "type": "cds.String"
+        },
+        "TS": {
+          "type": "cds.Timestamp"
+        },
+        "status": {
+          "@Core.Computed": true,
+          "type": "cds.String"
+        }
+      },
+      "$syntax": "entity"
     },
     "uni_li_wue.dw.service.ConfigurationService.LOG_FETCH_ERROR": {
       "kind": "entity",
@@ -2228,32 +2573,6 @@
       },
       "$syntax": "projection"
     },
-    "uni_li_wue.dw.service.KafkaPublishService.KPI_E_SMART_EXEC": {
-      "kind": "entity",
-      "@insertonly": true,
-      "query": {
-        "SELECT": {
-          "from": {
-            "ref": [
-              "uni_li_wue.dw.KPI_E_SMART_EXEC"
-            ]
-          }
-        }
-      },
-      "elements": {
-        "timestamp": {
-          "key": true,
-          "type": "cds.DateTime"
-        },
-        "contractAddress": {
-          "type": "cds.String"
-        },
-        "count": {
-          "type": "cds.Integer"
-        }
-      },
-      "$syntax": "projection"
-    },
     "uni_li_wue.dw.service.KafkaPublishService.KPI_E_TOKEN": {
       "kind": "entity",
       "@insertonly": true,
@@ -2272,6 +2591,7 @@
           "type": "cds.DateTime"
         },
         "token": {
+          "key": true,
           "type": "cds.String"
         },
         "tokenInfo": {
@@ -2315,58 +2635,6 @@
         },
         "volume24h": {
           "type": "cds.Double"
-        }
-      },
-      "$syntax": "projection"
-    },
-    "uni_li_wue.dw.service.KafkaPublishService.KPI_G_CREDITS": {
-      "kind": "entity",
-      "@insertonly": true,
-      "query": {
-        "SELECT": {
-          "from": {
-            "ref": [
-              "uni_li_wue.dw.KPI_G_CREDITS"
-            ]
-          }
-        }
-      },
-      "elements": {
-        "timestamp": {
-          "key": true,
-          "type": "cds.DateTime"
-        },
-        "coin": {
-          "key": true,
-          "type": "cds.String",
-          "length": 3
-        },
-        "coinInfo": {
-          "type": "cds.Association",
-          "cardinality": {
-            "max": 1
-          },
-          "target": "uni_li_wue.dw.service.KafkaPublishService.KPI_ENUM_COIN",
-          "on": [
-            {
-              "ref": [
-                "coin"
-              ]
-            },
-            "=",
-            {
-              "ref": [
-                "coinInfo",
-                "shortName"
-              ]
-            }
-          ]
-        },
-        "noOfCredits": {
-          "type": "cds.Integer"
-        },
-        "noOfTransactions": {
-          "type": "cds.Integer"
         }
       },
       "$syntax": "projection"
@@ -3276,32 +3544,6 @@
       },
       "$syntax": "entity"
     },
-    "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_E_SMART_EXEC": {
-      "kind": "entity",
-      "@readonly": true,
-      "query": {
-        "SELECT": {
-          "from": {
-            "ref": [
-              "uni_li_wue.dw.KPI_E_SMART_EXEC"
-            ]
-          }
-        }
-      },
-      "elements": {
-        "timestamp": {
-          "key": true,
-          "type": "cds.DateTime"
-        },
-        "contractAddress": {
-          "type": "cds.String"
-        },
-        "count": {
-          "type": "cds.Integer"
-        }
-      },
-      "$syntax": "projection"
-    },
     "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_E_TOKEN": {
       "kind": "entity",
       "@readonly": true,
@@ -3320,6 +3562,7 @@
           "type": "cds.DateTime"
         },
         "token": {
+          "key": true,
           "type": "cds.String"
         },
         "tokenInfo": {
@@ -3363,58 +3606,6 @@
         },
         "volume24h": {
           "type": "cds.Double"
-        }
-      },
-      "$syntax": "projection"
-    },
-    "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_G_CREDITS": {
-      "kind": "entity",
-      "@readonly": true,
-      "query": {
-        "SELECT": {
-          "from": {
-            "ref": [
-              "uni_li_wue.dw.KPI_G_CREDITS"
-            ]
-          }
-        }
-      },
-      "elements": {
-        "timestamp": {
-          "key": true,
-          "type": "cds.DateTime"
-        },
-        "coin": {
-          "key": true,
-          "type": "cds.String",
-          "length": 3
-        },
-        "coinInfo": {
-          "type": "cds.Association",
-          "cardinality": {
-            "max": 1
-          },
-          "target": "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_ENUM_COINS",
-          "on": [
-            {
-              "ref": [
-                "coin"
-              ]
-            },
-            "=",
-            {
-              "ref": [
-                "coinInfo",
-                "shortName"
-              ]
-            }
-          ]
-        },
-        "noOfCredits": {
-          "type": "cds.Integer"
-        },
-        "noOfTransactions": {
-          "type": "cds.Integer"
         }
       },
       "$syntax": "projection"
@@ -3532,10 +3723,62 @@
       "query": {
         "SELECT": {
           "from": {
-            "ref": [
-              "uni_li_wue.dw.KPI_G_NODE_DISTRIBUTION"
+            "join": "inner",
+            "args": [
+              {
+                "ref": [
+                  "uni_li_wue.dw.KPI_G_NODE_DISTRIBUTION"
+                ]
+              },
+              {
+                "ref": [
+                  "uni_li_wue.dw.KPI_ENUM_COUNTRY_CODES"
+                ]
+              }
+            ],
+            "on": [
+              {
+                "ref": [
+                  "country"
+                ]
+              },
+              "=",
+              {
+                "ref": [
+                  "isoCode"
+                ]
+              }
             ]
-          }
+          },
+          "columns": [
+            {
+              "key": true,
+              "ref": [
+                "timestamp"
+              ]
+            },
+            {
+              "key": true,
+              "ref": [
+                "coin"
+              ]
+            },
+            {
+              "ref": [
+                "latitude"
+              ]
+            },
+            {
+              "ref": [
+                "longitude"
+              ]
+            },
+            {
+              "ref": [
+                "nodes"
+              ]
+            }
+          ]
         }
       },
       "elements": {
@@ -3543,42 +3786,22 @@
           "key": true,
           "type": "cds.DateTime"
         },
-        "country": {
-          "key": true,
-          "type": "cds.String",
-          "length": 3
-        },
         "coin": {
           "key": true,
           "type": "cds.String",
           "length": 3
         },
-        "coinInfo": {
-          "type": "cds.Association",
-          "cardinality": {
-            "max": 1
-          },
-          "target": "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_ENUM_COINS",
-          "on": [
-            {
-              "ref": [
-                "coin"
-              ]
-            },
-            "=",
-            {
-              "ref": [
-                "coinInfo",
-                "shortName"
-              ]
-            }
-          ]
+        "latitude": {
+          "type": "cds.Double"
+        },
+        "longitude": {
+          "type": "cds.Double"
         },
         "nodes": {
           "type": "cds.Integer"
         }
       },
-      "$syntax": "projection"
+      "$syntax": "entity"
     },
     "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_G_N_PER_TIME": {
       "kind": "entity",

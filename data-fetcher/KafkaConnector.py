@@ -6,6 +6,8 @@ from json.decoder import JSONDecodeError
 
 from kafka import KafkaProducer
 
+from ErrorTypes import ErrorTypes
+
 os.environ["KAFKA_BOOTSTRAP_SERVER"] = '132.187.226.20:9092'
 logging.basicConfig(filename='output.log', level=logging.ERROR)
 
@@ -18,7 +20,7 @@ class KafkaConnector:
     class __KafkaConnector:
         def __init__(self):
             self.producer = KafkaProducer(bootstrap_servers=[os.getenv('KAFKA_BOOTSTRAP_SERVER', 'localhost:9092')],
-                                          value_serializer=lambda m: json.dumps(m).encode('ascii'))
+                                          value_serializer=lambda m: json.dumps(m, cls=EnumEncoder).encode('ascii'))
 
     instance = None
 
@@ -33,7 +35,7 @@ class KafkaConnector:
         try:
             self.producer.send(topic, dict_elm).add_callback(on_send_success).add_errback(on_send_error)
             self.producer.flush()
-        except JSONDecodeError as e:
+        except JSONDecodeError:
             self.forward_error({
                 "error": "Failed to send to Kafka"
             })
@@ -52,7 +54,8 @@ def get_unix_timestamp():
 
 
 def catch_request_error(error, kafka_topic):
-    logging.error('Error while fetching', exc_info=error)
+    logging.error('Error while fetching for %s', kafka_topic)
+    logging.error(error)
     error['topic'] = kafka_topic
     error['timestamp'] = get_unix_timestamp()
     KafkaConnector().forward_error(error)
@@ -63,8 +66,12 @@ def on_send_success(record_metadata):
 
 
 def on_send_error(exception):
-    logging.error('Error while sending to Kafka', exc_info=exception)
+    logging.error('Error while sending to Kafka' + str(exception))
     KafkaConnector().forward_error(exception)
 
-# Sample how to use it
-# KafkaConnector().send_to_kafka("my-test-kafka", {"abc": "def"})
+
+class EnumEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if type(obj) in ErrorTypes.values():
+            return {"__enum__": str(obj)}
+        return json.JSONEncoder.default(self, obj)

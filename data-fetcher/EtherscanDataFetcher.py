@@ -1,43 +1,38 @@
 import json
 import logging
 import sys
-import threading
 from json import JSONDecodeError
 
 import cfscrape
 from requests.exceptions import ConnectionError, Timeout, TooManyRedirects
 
-from DWConfigs import DWConfigs
+from BaseFetcher import BaseFetcher
 from ErrorTypes import ErrorTypes
 from KafkaConnector import catch_request_error, get_unix_timestamp, KafkaConnector
 
+logging.basicConfig(filename='output.log', level=logging.INFO)
 
-class EtherscanDataFetcher:
+
+class EtherscanDataFetcher(BaseFetcher):
     fetcher_name = "Etherscan Data Fetcher"
     kafka_topic = "RAW_G_NODE_DISTRIBUTION"
 
     def __init__(self):
         self.url = "https://etherscan.io/stats_nodehandler.ashx?t=1&code=&range=1&additional="
-        self.trigger_health_pings()
-        self.process_data_fetch()
-        logging.info('Successful init')
+        BaseFetcher.__init__(self, self.kafka_topic, self.send_health_pings, self.process_data_fetch)
 
     # Supporting methods
     def send_health_pings(self):
         KafkaConnector().send_health_ping(self.fetcher_name)
-        self.trigger_health_pings()
-
-    def trigger_health_pings(self):
-        s = threading.Timer(DWConfigs().get_health_ping_interval(self.kafka_topic), self.send_health_pings, [], {})
-        s.start()
+        self.run_health()
 
     def get_data_from_node_dist_endpoint(self):
         try:
             response = cfscrape.CloudflareScraper().get(self.url)
-            list = json.loads(response.content)
+            json_content = json.loads(response.content)
             countries_list = {}
             node_count = 0
-            for country in list:
+            for country in json_content:
                 if country["value"] is not 0:
                     countries_list[country["code"]] = country["value"]
                     node_count += country["value"]
@@ -64,14 +59,13 @@ class EtherscanDataFetcher:
                 "countries": countries_list,
                 "coin": 'ETH'
             })
-        except:
+        except Exception:
             catch_request_error({
                 "type": ErrorTypes.FETCH_ERROR,
                 "error": sys.exc_info()[0]
             }, self.kafka_topic)
         finally:
-            s = threading.Timer(DWConfigs().get_fetch_interval(self.kafka_topic), self.process_data_fetch, [], {})
-            s.start()
+            self.run_app()
 
 
 EtherscanDataFetcher()

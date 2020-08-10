@@ -1,37 +1,32 @@
 import logging
 import os
-import threading
-from typing import re
+import re
 
 from google.cloud import bigquery
 from requests import Session
 
-from DWConfigs import DWConfigs
+from BaseFetcher import BaseFetcher
 from KafkaConnector import catch_request_error, KafkaConnector, get_unix_timestamp
 
 os.environ[
     "GOOGLE_APPLICATION_CREDENTIALS"] = "/home/pjs/python_fetchers/googlebigquerytoken.json"
+logging.basicConfig(filename='output.log', level=logging.INFO)
 
 
-class GoogleBigQueryDataFetcher:
+# noinspection PyPep8,PyPep8,PyPep8,PyPep8
+class GoogleBigQueryDataFetcher(BaseFetcher):
     fetcher_name = "Google Big Query Data Fetcher"
     kafka_topic = "RAW_G_GINI"
     sub_kafka_topic = "RAW_G_RICH_ACC"
 
     def __init__(self):
         self.client = bigquery.Client()
-        self.trigger_health_pings()
-        self.process_data_fetch()
-        logging.info('Successful init')
+        BaseFetcher.__init__(self, self.kafka_topic, self.send_health_pings, self.process_data_fetch)
 
     # Supporting methods
     def send_health_pings(self):
         KafkaConnector().send_health_ping(self.fetcher_name)
-        self.trigger_health_pings()
-
-    def trigger_health_pings(self):
-        s = threading.Timer(DWConfigs().get_health_ping_interval(self.kafka_topic), self.send_health_pings, [], {})
-        s.start()
+        self.run_health()
 
     def calc_eth_gini(self):
         query_job = self.client.query("""with
@@ -117,10 +112,10 @@ order by date asc""")
                     "coin": "ETH",
                     "gini": row.gini * 1.0
                 })
-            except:
+            except Exception:
                 catch_request_error({
                     "error": "Couldn't calculate Gini for Ethereum"
-                })
+                }, self.kafka_topic)
 
     def calc_btc_gini(self):
         query_job = self.client.query("""with
@@ -195,12 +190,12 @@ order by date asc""")
                 KafkaConnector().send_to_kafka(self.kafka_topic, {
                     "date": row.date.strftime("%Y-%m-%d"),
                     "coin": "BTC",
-                    "gini": row.gini * 1.0  # avoid decimal object
+                    "gini": float(row.gini)  # avoid decimal object
                 })
-            except:
+            except Exception:
                 catch_request_error({
                     "error": "Couldn't calculate Gini for Bitcoin"
-                })
+                }, self.kafka_topic)
                 pass
 
     def get_richest_eth_account(self):
@@ -241,19 +236,20 @@ order by date asc""")
                     "timestamp": get_unix_timestamp(),
                     "coin": "ETH",
                     "accountAddress": row.address,
-                    "balance": row.balance * 1.0
+                    "balance": float(row.balance)
                 })
-            except:
+            except Exception:
                 catch_request_error({
                     "error": "Couldn't get richest ETH account"
-                })
+                }, self.sub_kafka_topic)
                 pass
 
     def get_richest_btc_account(self):
         session = Session()
         response = session.get("https://bitinfocharts.com/de/top-100-richest-bitcoin-addresses.html")
         m = re.match(
-            r"id=\"tblOne\"(.+)>((.|\s)+?(?=tbody))((.|\s)+?(?=<a href))((.|\s)+?(?=>))>(.+)<\/a>((.|\s)+?(?=<td ))<td (.+)data-val=\"(.+)\">",
+            r"id=\"tblOne\"(.+)>((.|\s)+?(?=tbody))((.|\s)+?(?=<a href))((.|\s)+?(?=>))>(.+)</a>((.|\s)+?(?=<td "
+            r"))<td (.+)data-val=\"(.+)\">",
             response.text)
         address = m[8]
         balance = m[12]
@@ -263,12 +259,12 @@ order by date asc""")
                     "timestamp": get_unix_timestamp(),
                     "coin": "BTC",
                     "accountAddress": address,
-                    "balance": balance * 1.0
+                    "balance": float(balance)
                 })
-            except:
+            except Exception:
                 catch_request_error({
                     "error": "Couldn't get richest BTC account"
-                })
+                }, self.sub_kafka_topic)
                 pass
 
     def process_data_fetch(self):
@@ -277,8 +273,7 @@ order by date asc""")
         self.get_richest_eth_account()
         self.get_richest_btc_account()
 
-        s = threading.Timer(DWConfigs().get_fetch_interval(self.kafka_topic), self.process_data_fetch, [], {})
-        s.start()
+        self.run_app()
 
 
 GoogleBigQueryDataFetcher()

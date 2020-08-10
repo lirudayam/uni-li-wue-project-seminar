@@ -1,38 +1,32 @@
 import json
 import logging
 import sys
-import threading
 from json import JSONDecodeError
 
 from requests import Session
 from requests.exceptions import ConnectionError, Timeout, TooManyRedirects
 
-from DWConfigs import DWConfigs
+from BaseFetcher import BaseFetcher
 from ErrorTypes import ErrorTypes
-from KafkaConnector import catch_request_error, get_unix_timestamp, KafkaConnector
+from KafkaConnector import catch_request_error, KafkaConnector
+
+logging.basicConfig(filename='output.log', level=logging.INFO)
 
 
-class ETHGasStationDataFetcher:
+class ETHGasStationDataFetcher(BaseFetcher):
     fetcher_name = "Eth Gas Station Data Fetcher"
     kafka_topic = "RAW_E_GASSTATION"
 
     def __init__(self):
         self.url = "https://ethgasstation.info/api/ethgasAPI.json"
         self.session = Session()
-        self.trigger_health_pings()
-        self.process_data_fetch()
-        self.x10Gwei = None
         self.request_output = None
-        logging.info('Successful init')
+        BaseFetcher.__init__(self, self.kafka_topic, self.send_health_pings, self.process_data_fetch)
 
     # Supporting methods
     def send_health_pings(self):
         KafkaConnector().send_health_ping(self.fetcher_name)
-        self.trigger_health_pings()
-
-    def trigger_health_pings(self):
-        s = threading.Timer(DWConfigs().get_health_ping_interval(self.kafka_topic), self.send_health_pings, [], {})
-        s.start()
+        self.run_health()
 
     def get_data_from_gasstation(self):
         try:
@@ -56,18 +50,18 @@ class ETHGasStationDataFetcher:
         try:
             KafkaConnector().send_to_kafka(self.kafka_topic, {
                 "safeGasPrice": self.request_output["safeLow"],
-                # this unit divided by 10 = Gwei (Gwei to Ether = divide by 10^9) --> then convert to USD according to current rate
+                # this unit divided by 10 = Gwei (Gwei to Ether = divide by 10^9)
+                # then convert to USD according to current rate
                 "blockNumber": self.request_output["blockNum"],
                 "blockTime": self.request_output["block_time"]
             })
-        except:
+        except Exception:
             catch_request_error({
                 "type": ErrorTypes.FETCH_ERROR,
                 "error": sys.exc_info()[0]
             }, self.kafka_topic)
         finally:
-            s = threading.Timer(DWConfigs().get_fetch_interval(self.kafka_topic), self.process_data_fetch, [], {})
-            s.start()
+            self.run_app()
 
 
 ETHGasStationDataFetcher()

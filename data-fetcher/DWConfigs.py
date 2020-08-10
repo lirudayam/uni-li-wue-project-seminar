@@ -1,7 +1,10 @@
-import sys
+import logging
+
+import requests
 
 from HashiVaultCredentialStorage import HashiVaultCredentialStorage
-import requests
+
+logging.basicConfig(filename='output.log', level=logging.INFO)
 
 
 class DWConfigs:
@@ -23,12 +26,16 @@ class DWConfigs:
 
     def get_interval_data(self, topic):
         try:
-            SERVICE_URL = HashiVaultCredentialStorage().get_credentials("DWConfigs", "ODataServiceURL")[0]
-            result = requests.get(SERVICE_URL + "/KPI_CONFIG('" + topic + "')").json()
+            service_url = HashiVaultCredentialStorage().get_credentials("DWConfigs", "ODataServiceURL")[0]
+            result = requests.get(service_url + "/KPI_CONFIG('" + topic + "')").json()
+
             if result is None:
+                logging.error("Using fallback values")
                 raise ValueError('Error')
+
+            logging.info("Using real values")
             return result
-        except:
+        except Exception:
             return {
                 "aggregationInterval": self.fallback_aggregation_interval,
                 "fetchInterval": self.fallback_fetch_interval
@@ -41,9 +48,14 @@ class DWConfigs:
         return self.get_interval_data(topic)['aggregationInterval']
 
     def get_health_ping_interval(self, topic):
+        val = self.fallback_health_ping_interval
         try:
-            SERVICE_URL = HashiVaultCredentialStorage().get_credentials("DWConfigs", "ODataServiceURL")[0]
-            result = requests.get(SERVICE_URL + "/API_CONFIG('health_ping_interval')").json()
-            return result['health_ping_interval']
-        except:
-            return self.fallback_health_ping_interval
+            if topic is not "":
+                service_url = HashiVaultCredentialStorage().get_credentials("DWConfigs", "ODataServiceURL")[0]
+                result = requests.get(service_url + "/API_CONFIG('health_ping_interval')").json()
+                val = result['health_ping_interval']
+        except Exception:
+            val = self.fallback_health_ping_interval
+            logging.error("Failed to receive health ping interval")
+        finally:
+            return val

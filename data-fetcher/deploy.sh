@@ -5,15 +5,14 @@ pip3 install setuptools
 ################################################################################
 # Help                                                                         #
 ################################################################################
-Help()
-{
-   # Display Help
-   echo "Manual Deployment for a single data fetcher."
-   echo
-   echo "Syntax: ./deploy.sh [fetcher_name...]"
-   echo "arguments:"
-   echo "fetcher_name     The name of the data fetcher to be deployed, space-separated (e.g. Infura ETHGasStation)"
-   echo
+Help() {
+  # Display Help
+  echo "Manual Deployment for a single data fetcher."
+  echo
+  echo "Syntax: ./deploy.sh [fetcher_name...]"
+  echo "arguments:"
+  echo "fetcher_name     The name of the data fetcher to be deployed, space-separated (e.g. Infura ETHGasStation)"
+  echo
 }
 
 ################################################################################
@@ -23,10 +22,11 @@ Help()
 #############################################################################
 Help
 
-while (( "$#" )); do
+while (("$#")); do
   FILE_TO_BE_DEPLOYED=$1
   mkdir "tmp_deploy"
   mkdir "tmp_deploy/${FILE_TO_BE_DEPLOYED}"
+  cp BaseFetcher.py "tmp_deploy/${FILE_TO_BE_DEPLOYED}"
   cp DWConfigs.py "tmp_deploy/${FILE_TO_BE_DEPLOYED}"
   cp KafkaConnector.py "tmp_deploy/${FILE_TO_BE_DEPLOYED}"
   cp ErrorTypes.py "tmp_deploy/${FILE_TO_BE_DEPLOYED}"
@@ -35,10 +35,10 @@ while (( "$#" )); do
   SCRIPT_FILE="${FILE_TO_BE_DEPLOYED}"
   SCRIPT_FILE+="DataFetcher.py"
   cp "${SCRIPT_FILE}" "tmp_deploy/${FILE_TO_BE_DEPLOYED}"
-  cd tmp_deploy
+  cd tmp_deploy || exit
   touch README.md
   touch __init__.py
-  cat <<EOT >> __init__.py
+  cat <<EOT >>__init__.py
 import ${FILE_TO_BE_DEPLOYED}DataFetcher
 def main():
   ${FILE_TO_BE_DEPLOYED}DataFetcher()
@@ -48,7 +48,7 @@ EOT
   sed -i '' "s/FETCHER_NAME/$FILE_TO_BE_DEPLOYED/g" setup.py
   python3 setup.py sdist bdist_wheel
 
-  cd dist
+  cd dist || exit
   DIST="uniliwue.datafetchers"
   DIST+="${FILE_TO_BE_DEPLOYED}"
   DIST+="-0.0.1"
@@ -60,7 +60,7 @@ EOT
 
   echo "Insert password for VM to install:"
   #ps ax | grep "${DIST}" | grep -v grep | awk '{print $1}' | xargs kill
-  ssh -p 64526 pjs@wrzh020.rzhousing.uni-wuerzburg.de /bin/bash << EOF
+  ssh -p 64526 pjs@wrzh020.rzhousing.uni-wuerzburg.de /bin/bash <<EOF
     cd python_fetchers
     kill $(ps aux | grep "${FOLDER_NAME}" | awk '{print $2}')
     tar -xvzf "${DIST}"
@@ -77,7 +77,7 @@ EOF
 
   cd ../..
   rm -r tmp_deploy
-shift
+  shift
 done
 
 exit

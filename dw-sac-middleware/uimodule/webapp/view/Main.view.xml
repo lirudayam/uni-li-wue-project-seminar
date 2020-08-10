@@ -1,21 +1,32 @@
-<mvc:View xmlns="sap.m" xmlns:mvc="sap.ui.core.mvc" controllerName="uni.li.wue.project.dwconfig.controller.Main" displayBlock="true">
+<mvc:View xmlns="sap.m" xmlns:mvc="sap.ui.core.mvc" xmlns:f="sap.f" controllerName="uni.li.wue.project.dwconfig.controller.Main" displayBlock="true">
 	<App id="idAppControl">
 		<pages>
-			<Page title="{i18n>title}">
+			<Page title="{i18n>title}" showHeader="false">
 				<content>
+					<f:ShellBar title="{i18n>title}" secondTitle="{i18n>subTitle}" showCopilot="false" showNotifications="false" showProductSwitcher="false">
+						<f:profile>
+							<f:Avatar initials="UI"/>
+						</f:profile>
+					</f:ShellBar>
 					<HBox width="100%">
 						<items>
-							<VBox width="100%" direction="Column" class="sapUiSmallPadding sapUiTinyMargin">
+							<VBox width="100%" direction="Column" class="sapUiSmallPadding sapUiMediumMargin">
 								<items>
-									<Title text="{i18n>healthStatus}"/>
-									<Text text="{i18n>healthStatusDetails}"/>
-									<Table noDataText="Drop column list items here and columns in the area above" items="{configuration>/HEALTH_STATUS}">
+									<Title text="{i18n>healthStatus}" class="sapUiTinyMargin"/>
+									<Text text="{i18n>healthStatusDetails}" class="sapUiTinyMargin sapUiNoMarginTop"/>
+									<Toolbar width="100%"  class="sapUiTinyMargin">
+									    <content>
+									        <ToolbarSpacer/>
+									        <Button text="Refresh" icon="sap-icon://refresh" press="onRefreshHealthStatus"/>
+									    </content>
+									</Toolbar>
+									<Table items="{configuration>/HEALTH_STATUS}" alternateRowColors="true" id="health_table" class="sapUiTinyMargin">
 										<items>
 											<ColumnListItem type="Active">
 												<cells>
 													<Text text="{configuration>api}"/>
 													<Text text="{configuration>last_ping}"/>
-													<Text text="{configuration>status}"/>
+													<ObjectStatus text="{configuration>status}" state="{= ${configuration>status} === 'up' ? 'Success' : 'Error'}"/>
 												</cells>
 											</ColumnListItem>
 										</items>
@@ -39,10 +50,60 @@
 									</Table>
 								</items>
 							</VBox>
-							<VBox width="100%" direction="Column" class="sapUiSmallPadding sapUiTinyMargin">
-								<Title text="{i18n>generalAPIConfig}"/>
-								<Text text="{i18n>generalAPIConfigDetails}"/>
-								<Table noDataText="Drop column list items here and columns in the area above" items="{configuration>/API_CONFIG}">
+							<VBox width="100%" direction="Column" class="sapUiSmallPadding sapUiMediumMargin">
+								<items>
+									<Title text="{i18n>dataStatus}" class="sapUiTinyMargin"/>
+									<Text text="{i18n>dataStatusDetails}" class="sapUiTinyMargin sapUiNoMarginTop"/>
+									<Toolbar width="100%"  class="sapUiTinyMargin">
+									    <content>
+									        <ToolbarSpacer/>
+									        <Button text="Refresh" icon="sap-icon://refresh" press="onRefreshDataStatus"/>
+									    </content>
+									</Toolbar>
+									<Table items="{configuration>/LAST_DATA_ARRIVAL}" alternateRowColors="true" id="data_table" class="sapUiTinyMargin">
+										<items>
+											<ColumnListItem type="Active">
+												<cells>
+													<Text text="{configuration>D_Topic}"/>
+													<Text text="{configuration>TS}"/>
+													<ObjectStatus text="{configuration>status}" state="{= ${configuration>status} === 'on-time' ? 'Success' : 'Error'}"/>
+												</cells>
+											</ColumnListItem>
+										</items>
+										<columns>
+											<Column>
+												<header>
+													<Label text="{i18n>topic}"/>
+												</header>
+											</Column>
+											<Column>
+												<header>
+													<Label text="{i18n>lastPing}"/>
+												</header>
+											</Column>
+											<Column>
+												<header>
+													<Label text="{i18n>status}"/>
+												</header>
+											</Column>
+										</columns>
+									</Table>
+								</items>
+							</VBox>
+						</items>
+					</HBox>
+					<HBox width="100%" id="hbox1">
+						<items>
+						<VBox width="100%" direction="Column" class="sapUiSmallPadding sapUiMediumMargin">
+								<Title text="{i18n>generalAPIConfig}" class="sapUiTinyMargin"/>
+								<Text text="{i18n>generalAPIConfigDetails}" class="sapUiTinyMargin sapUiNoMarginTop"/>
+								<Toolbar width="100%" class="sapUiTinyMargin">
+									<content>
+										<ToolbarSpacer/>
+										<Button text="Refresh" icon="sap-icon://refresh" press="onRefreshAPIConfig"/>
+									</content>
+								</Toolbar>
+								<Table items="{configuration>/API_CONFIG}" alternateRowColors="true" id="config_table" class="sapUiTinyMargin">
 									<items>
 										<ColumnListItem type="Active">
 											<cells>
@@ -65,15 +126,17 @@
 									</columns>
 								</Table>
 							</VBox>
-						</items>
-					</HBox>
-					<HBox width="100%" id="hbox1">
-						<items>
-							<VBox width="100%" direction="Column" class="sapUiSmallPadding sapUiTinyMargin">
+							<VBox width="100%" direction="Column" class="sapUiSmallPadding sapUiMediumMargin">
 								<items>
-									<Title text="{i18n>fetchErrors}"/>
-									<Text text="{i18n>fetchErrorsDetails}"/>
-									<Table noDataText="Drop column list items here and columns in the area above" items="{configuration>/LOG_FETCH_ERROR}">
+									<Title text="{i18n>fetchErrors}" class="sapUiTinyMargin" />
+									<Text text="{i18n>fetchErrorsDetails}" class="sapUiTinyMargin sapUiNoMarginTop"/>
+									<Toolbar width="100%">
+									    <content>
+									        <ToolbarSpacer/>
+									        <Button text="Refresh" icon="sap-icon://refresh" press="onRefreshErrors" />
+									    </content>
+									</Toolbar>
+									<Table noDataText="No errors found" items="{configuration>/LOG_FETCH_ERROR}" alternateRowColors="true" id="error_table" class="sapUiTinyMargin">
 										<items>
 											<ColumnListItem type="Active">
 												<cells>

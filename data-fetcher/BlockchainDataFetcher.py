@@ -1,43 +1,38 @@
+import json
 import logging
-import threading
 
-from DWConfigs import DWConfigs
+from requests import Session
+from requests.exceptions import ConnectionError, Timeout, TooManyRedirects
+
+from BaseFetcher import BaseFetcher
 from ErrorTypes import ErrorTypes
 from HashiVaultCredentialStorage import HashiVaultCredentialStorage
 from KafkaConnector import catch_request_error, get_unix_timestamp, KafkaConnector
 
-from requests import Session, Request
-from requests.exceptions import ConnectionError, Timeout, TooManyRedirects
-import json
+logging.basicConfig(filename='output.log', level=logging.INFO)
 
 
-class BlockchainDataFetcher:
+class BlockchainDataFetcher(BaseFetcher):
     fetcher_name = "BlockchainCom Data Fetcher"
     kafka_topic = "RAW_B_BLOCK"
 
     def __init__(self):
         self.url = 'https://api.blockchain.info/stats'
         self.session = Session()
-        self.session.headers.update({
-            'Accepts': 'application/json',
-            'X-CMC_PRO_API_KEY': HashiVaultCredentialStorage().get_credentials("Bitcoin", "X-CMC_PRO_API_KEY")[0]
-        })
-        self.trigger_health_pings()
-        self.process_data_fetch()
         self.output = None
-        logging.info('Successful init')
+        BaseFetcher.__init__(self, self.kafka_topic, self.send_health_pings, self.process_data_fetch)
 
     # Supporting methods
     def send_health_pings(self):
         KafkaConnector().send_health_ping(self.fetcher_name)
-        self.trigger_health_pings()
-
-    def trigger_health_pings(self):
-        s = threading.Timer(DWConfigs().get_health_ping_interval(self.kafka_topic), self.send_health_pings, [], {})
-        s.start()
+        self.run_health()
 
     def get_data_from_blockchain(self):
         try:
+            self.session.headers.update({
+                'Accepts': 'application/json',
+                'X-CMC_PRO_API_KEY': HashiVaultCredentialStorage().get_credentials("Bitcoin", "X-CMC_PRO_API_KEY")[0]
+            })
             response = self.session.get(self.url)
             self.output = json.loads(response.text)
         except (ConnectionError, Timeout, TooManyRedirects) as e:
@@ -58,13 +53,12 @@ class BlockchainDataFetcher:
                 "estimatedSent": self.output['estimated_btc_sent'],
                 "minersRevenue": self.output['miners_revenue_btc'],
             })
-        except:
+        except Exception:
             catch_request_error({
                 "error": "ERROR"
-            })
+            }, self.kafka_topic)
         finally:
-            s = threading.Timer(DWConfigs().get_fetch_interval(self.kafka_topic), self.process_data_fetch, [], {})
-            s.start()
+            self.run_app()
 
 
 BlockchainDataFetcher()
