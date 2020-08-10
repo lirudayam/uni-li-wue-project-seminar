@@ -180,7 +180,6 @@ const asyncInitialRunFn = async () => {
 													);
 													cb(true);
 													return;
-													break;
 											}
 										}
 									}
@@ -214,7 +213,6 @@ const asyncInitialRunFn = async () => {
 						startKafka(socket);
 					}
 				);
-				console.log('DONE');
 			})
 			.catch((err) => log.error(err));
 

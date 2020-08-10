@@ -23,6 +23,8 @@ modules:
  # ------------------------------------------------------------
    type: nodejs
    path: gen/srv
+   parameters:
+     instances: 2
    properties:
      EXIT: 1  # required by deploy.js task to terminate 
    requires:
