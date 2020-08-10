@@ -28,11 +28,11 @@
         "model": "./csn.json",
         "credentials": {
           "destination": "DWODataService",
-          "requestTimeout": 30000000
+          "requestTimeout": 20000
         },
         "pool": {
           "min": 1,
-          "max": 10
+          "max": 100
         }
       }
     }
