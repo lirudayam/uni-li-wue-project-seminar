@@ -82,7 +82,6 @@ const asyncInitialRunFn = async () => {
 	};
 	var aBatchLayerTopics = [
 		'RAW_E_GASSTATION',
-		'RAW_G_LATEST_BLOCK',
 		'RAW_G_NODE_DISTRIBUTION',
 		'RAW_E_BLOCK',
 		'RAW_B_BLOCK',
@@ -276,15 +275,20 @@ const asyncInitialRunFn = async () => {
 							threadSafeQueueCopy
 						)) {
 							try {
-								console.log(...values);
 								if (values.length > 0) {
-									srv.run(
-										INSERT.into(
-											relevantServiceEntities[entity]
-										).entries(...values)
-									).catch((error) => {
-										log.error(error);
-									});
+									values.forEach((item) =>
+										srv
+											.run(
+												INSERT.into(
+													relevantServiceEntities[
+														entity
+													]
+												).entries(item)
+											)
+											.catch((error) => {
+												log.error(error);
+											})
+									);
 								}
 							} catch (e) {
 								log.error(entity);
@@ -497,7 +501,7 @@ const asyncInitialRunFn = async () => {
 							} catch (e) {
 								log.error('Error has occurred', e);
 							}
-						} else if (topic === 'RAW_FETCH_ERROR') {
+						} else if (topic === 'RAW_FETCH_ERRORS') {
 							try {
 								let entry = JSON.parse(message.value);
 								if (entry.timestamp) {
