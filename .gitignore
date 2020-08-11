@@ -105,6 +105,7 @@ dist
 
 data-fetcher/.idea
 data-fetcher/__pycache__
+data-fetcher/cfg-container/docker-cfg
 
 dw-sac-middleware/gen
 dw-sac-middleware/mta_archives
@@ -116,3 +117,4 @@ workspace.code-workspace
 *.DS_Store
 vault-token.txt
 data-fetcher/googlebigquerytoken.json
+data-fetcher/cfg-container/docker-cfg
