@@ -27,12 +27,6 @@ EOT
   docker build -t uniliwuedockerepo/"${IMGNAME}"-fetcher .
   docker push uniliwuedockerepo/"${IMGNAME}"-fetcher
 
-  echo "Run following:"
-  echo "sudo docker stop ${IMGNAME}"
-  echo "sudo docker rm ${IMGNAME}"
-  echo "sudo docker pull uniliwuedockerepo/"${IMGNAME}"-fetcher"
-  echo "sudo docker run -d --name ${IMGNAME} uniliwuedockerepo/"${IMGNAME}"-fetcher"
-
   cd ..
   rm -r tmp_deploy
 

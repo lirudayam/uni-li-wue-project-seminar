@@ -118,3 +118,4 @@ workspace.code-workspace
 vault-token.txt
 data-fetcher/googlebigquerytoken.json
 data-fetcher/cfg-container/docker-cfg
+data-fetcher/all_deploy.sh
