@@ -50,7 +50,7 @@ class DWConfigs:
     def get_health_ping_interval(self, topic):
         val = self.fallback_health_ping_interval
         try:
-            if topic is not "":
+            if topic != "":
                 service_url = HashiVaultCredentialStorage().get_credentials("DWConfigs", "ODataServiceURL")[0]
                 result = requests.get(service_url + "/API_CONFIG('health_ping_interval')").json()
                 val = result['health_ping_interval']
