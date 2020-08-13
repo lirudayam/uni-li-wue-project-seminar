@@ -23,7 +23,7 @@ Neuste Änderungen sollten nur im dev-Branch erfolgen. Nach erfolgreichem Versio
 
 ### DW Schema
 
-![DW Schema](img/DW_Schema.svg)
+![DW Schema](img/DB_Schema.svg)
 
 ## Repo-Struktur
 
