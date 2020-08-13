@@ -21,6 +21,10 @@ Neuste Änderungen sollten nur im dev-Branch erfolgen. Nach erfolgreichem Versio
 
 ![Data Fetcher Architektur](img/Data_Fetcher_Structure.svg)
 
+### DW Schema
+
+![DW Schema](img/DW_Schema.svg)
+
 ## Repo-Struktur
 
 - data-fetcher: alle Data-Fetchers inklusive Hilfsklassen
