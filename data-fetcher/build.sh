@@ -24,6 +24,7 @@ COPY . .
 RUN pip3 install -r requirements.txt
 CMD [ "python3", "${SCRIPT_FILE}" ]
 EOT
+  docker image rm uniliwuedockerepo/"${IMGNAME}"-fetcher
   docker build -t uniliwuedockerepo/"${IMGNAME}"-fetcher .
   docker push uniliwuedockerepo/"${IMGNAME}"-fetcher
 

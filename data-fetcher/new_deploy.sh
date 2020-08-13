@@ -9,7 +9,7 @@ while (("$#")); do
   ./build.sh ${FILE_TO_BE_DEPLOYED}
 
   echo "" >> all_deploy.sh
-  echo "${IMGNAME}" >> all_deploy.sh
+  echo "# -- ${IMGNAME}" >> all_deploy.sh
   echo "sudo docker stop ${IMGNAME}" >> all_deploy.sh
   echo "sudo docker rm ${IMGNAME}" >> all_deploy.sh
   echo "sudo docker pull uniliwuedockerepo/"${IMGNAME}"-fetcher" >> all_deploy.sh
