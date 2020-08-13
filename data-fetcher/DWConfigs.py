@@ -1,10 +1,10 @@
 import logging
+import os
 
 import requests
 
-from HashiVaultCredentialStorage import HashiVaultCredentialStorage
-
 logging.basicConfig(filename='output.log', level=logging.INFO)
+os.environ["DW_SERVER"] = '132.187.226.20:8080'
 
 
 class DWConfigs:
@@ -12,7 +12,6 @@ class DWConfigs:
         def __init__(self):
             # in seconds
             self.fallback_fetch_interval = 300.0
-            self.fallback_aggregation_interval = 60.0
             self.fallback_health_ping_interval = 60.0
 
     instance = None
@@ -26,34 +25,26 @@ class DWConfigs:
 
     def get_interval_data(self, topic):
         try:
-            service_url = HashiVaultCredentialStorage().get_credentials("DWConfigs", "ODataServiceURL")[0]
-            result = requests.get(service_url + "/KPI_CONFIG('" + topic + "')").json()
+            result = requests.get(os.environ["DW_SERVER"] + "/fetch_interval/" + topic).text
 
             if result is None:
                 logging.error("Using fallback values")
                 raise ValueError('Error')
 
             logging.info("Using real values")
-            return result
+            return float(result)
         except Exception:
-            return {
-                "aggregationInterval": self.fallback_aggregation_interval,
-                "fetchInterval": self.fallback_fetch_interval
-            }
+            return self.fallback_fetch_interval
 
     def get_fetch_interval(self, topic):
-        return self.get_interval_data(topic)['fetchInterval']
-
-    def get_aggregation_interval(self, topic):
-        return self.get_interval_data(topic)['aggregationInterval']
+        return self.get_interval_data(topic)
 
     def get_health_ping_interval(self, topic):
         val = self.fallback_health_ping_interval
         try:
             if topic != "":
-                service_url = HashiVaultCredentialStorage().get_credentials("DWConfigs", "ODataServiceURL")[0]
-                result = requests.get(service_url + "/API_CONFIG('health_ping_interval')").json()
-                val = result['health_ping_interval']
+                result = requests.get(os.environ["DW_SERVER"] + "/health_ping_interval").text
+                val = float(result)
         except Exception:
             val = self.fallback_health_ping_interval
             logging.error("Failed to receive health ping interval")
