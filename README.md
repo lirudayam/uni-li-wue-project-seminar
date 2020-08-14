@@ -3,7 +3,9 @@
 
 ## Projekt an der Uni Würzburg vom Team der Uni Liechtenstein
 
-Jeder ab dem Focus Day geschriebene Code sollten immer zu diesem GitHub Repository gepushed werden. Es wird kein Branching-/Deployment Konzept genutzt, sondern jeglicher Code wird zu Beginn in den *master* branch deployed, so lange bis es eine stabile Version gibt.
+Jeder ab dem Focus Day geschriebene Code sollten immer zu diesem GitHub Repository gepushed werden. Es wird kein Branching-/Deployment Konzept genutzt, sondern jeglicher Code wird zu Beginn in den *master* branch deployed, so lange bis es eine stabile Version gibt (dies ist inzwischen der Fall). Danach wird nur noch zu dev committed.
+
+Kritische Architekturentscheidungen werden als ADR (Architecture Decision Record), wie https://github.blog/2020-08-13-why-write-adrs/ beschrieben, dokumentiert unter docs/adr. Dabei wird https://adr.github.io/madr/ als Framework verwendet.
 
 ### Programming Guidelines
 
