@@ -5,13 +5,14 @@ import hvac
 from hvac.exceptions import InvalidPath
 
 logging.basicConfig(filename='output.log', level=logging.ERROR)
+os.environ["VAULT_TOKEN"] = "s.T4Habd4nXM9hhu3JP7bvKlqA"
 
 
 class HashiVaultCredentialStorage:
     class __HashiVaultCredentialStorage:
         def __init__(self):
             self.client = hvac.Client(url='http://132.187.226.20:8200',
-                                      token=os.environ['VAULT_TOKEN'])
+                                      token=os.getenv('VAULT_TOKEN', ''))
             print(self.client.is_authenticated())
 
     instance = None

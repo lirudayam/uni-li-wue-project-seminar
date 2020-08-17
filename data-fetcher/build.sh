@@ -15,6 +15,7 @@ while (("$#")); do
 
   cd tmp_deploy || exit
   pipreqs .
+  touch output.log
   touch Dockerfile
   cat <<EOT >>Dockerfile
 FROM python:3.6

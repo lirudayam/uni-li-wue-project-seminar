@@ -2,6 +2,7 @@ import logging
 import threading
 
 from DWConfigs import DWConfigs
+import time
 
 logging.basicConfig(
     filename='output.log',
@@ -21,13 +22,18 @@ class BaseFetcher:
         self._app_interval = DWConfigs().get_fetch_interval(self._kafka_topic)
 
         # define the base timers
-        self.health_timer = threading.Timer(self._health_interval, self._health_ping_fn, [], {})
-        self.app_timer = threading.Timer(self._app_interval, self._process_fn, [], {})
-        logging.info('Successful init')
+        self.health_timer = threading.Timer(self._health_interval, self._health_ping_fn)
+        self.app_timer = threading.Timer(self._app_interval, self._process_fn)
+
+        logging.info('Successful init of timers')
 
         # fire threads
         self.health_timer.start()
         self.app_timer.start()
+
+        # keep alive method
+        while True:
+            time.sleep(2)  # 2 second delay
 
     def run_health(self):
         if DWConfigs().get_health_ping_interval(self._kafka_topic) != self._health_interval:

@@ -8,7 +8,7 @@ logging.basicConfig(
     format='%(asctime)s %(levelname)-8s %(message)s',
     level=logging.INFO,
     datefmt='%Y-%m-%d %H:%M:%S')
-os.environ["DW_SERVER"] = '132.187.226.20:8080'
+os.environ["DW_SERVER"] = 'http://132.187.226.20:8080'
 
 
 class DWConfigs:
@@ -37,7 +37,8 @@ class DWConfigs:
 
             logging.info("Using real values")
             return float(result)
-        except Exception:
+        except Exception as e:
+            logging.error("Failed to receive fetch interval due to {0}".format(e))
             return self.fallback_fetch_interval
 
     def get_fetch_interval(self, topic):
@@ -47,10 +48,17 @@ class DWConfigs:
         val = self.fallback_health_ping_interval
         try:
             if topic != "":
-                result = requests.get(os.environ["DW_SERVER"] + "/health_ping_interval").text
-                val = float(result)
-        except Exception:
+                result = requests.get(os.environ["DW_SERVER"] + "/health_ping_interval")
+                if result.status_code == 200:
+                    result = result.text
+                else:
+                    result = self.fallback_fetch_interval
+                    logging.error("health ping endpoint returned {0}".format(result.status_code))
+        except Exception as e:
             val = self.fallback_health_ping_interval
-            logging.error("Failed to receive health ping interval")
+            logging.error("Failed to receive health ping interval due to {0}".format(e))
+            pass
+        else:
+            val = float(result)
         finally:
             return val

@@ -10,7 +10,8 @@ from ErrorTypes import ErrorTypes
 from KafkaConnector import catch_request_error, get_unix_timestamp, KafkaConnector
 
 
-# nltk.downloader.download('vader_lexicon')
+import nltk
+nltk.download('vader_lexicon')
 
 
 # noinspection PyMethodMayBeStatic
@@ -33,31 +34,34 @@ class StocktwitsDataFetcher(BaseFetcher):
     def process_data_fetch(self):
         self.get_data()
         try:
-            for i in range(len(self.complete_btcdataset)):
-                KafkaConnector().send_to_kafka(self.kafka_topic, {
-                    "timestamp": get_unix_timestamp(),
-                    "msgId": self.complete_btcdataset[i]["id"],
-                    "sentiment": self.complete_btcdataset[i]["sentiment"],
-                    "sentimentScore": self.complete_btcdataset[i]["msg_sentimentscore"],
-                    "weightedScore": self.complete_btcdataset[i]["weighted_score"],
-                    "coin": "BTC"
-                })
+            for item in self.complete_btcdataset:
+                if hasattr(item, 'id') and hasattr(item, 'sentiment') and hasattr(item, 'msg_sentimentscore') and hasattr(item, 'weighted_score'):
+                    KafkaConnector().send_async_to_kafka(self.kafka_topic, {
+                        "timestamp": get_unix_timestamp(),
+                        "msgId": item["id"],
+                        "sentiment": item["sentiment"],
+                        "sentimentScore": item["msg_sentimentscore"],
+                        "weightedScore": item["weighted_score"],
+                        "coin": "BTC"
+                    })
 
-            for i in range(len(self.complete_ethdataset)):
-                KafkaConnector().send_to_kafka(self.kafka_topic, {
-                    "timestamp": get_unix_timestamp(),
-                    "msgId": self.complete_ethdataset[i]["id"],
-                    "sentiment": self.complete_ethdataset[i]["sentiment"],
-                    "sentimentScore": self.complete_ethdataset[i]["msg_sentimentscore"],
-                    "weightedScore": self.complete_ethdataset[i]["weighted_score"],
-                    "coin": "ETH"
-                })
+            for item in self.complete_ethdataset:
+                if hasattr(item, 'id') and hasattr(item, 'sentiment') and hasattr(item, 'msg_sentimentscore') and hasattr(item, 'weighted_score'):
+                    KafkaConnector().send_async_to_kafka(self.kafka_topic, {
+                        "timestamp": get_unix_timestamp(),
+                        "msgId": item["id"],
+                        "sentiment": item["sentiment"],
+                        "sentimentScore": item["msg_sentimentscore"],
+                        "weightedScore": item["weighted_score"],
+                        "coin": "ETH"
+                    })
         except Exception:
             catch_request_error({
                 "type": ErrorTypes.FETCH_ERROR,
                 "error": sys.exc_info()[0]
             }, self.kafka_topic)
         finally:
+            KafkaConnector().flush()
             self.run_app()
 
     # -------------------------------------------------------------

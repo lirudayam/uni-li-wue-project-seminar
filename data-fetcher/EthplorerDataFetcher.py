@@ -81,6 +81,7 @@ class EthplorerDataFetcher(BaseFetcher):
                 "error": sys.exc_info()[0]
             }, self.kafka_topic)
         finally:
+            KafkaConnector().flush()
             self.run_app()
 
 

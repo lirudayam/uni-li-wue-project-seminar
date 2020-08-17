@@ -1,8 +1,10 @@
+import gc
 import json
 import logging
 import os
 import time
 from json.decoder import JSONDecodeError
+from random import random
 
 from kafka import KafkaProducer
 
@@ -12,8 +14,9 @@ os.environ["KAFKA_BOOTSTRAP_SERVER"] = '132.187.226.20:9092'
 logging.basicConfig(
     filename='output.log',
     format='%(asctime)s %(levelname)-8s %(message)s',
-    level=logging.INFO,
+    level=logging.DEBUG,
     datefmt='%Y-%m-%d %H:%M:%S')
+gc.disable()
 
 
 # Singleton class for handling any connection and sending to Kafka
@@ -35,22 +38,40 @@ class KafkaConnector:
     def __getattr__(self, name):
         return getattr(self.instance, name)
 
+    def push_msg(self, topic, msg, flush_flag = True):
+        # random reconnect
+        if not self.producer or random() < 0.1:
+            self.producer.close(1000)
+            KafkaConnector.producer = KafkaConnector.__KafkaConnector()
+
+        self.producer.send(topic, msg).add_callback(on_send_success).add_errback(on_send_error)
+        if flush_flag:
+            self.producer.flush()
+
     def send_to_kafka(self, topic, dict_elm):
         try:
-            self.producer.send(topic, dict_elm).add_callback(on_send_success).add_errback(on_send_error)
-            self.producer.flush()
+            self.push_msg(topic, dict_elm)
         except JSONDecodeError:
             self.forward_error({
                 "error": "Failed to send to Kafka"
             })
 
-    def forward_error(self, error):
-        self.producer.send('RAW_FETCH_ERRORS', error).add_callback(on_send_success).add_errback(on_send_error)
+    def send_async_to_kafka(self, topic, dict_elm):
+        try:
+            self.push_msg(topic, dict_elm, False)
+        except JSONDecodeError:
+            self.forward_error({
+                "error": "Failed to send to Kafka"
+            })
+
+    def flush(self):
         self.producer.flush()
 
+    def forward_error(self, error):
+        self.push_msg('RAW_FETCH_ERRORS', error)
+
     def send_health_ping(self, fetcher_name):
-        self.producer.send('RAW_HEALTH_CHECKS', fetcher_name).add_callback(on_send_success).add_errback(on_send_error)
-        self.producer.flush()
+        self.push_msg('RAW_HEALTH_CHECKS', fetcher_name)
 
 
 def get_unix_timestamp():

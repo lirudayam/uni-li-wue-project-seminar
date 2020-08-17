@@ -105,12 +105,13 @@ class CryptowatDataFetcher(BaseFetcher):
         items = self.get_data_from_cryptowat()
         try:
             for entry in items:
-                KafkaConnector().send_to_kafka(self.kafka_topic, entry)
+                KafkaConnector().send_asnyc_to_kafka(self.kafka_topic, entry)
         except Exception:
             catch_request_error({
                 "error": "msg"
             }, self.kafka_topic)
         finally:
+            KafkaConnector().flush()
             self.run_app()
 
 
