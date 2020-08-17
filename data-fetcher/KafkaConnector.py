@@ -19,7 +19,7 @@ logging.basicConfig(filename='output.log', level=logging.ERROR)
 class KafkaConnector:
     class __KafkaConnector:
         def __init__(self):
-            self.producer = KafkaProducer(bootstrap_servers=[os.getenv('KAFKA_BOOTSTRAP_SERVER', 'localhost:9092')],
+            self.producer = KafkaProducer(bootstrap_servers=[os.getenv('KAFKA_BOOTSTRAP_SERVER', '132.187.226.20:9092')],
                                           value_serializer=lambda m: json.dumps(m, cls=EnumEncoder).encode('ascii'))
 
     instance = None

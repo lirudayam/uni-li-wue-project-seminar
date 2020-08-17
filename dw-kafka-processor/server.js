@@ -180,7 +180,6 @@ const asyncInitialRunFn = async () => {
 													);
 													cb(true);
 													return;
-													break;
 											}
 										}
 									}
@@ -214,7 +213,6 @@ const asyncInitialRunFn = async () => {
 						startKafka(socket);
 					}
 				);
-				console.log('DONE');
 			})
 			.catch((err) => log.error(err));
 
@@ -254,6 +252,7 @@ const asyncInitialRunFn = async () => {
 				await consumer.subscribe({
 					topic: /RAW_.*/i
 				});
+				console.log("Listening to Kafka now");
 
 				let oBatchInsertQueue = {};
 
@@ -276,19 +275,15 @@ const asyncInitialRunFn = async () => {
 						)) {
 							try {
 								if (values.length > 0) {
-									values.forEach((item) =>
-										srv
-											.run(
-												INSERT.into(
-													relevantServiceEntities[
-														entity
-													]
-												).entries(item)
-											)
-											.catch((error) => {
-												log.error(error);
-											})
-									);
+									srv.run(
+										INSERT.into(
+											relevantServiceEntities[entity]
+										).entries(
+											values.filter((item) => item !== {})
+										)
+									).catch((error) => {
+										log.error(error);
+									});
 								}
 							} catch (e) {
 								log.error(entity);

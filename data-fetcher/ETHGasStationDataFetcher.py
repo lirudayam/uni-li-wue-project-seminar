@@ -1,7 +1,7 @@
 import json
 import logging
 import sys
-from json import JSONDecodeError
+from json.decoder import JSONDecodeError
 
 from requests import Session
 from requests.exceptions import ConnectionError, Timeout, TooManyRedirects
@@ -21,6 +21,7 @@ class ETHGasStationDataFetcher(BaseFetcher):
         self.url = "https://ethgasstation.info/api/ethgasAPI.json"
         self.session = Session()
         self.request_output = None
+        self.last_block_no = None
         BaseFetcher.__init__(self, self.kafka_topic, self.send_health_pings, self.process_data_fetch)
 
     # Supporting methods
@@ -48,13 +49,15 @@ class ETHGasStationDataFetcher(BaseFetcher):
     def process_data_fetch(self):
         self.get_data_from_gasstation()
         try:
-            KafkaConnector().send_to_kafka(self.kafka_topic, {
-                "safeGasPrice": self.request_output["safeLow"],
-                # this unit divided by 10 = Gwei (Gwei to Ether = divide by 10^9)
-                # then convert to USD according to current rate
-                "blockNumber": self.request_output["blockNum"],
-                "blockTime": self.request_output["block_time"]
-            })
+            if self.last_block_no != self.request_output["blockNum"]:
+                KafkaConnector().send_to_kafka(self.kafka_topic, {
+                    "safeGasPrice": self.request_output["safeLow"],
+                    # this unit divided by 10 = Gwei (Gwei to Ether = divide by 10^9)
+                    # then convert to USD according to current rate
+                    "blockNumber": self.request_output["blockNum"],
+                    "blockTime": self.request_output["block_time"]
+                })
+            self.last_block_no = self.request_output["blockNum"]
         except Exception:
             catch_request_error({
                 "type": ErrorTypes.FETCH_ERROR,
