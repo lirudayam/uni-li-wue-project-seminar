@@ -9,7 +9,11 @@ from kafka import KafkaProducer
 from ErrorTypes import ErrorTypes
 
 os.environ["KAFKA_BOOTSTRAP_SERVER"] = '132.187.226.20:9092'
-logging.basicConfig(filename='output.log', level=logging.ERROR)
+logging.basicConfig(
+    filename='output.log',
+    format='%(asctime)s %(levelname)-8s %(message)s',
+    level=logging.INFO,
+    datefmt='%Y-%m-%d %H:%M:%S')
 
 
 # Singleton class for handling any connection and sending to Kafka
@@ -66,7 +70,7 @@ def on_send_success(record_metadata):
 
 
 def on_send_error(exception):
-    logging.error('Error while sending to Kafka' + str(exception))
+    logging.error('Error while sending to Kafka ' + str(exception))
     KafkaConnector().forward_error(exception)
 
 

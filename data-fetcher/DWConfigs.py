@@ -3,7 +3,11 @@ import os
 
 import requests
 
-logging.basicConfig(filename='output.log', level=logging.INFO)
+logging.basicConfig(
+    filename='output.log',
+    format='%(asctime)s %(levelname)-8s %(message)s',
+    level=logging.INFO,
+    datefmt='%Y-%m-%d %H:%M:%S')
 os.environ["DW_SERVER"] = '132.187.226.20:8080'
 
 

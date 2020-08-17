@@ -12,7 +12,11 @@ os.environ["WEB3_INFURA_API_SECRET"] = \
 
 from web3.auto.infura import w3
 
-logging.basicConfig(filename='output.log', level=logging.INFO)
+logging.basicConfig(
+    filename='output.log',
+    format='%(asctime)s %(levelname)-8s %(message)s',
+    level=logging.INFO,
+    datefmt='%Y-%m-%d %H:%M:%S')
 
 
 class InfuraDataFetcher(BaseFetcher):
