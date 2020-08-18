@@ -501,7 +501,7 @@ const asyncInitialRunFn = async () => {
 								let entry = JSON.parse(message.value);
 								if (entry.timestamp) {
 									entry.timestamp = moment(
-										entry.timestamp
+										entry.timestamp * 1000
 									).format();
 								}
 								const newEntry = {
