@@ -2,13 +2,14 @@ import logging
 import os
 
 import requests
+from requests.adapters import HTTPAdapter
+from requests.packages.urllib3.util.retry import Retry
 
 logging.basicConfig(
     filename='output.log',
     format='%(asctime)s %(levelname)-8s %(message)s',
     level=logging.INFO,
     datefmt='%Y-%m-%d %H:%M:%S')
-os.environ["DW_SERVER"] = 'http://132.187.226.20:8080'
 
 
 class DWConfigs:
@@ -17,6 +18,13 @@ class DWConfigs:
             # in seconds
             self.fallback_fetch_interval = 300.0
             self.fallback_health_ping_interval = 60.0
+
+            self.session = requests.Session()
+            retry = Retry(connect=3, backoff_factor=0.5)
+            adapter = HTTPAdapter(max_retries=retry)
+            self.session.mount('http://', adapter)
+
+            logging.info("using DW at {0}".format(os.environ["DW_SERVER"]))
 
     instance = None
 
@@ -28,18 +36,23 @@ class DWConfigs:
         return getattr(self.instance, name)
 
     def get_interval_data(self, topic):
+        val = 0
         try:
-            result = requests.get(os.environ["DW_SERVER"] + "/fetch_interval/" + topic).text
+            result = self.session.get(os.environ["DW_SERVER"] + "/fetch_interval/" + topic, timeout=1).text
 
             if result is None:
                 logging.error("Using fallback values")
                 raise ValueError('Error')
 
             logging.info("Using real values")
-            return float(result)
+            val = float(result)
+        except requests.exceptions.ConnectionError:
+            val = self.fallback_fetch_interval
         except Exception as e:
             logging.error("Failed to receive fetch interval due to {0}".format(e))
-            return self.fallback_fetch_interval
+            val = self.fallback_fetch_interval
+        finally:
+            return val
 
     def get_fetch_interval(self, topic):
         return self.get_interval_data(topic)
@@ -48,12 +61,14 @@ class DWConfigs:
         val = self.fallback_health_ping_interval
         try:
             if topic != "":
-                result = requests.get(os.environ["DW_SERVER"] + "/health_ping_interval")
+                result = self.session.get(os.environ["DW_SERVER"] + "/health_ping_interval", timeout=1)
                 if result.status_code == 200:
                     result = result.text
                 else:
                     result = self.fallback_fetch_interval
                     logging.error("health ping endpoint returned {0}".format(result.status_code))
+        except requests.exceptions.ConnectionError:
+            val = self.fallback_health_ping_interval
         except Exception as e:
             val = self.fallback_health_ping_interval
             logging.error("Failed to receive health ping interval due to {0}".format(e))

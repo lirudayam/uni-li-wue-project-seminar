@@ -10,7 +10,6 @@ from kafka import KafkaProducer
 
 from ErrorTypes import ErrorTypes
 
-os.environ["KAFKA_BOOTSTRAP_SERVER"] = '132.187.226.20:9092'
 logging.basicConfig(
     filename='output.log',
     format='%(asctime)s %(levelname)-8s %(message)s',
@@ -42,7 +41,7 @@ class KafkaConnector:
         # random reconnect
         if not self.producer or random() < 0.1:
             self.producer.close(1000)
-            KafkaConnector.producer = KafkaConnector.__KafkaConnector()
+            KafkaConnector.instance = KafkaConnector.__KafkaConnector()
 
         self.producer.send(topic, msg).add_callback(on_send_success).add_errback(on_send_error)
         if flush_flag:

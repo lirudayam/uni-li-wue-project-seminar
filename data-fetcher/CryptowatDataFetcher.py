@@ -1,5 +1,6 @@
 import json
 import logging
+import sys
 from json import JSONDecodeError
 
 from requests import Session
@@ -105,11 +106,13 @@ class CryptowatDataFetcher(BaseFetcher):
         items = self.get_data_from_cryptowat()
         try:
             for entry in items:
-                KafkaConnector().send_asnyc_to_kafka(self.kafka_topic, entry)
+                KafkaConnector().send_async_to_kafka(self.kafka_topic, entry)
         except Exception:
             catch_request_error({
-                "error": "msg"
+                "type": ErrorTypes.FETCH_ERROR,
+                "error": sys.exc_info()[0]
             }, self.kafka_topic)
+            pass
         finally:
             KafkaConnector().flush()
             self.run_app()
