@@ -29,6 +29,11 @@ service KafkaPublishService {
   entity KPI_G_NODE_DISTRIBUTION @insertonly as projection on dw.KPI_G_NODE_DISTRIBUTION;
   entity KPI_G_GINI @insertonly as projection on dw.KPI_G_GINI;
   entity KPI_E_TOKEN @insertonly as projection on dw.KPI_E_TOKEN;
+
+  action KPI_E_TOKEN_BI(array : array of KPI_E_TOKEN);
+  action KPI_G_NODE_DISTRIBUTION_BI(array : array of KPI_G_NODE_DISTRIBUTION);
+  action KPI_G_N_PER_TIME_BI(array : array of KPI_G_N_PER_TIME);
+  action KPI_E_GASSTATION_BI(array : array of KPI_E_EXT_GASSTATION);
   
   entity KPI_G_NEWS @insertonly as projection on dw.KPI_G_NEWS;
   entity KPI_G_RECOMM @insertonly as projection on dw.KPI_G_RECOMM;

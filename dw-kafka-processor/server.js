@@ -78,13 +78,14 @@ const asyncInitialRunFn = async () => {
 		RAW_G_RECOMM: KPI_G_RECOMM,
 		RAW_G_CREDITS: KPI_G_CREDITS,
 
-		RAW_G_GINI: KPI_G_GINI
+		RAW_G_GINI: KPI_G_GINI,
+
+		RAW_E_BLOCK: KPI_E_BLOCK,
+		RAW_B_BLOCK: KPI_B_BLOCK
 	};
 	var aBatchLayerTopics = [
 		'RAW_E_GASSTATION',
 		'RAW_G_NODE_DISTRIBUTION',
-		'RAW_E_BLOCK',
-		'RAW_B_BLOCK',
 		'RAW_E_TOKEN'
 	];
 
@@ -275,7 +276,8 @@ const asyncInitialRunFn = async () => {
 						)) {
 							try {
 								if (values.length > 0) {
-									srv.run(
+									srv[entity + "_BI"](values.filter((item) => item !== {}));
+									/*srv.run(
 										INSERT.into(
 											relevantServiceEntities[entity]
 										).entries(
@@ -283,7 +285,7 @@ const asyncInitialRunFn = async () => {
 										)
 									).catch((error) => {
 										log.error(error);
-									});
+									});*/
 								}
 							} catch (e) {
 								log.error(entity);
@@ -335,23 +337,6 @@ const asyncInitialRunFn = async () => {
 							}
 							try {
 								switch (topic) {
-									case 'RAW_E_BLOCK':
-										entries = await srv.run(
-											SELECT.from(KPI_E_BLOCK).where({
-												identifier: entry.identifier
-											})
-										);
-										if (
-											entries.length === 0 &&
-											entry.identifier !== null &&
-											entry.identifier !== undefined
-										) {
-											addIntoBatchInsertQueue(
-												'KPI_E_BLOCK',
-												entry
-											);
-										}
-										break;
 									case 'RAW_E_TOKEN':
 										entries = await srv.run(
 											SELECT.from(
@@ -386,25 +371,6 @@ const asyncInitialRunFn = async () => {
 											'KPI_E_TOKEN',
 											entry
 										);
-										break;
-									case 'RAW_B_BLOCK':
-										entries = await srv.run(
-											SELECT.from(KPI_B_BLOCK)
-												.orderBy({
-													timestamp: 'desc'
-												})
-												.limit(1)
-										);
-										if (
-											!entries[0] ||
-											entries[0].blockTime !==
-												entry.blockTime
-										) {
-											addIntoBatchInsertQueue(
-												'KPI_B_BLOCK',
-												entry
-											);
-										}
 										break;
 									case 'RAW_G_NODE_DISTRIBUTION':
 										Object.keys(entry.countries).forEach(

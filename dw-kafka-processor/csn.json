@@ -2573,6 +2573,16 @@
       },
       "$syntax": "projection"
     },
+    "uni_li_wue.dw.service.KafkaPublishService.KPI_E_GASSTATION_BI": {
+      "kind": "action",
+      "params": {
+        "array": {
+          "items": {
+            "type": "uni_li_wue.dw.service.KafkaPublishService.KPI_E_EXT_GASSTATION"
+          }
+        }
+      }
+    },
     "uni_li_wue.dw.service.KafkaPublishService.KPI_E_TOKEN": {
       "kind": "entity",
       "@insertonly": true,
@@ -2638,6 +2648,16 @@
         }
       },
       "$syntax": "projection"
+    },
+    "uni_li_wue.dw.service.KafkaPublishService.KPI_E_TOKEN_BI": {
+      "kind": "action",
+      "params": {
+        "array": {
+          "items": {
+            "type": "uni_li_wue.dw.service.KafkaPublishService.KPI_E_TOKEN"
+          }
+        }
+      }
     },
     "uni_li_wue.dw.service.KafkaPublishService.KPI_G_GINI": {
       "kind": "entity",
@@ -2800,6 +2820,16 @@
       },
       "$syntax": "projection"
     },
+    "uni_li_wue.dw.service.KafkaPublishService.KPI_G_NODE_DISTRIBUTION_BI": {
+      "kind": "action",
+      "params": {
+        "array": {
+          "items": {
+            "type": "uni_li_wue.dw.service.KafkaPublishService.KPI_G_NODE_DISTRIBUTION"
+          }
+        }
+      }
+    },
     "uni_li_wue.dw.service.KafkaPublishService.KPI_G_N_PER_TIME": {
       "kind": "entity",
       "@insertonly": true,
@@ -2848,6 +2878,16 @@
         }
       },
       "$syntax": "projection"
+    },
+    "uni_li_wue.dw.service.KafkaPublishService.KPI_G_N_PER_TIME_BI": {
+      "kind": "action",
+      "params": {
+        "array": {
+          "items": {
+            "type": "uni_li_wue.dw.service.KafkaPublishService.KPI_G_N_PER_TIME"
+          }
+        }
+      }
     },
     "uni_li_wue.dw.service.KafkaPublishService.KPI_G_PRICES": {
       "kind": "entity",
