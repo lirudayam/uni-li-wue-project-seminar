@@ -30,6 +30,12 @@ String.prototype.getBytes = function () {
 // get CDS module
 const cds = require('@sap/cds');
 
+// get axios for batch actions
+const axios = require('axios');
+
+console.log(process.env);
+const serviceURL = process.env.destinations[0].url;
+
 // async function for consuming kafka and writing to data warehouse
 const asyncInitialRunFn = async () => {
 	// connect to the external service of dw -> access via OData, no direct access
@@ -253,7 +259,7 @@ const asyncInitialRunFn = async () => {
 				await consumer.subscribe({
 					topic: /RAW_.*/i
 				});
-				console.log("Listening to Kafka now");
+				console.log('Listening to Kafka now');
 
 				let oBatchInsertQueue = {};
 
@@ -276,16 +282,25 @@ const asyncInitialRunFn = async () => {
 						)) {
 							try {
 								if (values.length > 0) {
-									srv[entity + "_BI"](values.filter((item) => item !== {}));
-									/*srv.run(
-										INSERT.into(
-											relevantServiceEntities[entity]
-										).entries(
-											values.filter((item) => item !== {})
+									axios
+										.post(
+											"https://cf-dts-eim-ch-sac-blockchain-uni-li-wue-dw-cloud-srv.cfapps.eu10.hana.ondemand.com/kafka-publish" +
+												'/' +
+												entity +
+												'_BI',
+											{array: values.filter((item) => item !== {})}
 										)
-									).catch((error) => {
-										log.error(error);
-									});*/
+										.then(function (response) {
+											log.info(
+												'batch complete to ' +
+													'/' +
+													entity +
+													'_BI'
+											);
+										})
+										.catch(function (error) {
+											log.error(error);
+										});
 								}
 							} catch (e) {
 								log.error(entity);
@@ -518,6 +533,7 @@ asyncInitialRunFn();
 
 // Ping - Pong Health
 const express = require('express');
+const { default: Axios } = require('axios');
 const app = express();
 
 app.get('/ping', function (req, res) {

@@ -16,8 +16,7 @@ module.exports = async (srv) => {
         return array.length;
       }
     } catch (error) {
-      req._.req.logger.error(error.message, { event: req.event, error });
-      throw error;
+      console.error(error);
     }
   };
 
