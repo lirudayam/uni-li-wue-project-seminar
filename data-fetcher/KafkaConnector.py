@@ -54,6 +54,7 @@ class KafkaConnector:
             self.forward_error({
                 "error": "Failed to send to Kafka"
             })
+            pass
 
     def send_async_to_kafka(self, topic, dict_elm):
         try:
@@ -62,12 +63,13 @@ class KafkaConnector:
             self.forward_error({
                 "error": "Failed to send to Kafka"
             })
+            pass
 
     def flush(self):
         self.producer.flush()
 
     def forward_error(self, error):
-        self.push_msg('RAW_FETCH_ERRORS', error)
+        self.producer.send('RAW_FETCH_ERRORS', error)
 
     def send_health_ping(self, fetcher_name):
         self.push_msg('RAW_HEALTH_CHECKS', fetcher_name)
