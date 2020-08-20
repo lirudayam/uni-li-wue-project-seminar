@@ -5,8 +5,10 @@ import os
 import time
 from json.decoder import JSONDecodeError
 from random import random
+from threading import Timer
 
 from kafka import KafkaProducer
+from kafka.errors import KafkaTimeoutError
 
 from ErrorTypes import ErrorTypes
 
@@ -55,6 +57,10 @@ class KafkaConnector:
                 "error": "Failed to send to Kafka"
             })
             pass
+        except (AssertionError, KafkaTimeoutError):
+            r = Timer(10.0, self.send_async_to_kafka, (topic, dict_elm))
+            r.start()
+            pass
 
     def send_async_to_kafka(self, topic, dict_elm):
         try:
@@ -63,6 +69,10 @@ class KafkaConnector:
             self.forward_error({
                 "error": "Failed to send to Kafka"
             })
+            pass
+        except (AssertionError, KafkaTimeoutError):
+            r = Timer(10.0, self.send_async_to_kafka, (topic, dict_elm))
+            r.start()
             pass
 
     def flush(self):
