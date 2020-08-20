@@ -1,5 +1,4 @@
 import re
-import re
 import sys
 from datetime import datetime
 
@@ -9,7 +8,7 @@ from nltk.sentiment.vader import SentimentIntensityAnalyzer
 
 from BaseFetcher import BaseFetcher
 from ErrorTypes import ErrorTypes
-from KafkaConnector import catch_request_error, get_unix_timestamp, KafkaConnector
+from KafkaConnector import catch_request_error, KafkaConnector
 
 nltk.download('vader_lexicon')
 
@@ -35,7 +34,9 @@ class StocktwitsDataFetcher(BaseFetcher):
         self.get_data()
         try:
             for item in self.complete_btcdataset:
-                if hasattr(item, 'id') and hasattr(item, 'sentiment') and hasattr(item, 'msg_sentimentscore') and hasattr(item, 'weighted_score'):
+                if hasattr(item, 'id') and hasattr(item, 'sentiment') and hasattr(item,
+                                                                                  'msg_sentimentscore') and hasattr(
+                    item, 'weighted_score'):
                     KafkaConnector().send_async_to_kafka(self.kafka_topic, {
                         "timestamp": item["created_at"],
                         "msgId": item["id"],
@@ -46,7 +47,9 @@ class StocktwitsDataFetcher(BaseFetcher):
                     })
 
             for item in self.complete_ethdataset:
-                if hasattr(item, 'id') and hasattr(item, 'sentiment') and hasattr(item, 'msg_sentimentscore') and hasattr(item, 'weighted_score'):
+                if hasattr(item, 'id') and hasattr(item, 'sentiment') and hasattr(item,
+                                                                                  'msg_sentimentscore') and hasattr(
+                    item, 'weighted_score'):
                     KafkaConnector().send_async_to_kafka(self.kafka_topic, {
                         "timestamp": item["created_at"],
                         "msgId": item["id"],

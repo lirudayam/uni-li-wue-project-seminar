@@ -27,8 +27,9 @@ gc.disable()
 class KafkaConnector:
     class __KafkaConnector:
         def __init__(self):
-            self.producer = KafkaProducer(bootstrap_servers=[os.getenv('KAFKA_BOOTSTRAP_SERVER', '132.187.226.20:9092')],
-                                          value_serializer=lambda m: json.dumps(m, cls=EnumEncoder).encode('ascii'))
+            self.producer = KafkaProducer(
+                bootstrap_servers=[os.getenv('KAFKA_BOOTSTRAP_SERVER', '132.187.226.20:9092')],
+                value_serializer=lambda m: json.dumps(m, cls=EnumEncoder).encode('ascii'))
 
     instance = None
 
@@ -39,7 +40,7 @@ class KafkaConnector:
     def __getattr__(self, name):
         return getattr(self.instance, name)
 
-    def push_msg(self, topic, msg, flush_flag = True):
+    def push_msg(self, topic, msg, flush_flag=True):
         # random reconnect
         if not self.producer or random() < 0.1:
             self.producer.close(1000)

@@ -1,9 +1,7 @@
 import logging
-import threading
+from threading import Timer
 
 from DWConfigs import DWConfigs
-import time
-from threading import Timer
 
 logging.basicConfig(
     filename='output.log',
@@ -13,7 +11,6 @@ logging.basicConfig(
 
 
 class BaseFetcher:
-
     class RepeatedTimer(object):
         def __init__(self, interval, function, *args, **kwargs):
             self._timer = None
