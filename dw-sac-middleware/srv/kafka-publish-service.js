@@ -35,6 +35,9 @@ module.exports = async (srv) => {
   srv.on("KPI_E_GASSTATION_BI", async (req) => {
     fnBatchInsert(req, KPI_E_EXT_GASSTATION, req.data.array);
   });
+  srv.on("KPI_G_NEWS", async (req) => {
+    fnBatchInsert(req, KPI_E_EXT_GASSTATION, req.data.array);
+  });
 
   srv.before("CREATE", "KPI_E_BLOCK", async (req) => {
     const tx = cds.transaction(req);

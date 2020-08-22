@@ -80,7 +80,6 @@ const asyncInitialRunFn = async () => {
 		RAW_G_PRICES: KPI_G_PRICES,
 		RAW_B_SPECIAL_EVT: KPI_B_SPECIAL_EVT,
 
-		RAW_G_STOCKTWITS_FETCHER: KPI_G_NEWS,
 		RAW_G_RECOMM: KPI_G_RECOMM,
 		RAW_G_CREDITS: KPI_G_CREDITS,
 
@@ -92,7 +91,8 @@ const asyncInitialRunFn = async () => {
 	var aBatchLayerTopics = [
 		'RAW_E_GASSTATION',
 		'RAW_G_NODE_DISTRIBUTION',
-		'RAW_E_TOKEN'
+		'RAW_E_TOKEN',
+		'RAW_G_STOCKTWITS_FETCHER'
 	];
 
 	const socketAliveTime = 60 * 60 * 1000;
@@ -284,11 +284,15 @@ const asyncInitialRunFn = async () => {
 								if (values.length > 0) {
 									axios
 										.post(
-											"https://cf-dts-eim-ch-sac-blockchain-uni-li-wue-dw-cloud-srv.cfapps.eu10.hana.ondemand.com/kafka-publish" +
+											'https://cf-dts-eim-ch-sac-blockchain-uni-li-wue-dw-cloud-srv.cfapps.eu10.hana.ondemand.com/kafka-publish' +
 												'/' +
 												entity +
 												'_BI',
-											{array: values.filter((item) => item !== {})}
+											{
+												array: values.filter(
+													(item) => item !== {}
+												)
+											}
 										)
 										.then(function (response) {
 											log.info(
@@ -415,6 +419,12 @@ const asyncInitialRunFn = async () => {
 													entry.nodeCount
 												)
 											}
+										);
+										break;
+									case 'RAW_G_STOCKTWITS_FETCHER':
+										addIntoBatchInsertQueue(
+											'KPI_G_NEWS',
+											entry
 										);
 										break;
 									case 'RAW_E_GASSTATION':
