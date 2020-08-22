@@ -3892,6 +3892,91 @@
       },
       "$syntax": "projection"
     },
+    "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_G_N_PER_TIME_LATEST": {
+      "kind": "entity",
+      "@readonly": true,
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_G_N_PER_TIME"
+            ],
+            "as": "M"
+          },
+          "columns": [
+            "*"
+          ],
+          "where": [
+            {
+              "ref": [
+                "M",
+                "timestamp"
+              ]
+            },
+            "=",
+            {
+              "SELECT": {
+                "from": {
+                  "ref": [
+                    "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_G_N_PER_TIME"
+                  ],
+                  "as": "H"
+                },
+                "columns": [
+                  {
+                    "func": "MAX",
+                    "args": [
+                      {
+                        "ref": [
+                          "timestamp"
+                        ]
+                      }
+                    ],
+                    "as": "Max"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "elements": {
+        "timestamp": {
+          "key": true,
+          "type": "cds.DateTime"
+        },
+        "coin": {
+          "key": true,
+          "type": "cds.String",
+          "length": 3
+        },
+        "coinInfo": {
+          "type": "cds.Association",
+          "cardinality": {
+            "max": 1
+          },
+          "target": "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_ENUM_COINS",
+          "on": [
+            {
+              "ref": [
+                "coin"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "coinInfo",
+                "shortName"
+              ]
+            }
+          ]
+        },
+        "numOfNodes": {
+          "type": "cds.Integer"
+        }
+      },
+      "$syntax": "entity"
+    },
     "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_G_PRICES": {
       "kind": "entity",
       "@readonly": true,
@@ -3949,6 +4034,100 @@
         }
       },
       "$syntax": "projection"
+    },
+    "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_G_PRICES_LATEST": {
+      "kind": "entity",
+      "@readonly": true,
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_G_PRICES"
+            ],
+            "as": "M"
+          },
+          "columns": [
+            "*"
+          ],
+          "where": [
+            {
+              "ref": [
+                "M",
+                "timestamp"
+              ]
+            },
+            "=",
+            {
+              "SELECT": {
+                "from": {
+                  "ref": [
+                    "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_G_PRICES"
+                  ],
+                  "as": "H"
+                },
+                "columns": [
+                  {
+                    "func": "MAX",
+                    "args": [
+                      {
+                        "ref": [
+                          "timestamp"
+                        ]
+                      }
+                    ],
+                    "as": "Max"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "elements": {
+        "timestamp": {
+          "key": true,
+          "type": "cds.DateTime"
+        },
+        "coin": {
+          "key": true,
+          "type": "cds.String",
+          "length": 3
+        },
+        "coinInfo": {
+          "type": "cds.Association",
+          "cardinality": {
+            "max": 1
+          },
+          "target": "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_ENUM_COINS",
+          "on": [
+            {
+              "ref": [
+                "coin"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "coinInfo",
+                "shortName"
+              ]
+            }
+          ]
+        },
+        "price": {
+          "type": "cds.Double"
+        },
+        "marketCap": {
+          "type": "cds.Double"
+        },
+        "volume24h": {
+          "type": "cds.Double"
+        },
+        "change24h": {
+          "type": "cds.Double"
+        }
+      },
+      "$syntax": "entity"
     },
     "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_G_PRICE_DIFF": {
       "kind": "entity",
@@ -4026,6 +4205,79 @@
               "ref": [
                 "coin"
               ]
+            }
+          ]
+        }
+      },
+      "elements": {
+        "timestamp": {
+          "key": true,
+          "type": "cds.DateTime"
+        },
+        "coin": {
+          "key": true,
+          "type": "cds.String",
+          "length": 3
+        },
+        "Minimum": {
+          "@Core.Computed": true,
+          "type": "cds.Double"
+        },
+        "Maximum": {
+          "@Core.Computed": true,
+          "type": "cds.Double"
+        },
+        "Average": {
+          "@Core.Computed": true,
+          "type": "cds.Double"
+        }
+      },
+      "$syntax": "entity"
+    },
+    "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_G_PRICE_DIFF_LATEST": {
+      "kind": "entity",
+      "@readonly": true,
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_G_PRICE_DIFF"
+            ],
+            "as": "M"
+          },
+          "columns": [
+            "*"
+          ],
+          "where": [
+            {
+              "ref": [
+                "M",
+                "timestamp"
+              ]
+            },
+            "=",
+            {
+              "SELECT": {
+                "from": {
+                  "ref": [
+                    "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_G_RICH_ACC"
+                  ],
+                  "as": "H"
+                },
+                "columns": [
+                  {
+                    "func": "MAX",
+                    "args": [
+                      {
+                        "ref": [
+                          "timestamp"
+                        ]
+                      }
+                    ],
+                    "as": "Max"
+                  }
+                ]
+              }
             }
           ]
         }
@@ -4210,6 +4462,93 @@
         }
       },
       "$syntax": "projection"
+    },
+    "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_G_RICH_ACC_LATEST": {
+      "kind": "entity",
+      "@readonly": true,
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_G_RICH_ACC"
+            ],
+            "as": "M"
+          },
+          "columns": [
+            "*"
+          ],
+          "where": [
+            {
+              "ref": [
+                "M",
+                "timestamp"
+              ]
+            },
+            "=",
+            {
+              "SELECT": {
+                "from": {
+                  "ref": [
+                    "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_G_RICH_ACC"
+                  ]
+                },
+                "columns": [
+                  {
+                    "func": "MAX",
+                    "args": [
+                      {
+                        "ref": [
+                          "timestamp"
+                        ]
+                      }
+                    ],
+                    "as": "Max"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "elements": {
+        "timestamp": {
+          "key": true,
+          "type": "cds.DateTime"
+        },
+        "coin": {
+          "key": true,
+          "type": "cds.String",
+          "length": 3
+        },
+        "coinInfo": {
+          "type": "cds.Association",
+          "cardinality": {
+            "max": 1
+          },
+          "target": "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_ENUM_COINS",
+          "on": [
+            {
+              "ref": [
+                "coin"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "coinInfo",
+                "shortName"
+              ]
+            }
+          ]
+        },
+        "accountAddress": {
+          "type": "cds.String"
+        },
+        "balance": {
+          "type": "cds.Double"
+        }
+      },
+      "$syntax": "entity"
     }
   },
   "meta": {
