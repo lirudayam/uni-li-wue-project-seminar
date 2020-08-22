@@ -3895,49 +3895,20 @@
     "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_G_N_PER_TIME_LATEST": {
       "kind": "entity",
       "@readonly": true,
+      "@restrict": [
+        {
+          "grant": "READ",
+          "where": "timestamp IN (select timestamp from (select MAX(timestamp) as timestamp, coin from uni_li_wue.dw.KPI_G_N_PER_TIME group by coin))",
+          "_where": "[{\"ref\":[\"timestamp\"]},\"in\",{\"SELECT\":{\"from\":{\"SELECT\":{\"from\":{\"ref\":[\"uni_li_wue.dw.KPI_G_N_PER_TIME\"]},\"columns\":[{\"func\":\"MAX\",\"args\":[{\"ref\":[\"timestamp\"]}],\"as\":\"timestamp\"},{\"ref\":[\"coin\"]}],\"groupBy\":[{\"ref\":[\"coin\"]}]}},\"columns\":[{\"ref\":[\"timestamp\"]}]}}]"
+        }
+      ],
       "query": {
         "SELECT": {
           "from": {
             "ref": [
-              "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_G_N_PER_TIME"
-            ],
-            "as": "M"
-          },
-          "columns": [
-            "*"
-          ],
-          "where": [
-            {
-              "ref": [
-                "M",
-                "timestamp"
-              ]
-            },
-            "=",
-            {
-              "SELECT": {
-                "from": {
-                  "ref": [
-                    "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_G_N_PER_TIME"
-                  ],
-                  "as": "H"
-                },
-                "columns": [
-                  {
-                    "func": "MAX",
-                    "args": [
-                      {
-                        "ref": [
-                          "timestamp"
-                        ]
-                      }
-                    ],
-                    "as": "Max"
-                  }
-                ]
-              }
-            }
-          ]
+              "uni_li_wue.dw.KPI_G_N_PER_TIME"
+            ]
+          }
         }
       },
       "elements": {
@@ -3975,7 +3946,7 @@
           "type": "cds.Integer"
         }
       },
-      "$syntax": "entity"
+      "$syntax": "projection"
     },
     "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_G_PRICES": {
       "kind": "entity",
@@ -4038,49 +4009,20 @@
     "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_G_PRICES_LATEST": {
       "kind": "entity",
       "@readonly": true,
+      "@restrict": [
+        {
+          "grant": "READ",
+          "where": "timestamp IN (select timestamp from (select MAX(timestamp) as timestamp, coin from uni_li_wue.dw.KPI_G_PRICES group by coin))",
+          "_where": "[{\"ref\":[\"timestamp\"]},\"in\",{\"SELECT\":{\"from\":{\"SELECT\":{\"from\":{\"ref\":[\"uni_li_wue.dw.KPI_G_PRICES\"]},\"columns\":[{\"func\":\"MAX\",\"args\":[{\"ref\":[\"timestamp\"]}],\"as\":\"timestamp\"},{\"ref\":[\"coin\"]}],\"groupBy\":[{\"ref\":[\"coin\"]}]}},\"columns\":[{\"ref\":[\"timestamp\"]}]}}]"
+        }
+      ],
       "query": {
         "SELECT": {
           "from": {
             "ref": [
-              "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_G_PRICES"
-            ],
-            "as": "M"
-          },
-          "columns": [
-            "*"
-          ],
-          "where": [
-            {
-              "ref": [
-                "M",
-                "timestamp"
-              ]
-            },
-            "=",
-            {
-              "SELECT": {
-                "from": {
-                  "ref": [
-                    "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_G_PRICES"
-                  ],
-                  "as": "H"
-                },
-                "columns": [
-                  {
-                    "func": "MAX",
-                    "args": [
-                      {
-                        "ref": [
-                          "timestamp"
-                        ]
-                      }
-                    ],
-                    "as": "Max"
-                  }
-                ]
-              }
-            }
-          ]
+              "uni_li_wue.dw.KPI_G_PRICES"
+            ]
+          }
         }
       },
       "elements": {
@@ -4127,7 +4069,7 @@
           "type": "cds.Double"
         }
       },
-      "$syntax": "entity"
+      "$syntax": "projection"
     },
     "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_G_PRICE_DIFF": {
       "kind": "entity",
@@ -4237,49 +4179,20 @@
     "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_G_PRICE_DIFF_LATEST": {
       "kind": "entity",
       "@readonly": true,
+      "@restrict": [
+        {
+          "grant": "READ",
+          "where": "timestamp IN (select timestamp from (select MAX(timestamp) as timestamp, coin from uni_li_wue.dw.KPI_G_PRICE_VOLA group by coin))",
+          "_where": "[{\"ref\":[\"timestamp\"]},\"in\",{\"SELECT\":{\"from\":{\"SELECT\":{\"from\":{\"ref\":[\"uni_li_wue.dw.KPI_G_PRICE_VOLA\"]},\"columns\":[{\"func\":\"MAX\",\"args\":[{\"ref\":[\"timestamp\"]}],\"as\":\"timestamp\"},{\"ref\":[\"coin\"]}],\"groupBy\":[{\"ref\":[\"coin\"]}]}},\"columns\":[{\"ref\":[\"timestamp\"]}]}}]"
+        }
+      ],
       "query": {
         "SELECT": {
           "from": {
             "ref": [
               "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_G_PRICE_DIFF"
-            ],
-            "as": "M"
-          },
-          "columns": [
-            "*"
-          ],
-          "where": [
-            {
-              "ref": [
-                "M",
-                "timestamp"
-              ]
-            },
-            "=",
-            {
-              "SELECT": {
-                "from": {
-                  "ref": [
-                    "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_G_RICH_ACC"
-                  ],
-                  "as": "H"
-                },
-                "columns": [
-                  {
-                    "func": "MAX",
-                    "args": [
-                      {
-                        "ref": [
-                          "timestamp"
-                        ]
-                      }
-                    ],
-                    "as": "Max"
-                  }
-                ]
-              }
-            }
-          ]
+            ]
+          }
         }
       },
       "elements": {
@@ -4305,7 +4218,7 @@
           "type": "cds.Double"
         }
       },
-      "$syntax": "entity"
+      "$syntax": "projection"
     },
     "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_G_PRICE_VOLA": {
       "kind": "entity",
@@ -4466,48 +4379,20 @@
     "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_G_RICH_ACC_LATEST": {
       "kind": "entity",
       "@readonly": true,
+      "@restrict": [
+        {
+          "grant": "READ",
+          "where": "timestamp IN (select timestamp from (select MAX(timestamp) as timestamp, coin from uni_li_wue.dw.KPI_G_RICH_ACC group by coin))",
+          "_where": "[{\"ref\":[\"timestamp\"]},\"in\",{\"SELECT\":{\"from\":{\"SELECT\":{\"from\":{\"ref\":[\"uni_li_wue.dw.KPI_G_RICH_ACC\"]},\"columns\":[{\"func\":\"MAX\",\"args\":[{\"ref\":[\"timestamp\"]}],\"as\":\"timestamp\"},{\"ref\":[\"coin\"]}],\"groupBy\":[{\"ref\":[\"coin\"]}]}},\"columns\":[{\"ref\":[\"timestamp\"]}]}}]"
+        }
+      ],
       "query": {
         "SELECT": {
           "from": {
             "ref": [
-              "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_G_RICH_ACC"
-            ],
-            "as": "M"
-          },
-          "columns": [
-            "*"
-          ],
-          "where": [
-            {
-              "ref": [
-                "M",
-                "timestamp"
-              ]
-            },
-            "=",
-            {
-              "SELECT": {
-                "from": {
-                  "ref": [
-                    "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_G_RICH_ACC"
-                  ]
-                },
-                "columns": [
-                  {
-                    "func": "MAX",
-                    "args": [
-                      {
-                        "ref": [
-                          "timestamp"
-                        ]
-                      }
-                    ],
-                    "as": "Max"
-                  }
-                ]
-              }
-            }
-          ]
+              "uni_li_wue.dw.KPI_G_RICH_ACC"
+            ]
+          }
         }
       },
       "elements": {
@@ -4548,7 +4433,7 @@
           "type": "cds.Double"
         }
       },
-      "$syntax": "entity"
+      "$syntax": "projection"
     }
   },
   "meta": {
