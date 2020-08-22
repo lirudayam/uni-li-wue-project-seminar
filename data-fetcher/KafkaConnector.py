@@ -46,7 +46,13 @@ class KafkaConnector:
             self.producer.close(1000)
             KafkaConnector.instance = KafkaConnector.__KafkaConnector()
 
-        self.producer.send(topic, msg).add_callback(on_send_success).add_errback(on_send_error)
+        try:
+            self.producer.send(topic, msg).add_callback(on_send_success).add_errback(on_send_error)
+        except (AssertionError, KafkaTimeoutError):
+            r = Timer(10.0, self.push_msg, (topic, msg, flush_flag))
+            r.start()
+            pass
+
         if flush_flag:
             self.producer.flush()
 
@@ -62,6 +68,8 @@ class KafkaConnector:
             r = Timer(10.0, self.send_async_to_kafka, (topic, dict_elm))
             r.start()
             pass
+        finally:
+            return True
 
     def send_async_to_kafka(self, topic, dict_elm):
         try:
@@ -75,6 +83,8 @@ class KafkaConnector:
             r = Timer(10.0, self.send_async_to_kafka, (topic, dict_elm))
             r.start()
             pass
+        finally:
+            return True
 
     def flush(self):
         self.producer.flush()

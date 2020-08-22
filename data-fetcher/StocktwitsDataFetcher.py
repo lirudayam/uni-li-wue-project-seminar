@@ -33,31 +33,27 @@ class StocktwitsDataFetcher(BaseFetcher):
     def process_data_fetch(self):
         self.get_data()
         try:
+            print(len(self.complete_btcdataset))
+            print(len(self.complete_ethdataset))
             for item in self.complete_btcdataset:
-                if hasattr(item, 'id') and hasattr(item, 'sentiment') and hasattr(item,
-                                                                                  'msg_sentimentscore') and hasattr(
-                    item, 'weighted_score'):
-                    KafkaConnector().send_async_to_kafka(self.kafka_topic, {
-                        "timestamp": item["created_at"],
-                        "msgId": item["id"],
-                        "sentiment": item["sentiment"],
-                        "sentimentScore": item["msg_sentimentscore"],
-                        "weightedScore": item["weighted_score"],
-                        "coin": "BTC"
-                    })
+                KafkaConnector().send_async_to_kafka(self.kafka_topic, {
+                    "timestamp": item["created_at"],
+                    "msgId": item["id"],
+                    "sentiment": item["sentiment"],
+                    "sentimentScore": item["msg_sentimentscore"],
+                    "weightedScore": item["weighted_score"],
+                    "coin": "BTC"
+                })
 
             for item in self.complete_ethdataset:
-                if hasattr(item, 'id') and hasattr(item, 'sentiment') and hasattr(item,
-                                                                                  'msg_sentimentscore') and hasattr(
-                    item, 'weighted_score'):
-                    KafkaConnector().send_async_to_kafka(self.kafka_topic, {
-                        "timestamp": item["created_at"],
-                        "msgId": item["id"],
-                        "sentiment": item["sentiment"],
-                        "sentimentScore": item["msg_sentimentscore"],
-                        "weightedScore": item["weighted_score"],
-                        "coin": "ETH"
-                    })
+                KafkaConnector().send_async_to_kafka(self.kafka_topic, {
+                    "timestamp": item["created_at"],
+                    "msgId": item["id"],
+                    "sentiment": item["sentiment"],
+                    "sentimentScore": item["msg_sentimentscore"],
+                    "weightedScore": item["weighted_score"],
+                    "coin": "ETH"
+                })
         except Exception:
             catch_request_error({
                 "type": ErrorTypes.FETCH_ERROR,
@@ -126,7 +122,7 @@ class StocktwitsDataFetcher(BaseFetcher):
                 dataset["sentiment"] = sent
                 dataset["msg_sentimentscore"] = sentiment_score
                 dataset["weighted_score"] = weighted_score
-                dataset["created_at"] = datetime.datetime.strptime(message['created_at'], "%Y-%m-%dT%H:%M:%SZ")
+                dataset["created_at"] = datetime.strptime(message['created_at'], "%Y-%m-%dT%H:%M:%SZ")
                 # Enter dataset into the whole collection
                 complete_dataset.append(dataset)
             else:
