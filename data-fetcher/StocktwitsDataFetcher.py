@@ -1,3 +1,4 @@
+import logging
 import re
 import sys
 from datetime import datetime
@@ -12,6 +13,11 @@ from KafkaConnector import catch_request_error, KafkaConnector
 
 nltk.download('vader_lexicon')
 
+logging.basicConfig(
+    filename='output.log',
+    format='%(asctime)s %(levelname)-8s %(message)s',
+    level=logging.INFO,
+    datefmt='%Y-%m-%d %H:%M:%S')
 
 # noinspection PyMethodMayBeStatic
 class StocktwitsDataFetcher(BaseFetcher):
@@ -33,19 +39,35 @@ class StocktwitsDataFetcher(BaseFetcher):
     def process_data_fetch(self):
         self.get_data()
         try:
-            print(len(self.complete_btcdataset))
-            print(len(self.complete_ethdataset))
-            for item in self.complete_btcdataset:
+            msg = None
+            for msg in self.complete_btcdataset:
+                logging.info({
+                    "timestamp": msg["created_at"],
+                    "msgId": msg["id"],
+                    "sentiment": msg["sentiment"],
+                    "sentimentScore": msg["msg_sentimentscore"],
+                    "weightedScore": msg["weighted_score"],
+                    "coin": "BTC"
+                })
                 KafkaConnector().send_async_to_kafka(self.kafka_topic, {
+                    "timestamp": msg["created_at"],
+                    "msgId": msg["id"],
+                    "sentiment": msg["sentiment"],
+                    "sentimentScore": msg["msg_sentimentscore"],
+                    "weightedScore": msg["weighted_score"],
+                    "coin": "BTC"
+                })
+
+            item = None
+            for item in self.complete_ethdataset:
+                logging.info({
                     "timestamp": item["created_at"],
                     "msgId": item["id"],
                     "sentiment": item["sentiment"],
                     "sentimentScore": item["msg_sentimentscore"],
                     "weightedScore": item["weighted_score"],
-                    "coin": "BTC"
+                    "coin": "ETH"
                 })
-
-            for item in self.complete_ethdataset:
                 KafkaConnector().send_async_to_kafka(self.kafka_topic, {
                     "timestamp": item["created_at"],
                     "msgId": item["id"],
@@ -122,7 +144,7 @@ class StocktwitsDataFetcher(BaseFetcher):
                 dataset["sentiment"] = sent
                 dataset["msg_sentimentscore"] = sentiment_score
                 dataset["weighted_score"] = weighted_score
-                dataset["created_at"] = datetime.strptime(message['created_at'], "%Y-%m-%dT%H:%M:%SZ")
+                dataset["created_at"] = datetime.strptime(message['created_at'], "%Y-%m-%dT%H:%M:%SZ").timestamp()
                 # Enter dataset into the whole collection
                 complete_dataset.append(dataset)
             else:
