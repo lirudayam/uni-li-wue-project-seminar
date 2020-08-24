@@ -1,17 +1,23 @@
-import json
+import logging
 import re
 import sys
+from datetime import datetime
 
+import nltk
 import requests
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 
 from BaseFetcher import BaseFetcher
 from ErrorTypes import ErrorTypes
-from KafkaConnector import catch_request_error, get_unix_timestamp, KafkaConnector
+from KafkaConnector import catch_request_error, KafkaConnector
 
+nltk.download('vader_lexicon')
 
-# nltk.downloader.download('vader_lexicon')
-
+logging.basicConfig(
+    filename='output.log',
+    format='%(asctime)s %(levelname)-8s %(message)s',
+    level=logging.INFO,
+    datefmt='%Y-%m-%d %H:%M:%S')
 
 # noinspection PyMethodMayBeStatic
 class StocktwitsDataFetcher(BaseFetcher):
@@ -33,23 +39,41 @@ class StocktwitsDataFetcher(BaseFetcher):
     def process_data_fetch(self):
         self.get_data()
         try:
-            for i in range(len(self.complete_btcdataset)):
-                KafkaConnector().send_to_kafka(self.kafka_topic, {
-                    "timestamp": get_unix_timestamp(),
-                    "msgId": self.complete_btcdataset[i]["id"],
-                    "sentiment": self.complete_btcdataset[i]["sentiment"],
-                    "sentimentScore": self.complete_btcdataset[i]["msg_sentimentscore"],
-                    "weightedScore": self.complete_btcdataset[i]["weighted_score"],
+            msg = None
+            for msg in self.complete_btcdataset:
+                logging.info({
+                    "timestamp": msg["created_at"],
+                    "msgId": msg["id"],
+                    "sentiment": msg["sentiment"],
+                    "sentimentScore": msg["msg_sentimentscore"],
+                    "weightedScore": msg["weighted_score"],
+                    "coin": "BTC"
+                })
+                KafkaConnector().send_async_to_kafka(self.kafka_topic, {
+                    "timestamp": msg["created_at"],
+                    "msgId": msg["id"],
+                    "sentiment": msg["sentiment"],
+                    "sentimentScore": msg["msg_sentimentscore"],
+                    "weightedScore": msg["weighted_score"],
                     "coin": "BTC"
                 })
 
-            for i in range(len(self.complete_ethdataset)):
-                KafkaConnector().send_to_kafka(self.kafka_topic, {
-                    "timestamp": get_unix_timestamp(),
-                    "msgId": self.complete_ethdataset[i]["id"],
-                    "sentiment": self.complete_ethdataset[i]["sentiment"],
-                    "sentimentScore": self.complete_ethdataset[i]["msg_sentimentscore"],
-                    "weightedScore": self.complete_ethdataset[i]["weighted_score"],
+            item = None
+            for item in self.complete_ethdataset:
+                logging.info({
+                    "timestamp": item["created_at"],
+                    "msgId": item["id"],
+                    "sentiment": item["sentiment"],
+                    "sentimentScore": item["msg_sentimentscore"],
+                    "weightedScore": item["weighted_score"],
+                    "coin": "ETH"
+                })
+                KafkaConnector().send_async_to_kafka(self.kafka_topic, {
+                    "timestamp": item["created_at"],
+                    "msgId": item["id"],
+                    "sentiment": item["sentiment"],
+                    "sentimentScore": item["msg_sentimentscore"],
+                    "weightedScore": item["weighted_score"],
                     "coin": "ETH"
                 })
         except Exception:
@@ -57,7 +81,9 @@ class StocktwitsDataFetcher(BaseFetcher):
                 "type": ErrorTypes.FETCH_ERROR,
                 "error": sys.exc_info()[0]
             }, self.kafka_topic)
+            pass
         finally:
+            KafkaConnector().flush()
             self.run_app()
 
     # -------------------------------------------------------------
@@ -65,46 +91,30 @@ class StocktwitsDataFetcher(BaseFetcher):
     def query_request(self, ticker):
         url = "https://api.stocktwits.com/api/2/streams/symbol/%s.json" % ticker
         response = requests.get(url)
-        return json.loads(response.text)
+        return response.json()
 
     def sentiment(self, message):
         try:
-            msg = message['entities']['sentiment']['basic']
-            if msg == "Bullish":
-                sentiment_value = 1
+            if message['entities']['sentiment'] is None:
+                sentiment_value = 0
             else:
-                sentiment_value = -1
+                msg = message['entities']['sentiment']['basic']
+                if msg == "Bullish":
+                    sentiment_value = 1
+                else:
+                    sentiment_value = -1
         except Exception:
             sentiment_value = 0
-        return sentiment_value
+        finally:
+            return sentiment_value
 
     def sentiment_analysis_score(self, text):
         return SentimentIntensityAnalyzer().polarity_scores(text)["compound"]
 
     def clean_message(self, text):
         text = re.sub("[0-9]+", "number", text)
-        text = re.sub("#", "", text)
-        text = re.sub("\n", "", text)
-        text = re.sub("$[^\s]+", "", text)
-        text = re.sub("@[^\s]+", "", text)
-        text = re.sub("(http|https)://[^\s]*", "", text)
-        text = re.sub("[^\s]+@[^\s]+", "", text)
-        text = re.sub('[^a-z A-Z]+', '', text)
+        text = re.sub("(\#|\n|@[^\s]+|(http|https):\/\/[^\s]*|[^\s]+@[^\s]+|[^a-z A-Z]+)", '', text)
         return text
-
-    def get_average_sentiment_score(self, ticker):
-        data = self.query_request(ticker)
-
-        sum_score = 0
-        length = len(data['messages'])
-        for message in data['messages']:
-            text = self.clean_message(message['body'])
-            sent = self.sentiment(message)
-            sentiment_score = self.sentiment_analysis_score(text)
-            weighted_score = (sent + sentiment_score) / 2
-            sum_score += weighted_score
-        average_score = round(sum_score / length, 3)
-        return average_score
 
     def get_data_line(self, ticker):
         data = self.query_request(ticker)
@@ -120,7 +130,7 @@ class StocktwitsDataFetcher(BaseFetcher):
         list_ids = []
 
         for message in data['messages']:
-            dataset = dict()
+            dataset = {}
             text = self.clean_message(message['body'])
             sent = self.sentiment(message)
             sentiment_score = self.sentiment_analysis_score(text)
@@ -128,13 +138,13 @@ class StocktwitsDataFetcher(BaseFetcher):
             weighted_score = (sent + sentiment_score) / 2
 
             if message['id'] not in copy_list_ids:
-                # print("yep")
                 list_ids.append(message['id'])
                 # Dictionary befüllen --> jeder Datensatz der 30
                 dataset["id"] = message['id']
                 dataset["sentiment"] = sent
                 dataset["msg_sentimentscore"] = sentiment_score
                 dataset["weighted_score"] = weighted_score
+                dataset["created_at"] = datetime.strptime(message['created_at'], "%Y-%m-%dT%H:%M:%SZ").timestamp()
                 # Enter dataset into the whole collection
                 complete_dataset.append(dataset)
             else:
@@ -148,10 +158,6 @@ class StocktwitsDataFetcher(BaseFetcher):
         elif ticker == "ETH.X":
             self.complete_ethdataset = complete_dataset
             self.list_ids_eth = list_ids
-
-    def sentiment_results(self, tickers):
-        for ticker in tickers:
-            print(self.get_average_sentiment_score(ticker))
 
     def get_data(self):
         self.get_data_line("BTC.X")

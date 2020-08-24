@@ -10,7 +10,11 @@ from ErrorTypes import ErrorTypes
 from HashiVaultCredentialStorage import HashiVaultCredentialStorage
 from KafkaConnector import catch_request_error, get_unix_timestamp, KafkaConnector
 
-logging.basicConfig(filename='output.log', level=logging.INFO)
+logging.basicConfig(
+    filename='output.log',
+    format='%(asctime)s %(levelname)-8s %(message)s',
+    level=logging.INFO,
+    datefmt='%Y-%m-%d %H:%M:%S')
 
 
 class CoinMarketCapDataFetcher(BaseFetcher):

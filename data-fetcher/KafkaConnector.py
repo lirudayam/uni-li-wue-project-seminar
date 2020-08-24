@@ -1,15 +1,23 @@
+import gc
 import json
 import logging
 import os
 import time
 from json.decoder import JSONDecodeError
+from random import random
+from threading import Timer
 
 from kafka import KafkaProducer
+from kafka.errors import KafkaTimeoutError
 
 from ErrorTypes import ErrorTypes
 
-os.environ["KAFKA_BOOTSTRAP_SERVER"] = '132.187.226.20:9092'
-logging.basicConfig(filename='output.log', level=logging.ERROR)
+logging.basicConfig(
+    filename='output.log',
+    format='%(asctime)s %(levelname)-8s %(message)s',
+    level=logging.DEBUG,
+    datefmt='%Y-%m-%d %H:%M:%S')
+gc.disable()
 
 
 # Singleton class for handling any connection and sending to Kafka
@@ -19,8 +27,9 @@ logging.basicConfig(filename='output.log', level=logging.ERROR)
 class KafkaConnector:
     class __KafkaConnector:
         def __init__(self):
-            self.producer = KafkaProducer(bootstrap_servers=[os.getenv('KAFKA_BOOTSTRAP_SERVER', '132.187.226.20:9092')],
-                                          value_serializer=lambda m: json.dumps(m, cls=EnumEncoder).encode('ascii'))
+            self.producer = KafkaProducer(
+                bootstrap_servers=[os.getenv('KAFKA_BOOTSTRAP_SERVER', '132.187.226.20:9092')],
+                value_serializer=lambda m: json.dumps(m, cls=EnumEncoder).encode('ascii'))
 
     instance = None
 
@@ -31,22 +40,60 @@ class KafkaConnector:
     def __getattr__(self, name):
         return getattr(self.instance, name)
 
+    def push_msg(self, topic, msg, flush_flag=True):
+        # random reconnect
+        if not self.producer or random() < 0.1:
+            self.producer.close(1000)
+            KafkaConnector.instance = KafkaConnector.__KafkaConnector()
+
+        try:
+            self.producer.send(topic, msg).add_callback(on_send_success).add_errback(on_send_error)
+        except (AssertionError, KafkaTimeoutError):
+            r = Timer(10.0, self.push_msg, (topic, msg, flush_flag))
+            r.start()
+            pass
+
+        if flush_flag:
+            self.producer.flush()
+
     def send_to_kafka(self, topic, dict_elm):
         try:
-            self.producer.send(topic, dict_elm).add_callback(on_send_success).add_errback(on_send_error)
-            self.producer.flush()
+            self.push_msg(topic, dict_elm)
         except JSONDecodeError:
             self.forward_error({
                 "error": "Failed to send to Kafka"
             })
+            pass
+        except (AssertionError, KafkaTimeoutError):
+            r = Timer(10.0, self.send_async_to_kafka, (topic, dict_elm))
+            r.start()
+            pass
+        finally:
+            return True
+
+    def send_async_to_kafka(self, topic, dict_elm):
+        try:
+            self.push_msg(topic, dict_elm, False)
+        except JSONDecodeError:
+            self.forward_error({
+                "error": "Failed to send to Kafka"
+            })
+            pass
+        except (AssertionError, KafkaTimeoutError):
+            r = Timer(10.0, self.send_async_to_kafka, (topic, dict_elm))
+            r.start()
+            pass
+        finally:
+            return True
+
+    def flush(self):
+        self.producer.flush()
 
     def forward_error(self, error):
-        self.producer.send('RAW_FETCH_ERRORS', error).add_callback(on_send_success).add_errback(on_send_error)
-        self.producer.flush()
+        self.producer.send('RAW_FETCH_ERRORS', error)
 
     def send_health_ping(self, fetcher_name):
-        self.producer.send('RAW_HEALTH_CHECKS', fetcher_name).add_callback(on_send_success).add_errback(on_send_error)
-        self.producer.flush()
+        self.push_msg('RAW_HEALTH_CHECKS', fetcher_name)
 
 
 def get_unix_timestamp():
@@ -66,7 +113,7 @@ def on_send_success(record_metadata):
 
 
 def on_send_error(exception):
-    logging.error('Error while sending to Kafka' + str(exception))
+    logging.error('Error while sending to Kafka ' + str(exception))
     KafkaConnector().forward_error(exception)
 
 

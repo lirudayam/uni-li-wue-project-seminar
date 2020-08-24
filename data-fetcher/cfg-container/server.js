@@ -2,6 +2,7 @@
 
 const express = require('express');
 const axios = require('axios');
+const cors = require('cors');
 
 // Constants
 const PORT = 8080;
@@ -50,11 +51,13 @@ setInterval(() => {getData()}, 60 * 1000);
 
 // App
 const app = express();
-app.get('/health_ping_interval', (req, res) => {
+app.use(cors());
+
+app.get('/health_ping_interval', async (req, res) => {
   res.send("" + iHealthPingInterval);
 });
 
-app.get('/aggregation_interval/:topic', (req, res) => {
+app.get('/aggregation_interval/:topic', async (req, res) => {
     const topic = req.params.topic;
     if (oAPIBasedMetrics[topic] && oAPIBasedMetrics[topic].aggregationInterval) {
         res.send("" + oAPIBasedMetrics[topic].aggregationInterval);
@@ -64,7 +67,7 @@ app.get('/aggregation_interval/:topic', (req, res) => {
     }
 });
 
-app.get('/fetch_interval/:topic', (req, res) => {
+app.get('/fetch_interval/:topic', async (req, res) => {
     const topic = req.params.topic;
     if (oAPIBasedMetrics[topic] && oAPIBasedMetrics[topic].fetchInterval) {
         res.send("" + oAPIBasedMetrics[topic].fetchInterval);

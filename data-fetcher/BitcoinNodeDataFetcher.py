@@ -11,7 +11,11 @@ from KafkaConnector import catch_request_error, KafkaConnector
 headers = {
     'Accept': 'application/json; indent=4',
 }
-logging.basicConfig(filename='output.log', level=logging.INFO)
+logging.basicConfig(
+    filename='output.log',
+    format='%(asctime)s %(levelname)-8s %(message)s',
+    level=logging.INFO,
+    datefmt='%Y-%m-%d %H:%M:%S')
 
 
 class BitcoinNodeDataFetcher(BaseFetcher):

@@ -2573,6 +2573,16 @@
       },
       "$syntax": "projection"
     },
+    "uni_li_wue.dw.service.KafkaPublishService.KPI_E_GASSTATION_BI": {
+      "kind": "action",
+      "params": {
+        "array": {
+          "items": {
+            "type": "uni_li_wue.dw.service.KafkaPublishService.KPI_E_EXT_GASSTATION"
+          }
+        }
+      }
+    },
     "uni_li_wue.dw.service.KafkaPublishService.KPI_E_TOKEN": {
       "kind": "entity",
       "@insertonly": true,
@@ -2638,6 +2648,16 @@
         }
       },
       "$syntax": "projection"
+    },
+    "uni_li_wue.dw.service.KafkaPublishService.KPI_E_TOKEN_BI": {
+      "kind": "action",
+      "params": {
+        "array": {
+          "items": {
+            "type": "uni_li_wue.dw.service.KafkaPublishService.KPI_E_TOKEN"
+          }
+        }
+      }
     },
     "uni_li_wue.dw.service.KafkaPublishService.KPI_G_GINI": {
       "kind": "entity",
@@ -2746,6 +2766,16 @@
       },
       "$syntax": "projection"
     },
+    "uni_li_wue.dw.service.KafkaPublishService.KPI_G_NEWS_BI": {
+      "kind": "action",
+      "params": {
+        "array": {
+          "items": {
+            "type": "uni_li_wue.dw.service.KafkaPublishService.KPI_G_NEWS"
+          }
+        }
+      }
+    },
     "uni_li_wue.dw.service.KafkaPublishService.KPI_G_NODE_DISTRIBUTION": {
       "kind": "entity",
       "@insertonly": true,
@@ -2800,6 +2830,16 @@
       },
       "$syntax": "projection"
     },
+    "uni_li_wue.dw.service.KafkaPublishService.KPI_G_NODE_DISTRIBUTION_BI": {
+      "kind": "action",
+      "params": {
+        "array": {
+          "items": {
+            "type": "uni_li_wue.dw.service.KafkaPublishService.KPI_G_NODE_DISTRIBUTION"
+          }
+        }
+      }
+    },
     "uni_li_wue.dw.service.KafkaPublishService.KPI_G_N_PER_TIME": {
       "kind": "entity",
       "@insertonly": true,
@@ -2848,6 +2888,16 @@
         }
       },
       "$syntax": "projection"
+    },
+    "uni_li_wue.dw.service.KafkaPublishService.KPI_G_N_PER_TIME_BI": {
+      "kind": "action",
+      "params": {
+        "array": {
+          "items": {
+            "type": "uni_li_wue.dw.service.KafkaPublishService.KPI_G_N_PER_TIME"
+          }
+        }
+      }
     },
     "uni_li_wue.dw.service.KafkaPublishService.KPI_G_PRICES": {
       "kind": "entity",
@@ -3852,9 +3902,130 @@
       },
       "$syntax": "projection"
     },
+    "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_G_N_PER_TIME_LATEST": {
+      "kind": "entity",
+      "@readonly": true,
+      "@restrict": [
+        {
+          "grant": "READ",
+          "where": "timestamp IN (select timestamp from (select MAX(timestamp) as timestamp, coin from uni_li_wue.dw.KPI_G_N_PER_TIME group by coin))",
+          "_where": "[{\"ref\":[\"timestamp\"]},\"in\",{\"SELECT\":{\"from\":{\"SELECT\":{\"from\":{\"ref\":[\"uni_li_wue.dw.KPI_G_N_PER_TIME\"]},\"columns\":[{\"func\":\"MAX\",\"args\":[{\"ref\":[\"timestamp\"]}],\"as\":\"timestamp\"},{\"ref\":[\"coin\"]}],\"groupBy\":[{\"ref\":[\"coin\"]}]}},\"columns\":[{\"ref\":[\"timestamp\"]}]}}]"
+        }
+      ],
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "uni_li_wue.dw.KPI_G_N_PER_TIME"
+            ]
+          }
+        }
+      },
+      "elements": {
+        "timestamp": {
+          "key": true,
+          "type": "cds.DateTime"
+        },
+        "coin": {
+          "key": true,
+          "type": "cds.String",
+          "length": 3
+        },
+        "coinInfo": {
+          "type": "cds.Association",
+          "cardinality": {
+            "max": 1
+          },
+          "target": "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_ENUM_COINS",
+          "on": [
+            {
+              "ref": [
+                "coin"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "coinInfo",
+                "shortName"
+              ]
+            }
+          ]
+        },
+        "numOfNodes": {
+          "type": "cds.Integer"
+        }
+      },
+      "$syntax": "projection"
+    },
     "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_G_PRICES": {
       "kind": "entity",
       "@readonly": true,
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "uni_li_wue.dw.KPI_G_PRICES"
+            ]
+          }
+        }
+      },
+      "elements": {
+        "timestamp": {
+          "key": true,
+          "type": "cds.DateTime"
+        },
+        "coin": {
+          "key": true,
+          "type": "cds.String",
+          "length": 3
+        },
+        "coinInfo": {
+          "type": "cds.Association",
+          "cardinality": {
+            "max": 1
+          },
+          "target": "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_ENUM_COINS",
+          "on": [
+            {
+              "ref": [
+                "coin"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "coinInfo",
+                "shortName"
+              ]
+            }
+          ]
+        },
+        "price": {
+          "type": "cds.Double"
+        },
+        "marketCap": {
+          "type": "cds.Double"
+        },
+        "volume24h": {
+          "type": "cds.Double"
+        },
+        "change24h": {
+          "type": "cds.Double"
+        }
+      },
+      "$syntax": "projection"
+    },
+    "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_G_PRICES_LATEST": {
+      "kind": "entity",
+      "@readonly": true,
+      "@restrict": [
+        {
+          "grant": "READ",
+          "where": "timestamp IN (select timestamp from (select MAX(timestamp) as timestamp, coin from uni_li_wue.dw.KPI_G_PRICES group by coin))",
+          "_where": "[{\"ref\":[\"timestamp\"]},\"in\",{\"SELECT\":{\"from\":{\"SELECT\":{\"from\":{\"ref\":[\"uni_li_wue.dw.KPI_G_PRICES\"]},\"columns\":[{\"func\":\"MAX\",\"args\":[{\"ref\":[\"timestamp\"]}],\"as\":\"timestamp\"},{\"ref\":[\"coin\"]}],\"groupBy\":[{\"ref\":[\"coin\"]}]}},\"columns\":[{\"ref\":[\"timestamp\"]}]}}]"
+        }
+      ],
       "query": {
         "SELECT": {
           "from": {
@@ -4015,6 +4186,50 @@
       },
       "$syntax": "entity"
     },
+    "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_G_PRICE_DIFF_LATEST": {
+      "kind": "entity",
+      "@readonly": true,
+      "@restrict": [
+        {
+          "grant": "READ",
+          "where": "timestamp IN (select timestamp from (select MAX(timestamp) as timestamp, coin from uni_li_wue.dw.KPI_G_PRICE_VOLA group by coin))",
+          "_where": "[{\"ref\":[\"timestamp\"]},\"in\",{\"SELECT\":{\"from\":{\"SELECT\":{\"from\":{\"ref\":[\"uni_li_wue.dw.KPI_G_PRICE_VOLA\"]},\"columns\":[{\"func\":\"MAX\",\"args\":[{\"ref\":[\"timestamp\"]}],\"as\":\"timestamp\"},{\"ref\":[\"coin\"]}],\"groupBy\":[{\"ref\":[\"coin\"]}]}},\"columns\":[{\"ref\":[\"timestamp\"]}]}}]"
+        }
+      ],
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_G_PRICE_DIFF"
+            ]
+          }
+        }
+      },
+      "elements": {
+        "timestamp": {
+          "key": true,
+          "type": "cds.DateTime"
+        },
+        "coin": {
+          "key": true,
+          "type": "cds.String",
+          "length": 3
+        },
+        "Minimum": {
+          "@Core.Computed": true,
+          "type": "cds.Double"
+        },
+        "Maximum": {
+          "@Core.Computed": true,
+          "type": "cds.Double"
+        },
+        "Average": {
+          "@Core.Computed": true,
+          "type": "cds.Double"
+        }
+      },
+      "$syntax": "projection"
+    },
     "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_G_PRICE_VOLA": {
       "kind": "entity",
       "@readonly": true,
@@ -4122,6 +4337,65 @@
     "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_G_RICH_ACC": {
       "kind": "entity",
       "@readonly": true,
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "uni_li_wue.dw.KPI_G_RICH_ACC"
+            ]
+          }
+        }
+      },
+      "elements": {
+        "timestamp": {
+          "key": true,
+          "type": "cds.DateTime"
+        },
+        "coin": {
+          "key": true,
+          "type": "cds.String",
+          "length": 3
+        },
+        "coinInfo": {
+          "type": "cds.Association",
+          "cardinality": {
+            "max": 1
+          },
+          "target": "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_ENUM_COINS",
+          "on": [
+            {
+              "ref": [
+                "coin"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "coinInfo",
+                "shortName"
+              ]
+            }
+          ]
+        },
+        "accountAddress": {
+          "type": "cds.String"
+        },
+        "balance": {
+          "type": "cds.Double"
+        }
+      },
+      "$syntax": "projection"
+    },
+    "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_G_RICH_ACC_LATEST": {
+      "kind": "entity",
+      "@readonly": true,
+      "@restrict": [
+        {
+          "grant": "READ",
+          "where": "timestamp IN (select timestamp from (select MAX(timestamp) as timestamp, coin from uni_li_wue.dw.KPI_G_RICH_ACC group by coin))",
+          "_where": "[{\"ref\":[\"timestamp\"]},\"in\",{\"SELECT\":{\"from\":{\"SELECT\":{\"from\":{\"ref\":[\"uni_li_wue.dw.KPI_G_RICH_ACC\"]},\"columns\":[{\"func\":\"MAX\",\"args\":[{\"ref\":[\"timestamp\"]}],\"as\":\"timestamp\"},{\"ref\":[\"coin\"]}],\"groupBy\":[{\"ref\":[\"coin\"]}]}},\"columns\":[{\"ref\":[\"timestamp\"]}]}}]"
+        }
+      ],
       "query": {
         "SELECT": {
           "from": {

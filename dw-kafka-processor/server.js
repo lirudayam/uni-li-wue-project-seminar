@@ -30,6 +30,12 @@ String.prototype.getBytes = function () {
 // get CDS module
 const cds = require('@sap/cds');
 
+// get axios for batch actions
+const axios = require('axios');
+
+console.log(process.env);
+const serviceURL = process.env.destinations[0].url;
+
 // async function for consuming kafka and writing to data warehouse
 const asyncInitialRunFn = async () => {
 	// connect to the external service of dw -> access via OData, no direct access
@@ -74,18 +80,19 @@ const asyncInitialRunFn = async () => {
 		RAW_G_PRICES: KPI_G_PRICES,
 		RAW_B_SPECIAL_EVT: KPI_B_SPECIAL_EVT,
 
-		RAW_G_STOCKTWITS_FETCHER: KPI_G_NEWS,
 		RAW_G_RECOMM: KPI_G_RECOMM,
 		RAW_G_CREDITS: KPI_G_CREDITS,
 
-		RAW_G_GINI: KPI_G_GINI
+		RAW_G_GINI: KPI_G_GINI,
+
+		RAW_E_BLOCK: KPI_E_BLOCK,
+		RAW_B_BLOCK: KPI_B_BLOCK
 	};
 	var aBatchLayerTopics = [
 		'RAW_E_GASSTATION',
 		'RAW_G_NODE_DISTRIBUTION',
-		'RAW_E_BLOCK',
-		'RAW_B_BLOCK',
-		'RAW_E_TOKEN'
+		'RAW_E_TOKEN',
+		'RAW_G_STOCKTWITS_FETCHER'
 	];
 
 	const socketAliveTime = 60 * 60 * 1000;
@@ -252,7 +259,7 @@ const asyncInitialRunFn = async () => {
 				await consumer.subscribe({
 					topic: /RAW_.*/i
 				});
-				console.log("Listening to Kafka now");
+				console.log('Listening to Kafka now');
 
 				let oBatchInsertQueue = {};
 
@@ -275,15 +282,29 @@ const asyncInitialRunFn = async () => {
 						)) {
 							try {
 								if (values.length > 0) {
-									srv.run(
-										INSERT.into(
-											relevantServiceEntities[entity]
-										).entries(
-											values.filter((item) => item !== {})
+									axios
+										.post(
+											'https://cf-dts-eim-ch-sac-blockchain-uni-li-wue-dw-cloud-srv.cfapps.eu10.hana.ondemand.com/kafka-publish' +
+												'/' +
+												entity +
+												'_BI',
+											{
+												array: values.filter(
+													(item) => item !== {}
+												)
+											}
 										)
-									).catch((error) => {
-										log.error(error);
-									});
+										.then(function (response) {
+											log.info(
+												'batch complete to ' +
+													'/' +
+													entity +
+													'_BI'
+											);
+										})
+										.catch(function (error) {
+											log.error(error);
+										});
 								}
 							} catch (e) {
 								log.error(entity);
@@ -335,23 +356,6 @@ const asyncInitialRunFn = async () => {
 							}
 							try {
 								switch (topic) {
-									case 'RAW_E_BLOCK':
-										entries = await srv.run(
-											SELECT.from(KPI_E_BLOCK).where({
-												identifier: entry.identifier
-											})
-										);
-										if (
-											entries.length === 0 &&
-											entry.identifier !== null &&
-											entry.identifier !== undefined
-										) {
-											addIntoBatchInsertQueue(
-												'KPI_E_BLOCK',
-												entry
-											);
-										}
-										break;
 									case 'RAW_E_TOKEN':
 										entries = await srv.run(
 											SELECT.from(
@@ -387,25 +391,6 @@ const asyncInitialRunFn = async () => {
 											entry
 										);
 										break;
-									case 'RAW_B_BLOCK':
-										entries = await srv.run(
-											SELECT.from(KPI_B_BLOCK)
-												.orderBy({
-													timestamp: 'desc'
-												})
-												.limit(1)
-										);
-										if (
-											!entries[0] ||
-											entries[0].blockTime !==
-												entry.blockTime
-										) {
-											addIntoBatchInsertQueue(
-												'KPI_B_BLOCK',
-												entry
-											);
-										}
-										break;
 									case 'RAW_G_NODE_DISTRIBUTION':
 										Object.keys(entry.countries).forEach(
 											(country) => {
@@ -434,6 +419,12 @@ const asyncInitialRunFn = async () => {
 													entry.nodeCount
 												)
 											}
+										);
+										break;
+									case 'RAW_G_STOCKTWITS_FETCHER':
+										addIntoBatchInsertQueue(
+											'KPI_G_NEWS',
+											entry
 										);
 										break;
 									case 'RAW_E_GASSTATION':
@@ -501,7 +492,7 @@ const asyncInitialRunFn = async () => {
 								let entry = JSON.parse(message.value);
 								if (entry.timestamp) {
 									entry.timestamp = moment(
-										entry.timestamp
+										entry.timestamp * 1000
 									).format();
 								}
 								const newEntry = {
@@ -552,6 +543,7 @@ asyncInitialRunFn();
 
 // Ping - Pong Health
 const express = require('express');
+const { default: Axios } = require('axios');
 const app = express();
 
 app.get('/ping', function (req, res) {

@@ -15,6 +15,7 @@ while (("$#")); do
 
   cd tmp_deploy || exit
   pipreqs .
+  touch output.log
   touch Dockerfile
   cat <<EOT >>Dockerfile
 FROM python:3.6
@@ -22,7 +23,7 @@ MAINTAINER uni.li-wue.projekt@protonmail.com
 WORKDIR /
 COPY . .
 RUN pip3 install -r requirements.txt
-CMD [ "python3", "${SCRIPT_FILE}" ]
+CMD python3 ${SCRIPT_FILE}
 EOT
   docker image rm uniliwuedockerepo/"${IMGNAME}"-fetcher
   docker build -t uniliwuedockerepo/"${IMGNAME}"-fetcher .
