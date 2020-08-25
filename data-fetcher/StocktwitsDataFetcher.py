@@ -19,6 +19,7 @@ logging.basicConfig(
     level=logging.INFO,
     datefmt='%Y-%m-%d %H:%M:%S')
 
+
 # noinspection PyMethodMayBeStatic
 class StocktwitsDataFetcher(BaseFetcher):
     fetcher_name = "Stocktwits Fetcher Skeleton"
@@ -39,7 +40,6 @@ class StocktwitsDataFetcher(BaseFetcher):
     def process_data_fetch(self):
         self.get_data()
         try:
-            msg = None
             for msg in self.complete_btcdataset:
                 logging.info({
                     "timestamp": msg["created_at"],
@@ -58,7 +58,6 @@ class StocktwitsDataFetcher(BaseFetcher):
                     "coin": "BTC"
                 })
 
-            item = None
             for item in self.complete_ethdataset:
                 logging.info({
                     "timestamp": item["created_at"],
@@ -76,7 +75,7 @@ class StocktwitsDataFetcher(BaseFetcher):
                     "weightedScore": item["weighted_score"],
                     "coin": "ETH"
                 })
-        except Exception:
+        except:
             catch_request_error({
                 "type": ErrorTypes.FETCH_ERROR,
                 "error": sys.exc_info()[0]

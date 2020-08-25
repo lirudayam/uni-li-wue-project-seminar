@@ -422,6 +422,8 @@ const asyncInitialRunFn = async () => {
 										);
 										break;
 									case 'RAW_G_STOCKTWITS_FETCHER':
+										console.log("NEWS");
+										console.log(entry);
 										addIntoBatchInsertQueue(
 											'KPI_G_NEWS',
 											entry
