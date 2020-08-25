@@ -64,7 +64,8 @@ class KafkaConnector:
                 "error": "Failed to send to Kafka"
             })
             pass
-        except (AssertionError, KafkaTimeoutError):
+        except (AssertionError, KafkaTimeoutError) as e:
+            logging.error('Error while sending to Kafka ' + str(e))
             r = Timer(10.0, self.send_async_to_kafka, (topic, dict_elm))
             r.start()
             pass
@@ -80,6 +81,7 @@ class KafkaConnector:
             })
             pass
         except (AssertionError, KafkaTimeoutError):
+            logging.error('Error while sending to Kafka ' + str(e))
             r = Timer(10.0, self.send_async_to_kafka, (topic, dict_elm))
             r.start()
             pass

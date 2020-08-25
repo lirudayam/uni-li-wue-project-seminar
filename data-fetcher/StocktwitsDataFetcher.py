@@ -143,7 +143,7 @@ class StocktwitsDataFetcher(BaseFetcher):
                 dataset["sentiment"] = sent
                 dataset["msg_sentimentscore"] = sentiment_score
                 dataset["weighted_score"] = weighted_score
-                dataset["created_at"] = datetime.strptime(message['created_at'], "%Y-%m-%dT%H:%M:%SZ").timestamp()
+                dataset["created_at"] = int(datetime.strptime(message['created_at'], "%Y-%m-%dT%H:%M:%SZ").timestamp())
                 # Enter dataset into the whole collection
                 complete_dataset.append(dataset)
             else:

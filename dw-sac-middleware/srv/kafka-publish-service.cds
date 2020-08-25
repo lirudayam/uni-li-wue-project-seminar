@@ -36,7 +36,7 @@ service KafkaPublishService {
   action KPI_E_TOKEN_BI(array : array of KPI_E_TOKEN);
   action KPI_G_NODE_DISTRIBUTION_BI(array : array of KPI_G_NODE_DISTRIBUTION);
   action KPI_G_N_PER_TIME_BI(array : array of KPI_G_N_PER_TIME);
-  action KPI_E_GASSTATION_BI(array : array of KPI_E_EXT_GASSTATION);
+  action KPI_E_EXT_GASSTATION_BI(array : array of KPI_E_EXT_GASSTATION);
   action KPI_G_NEWS_BI(array : array of KPI_G_NEWS);
   
 }

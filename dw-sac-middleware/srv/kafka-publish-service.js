@@ -5,7 +5,8 @@ const {
   KPI_G_NODE_DISTRIBUTION,
   KPI_G_N_PER_TIME,
   KPI_E_EXT_GASSTATION,
-  LOG_FETCH_ERROR
+  KPI_G_NEWS,
+  LOG_FETCH_ERROR,
 } = cds.entities("uni_li_wue.dw");
 
 const moment = require("moment");
@@ -32,11 +33,11 @@ module.exports = async (srv) => {
   srv.on("KPI_G_N_PER_TIME_BI", async (req) => {
     fnBatchInsert(req, KPI_G_N_PER_TIME, req.data.array);
   });
-  srv.on("KPI_E_GASSTATION_BI", async (req) => {
+  srv.on("KPI_E_EXT_GASSTATION_BI", async (req) => {
     fnBatchInsert(req, KPI_E_EXT_GASSTATION, req.data.array);
   });
-  srv.on("KPI_G_NEWS", async (req) => {
-    fnBatchInsert(req, KPI_E_EXT_GASSTATION, req.data.array);
+  srv.on("KPI_G_NEWS_BI", async (req) => {
+    fnBatchInsert(req, KPI_G_NEWS, req.data.array);
   });
 
   srv.before("CREATE", "KPI_E_BLOCK", async (req) => {
@@ -75,7 +76,6 @@ module.exports = async (srv) => {
     }
   });
 
-
   /* Handlers for catching errors and documenting as an error */
   const aTopics = [
     "KPI_G_RICH_ACC",
@@ -92,23 +92,34 @@ module.exports = async (srv) => {
     "KPI_G_GINI",
   ];
 
-  aTopics.forEach(sEntity => {
-    srv.on(["CREATE", "UPDATE"], sEntity, async (req) => {
-        try {
-          const tx = cds.transaction(req);
-          return await tx.run(req.query);
-        } catch (error) {
-          await srv.run(
-            INSERT.into(LOG_FETCH_ERROR).entries([
-              {
-                api: sEntity,
-                timestamp: moment().format(),
-                message: "Insert error: " + req.query,
-              },
-            ])
-          );
-          throw error;
+  aTopics.forEach((sEntity) => {
+    srv.before(["CREATE", "UPDATE"], sEntity, async (req) => {
+      if (sEntity !== "KPI_G_GINI") {
+        const { timestamp } = req.data;
+        if (!timestamp) {
+          req.data.timestamp = moment().format();
         }
-      });
-  })
+      }
+    });
+  });
+
+  aTopics.forEach((sEntity) => {
+    srv.on(["CREATE", "UPDATE"], sEntity, async (req) => {
+      try {
+        const tx = cds.transaction(req);
+        return await tx.run(req.query);
+      } catch (error) {
+        await srv.run(
+          INSERT.into(LOG_FETCH_ERROR).entries([
+            {
+              api: sEntity,
+              timestamp: moment().format(),
+              message: "Insert error: " + req.query,
+            },
+          ])
+        );
+        throw error;
+      }
+    });
+  });
 };
