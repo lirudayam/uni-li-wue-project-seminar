@@ -2573,7 +2573,7 @@
       },
       "$syntax": "projection"
     },
-    "uni_li_wue.dw.service.KafkaPublishService.KPI_E_GASSTATION_BI": {
+    "uni_li_wue.dw.service.KafkaPublishService.KPI_E_EXT_GASSTATION_BI": {
       "kind": "action",
       "params": {
         "array": {
