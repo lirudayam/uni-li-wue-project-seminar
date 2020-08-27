@@ -128,6 +128,7 @@ entity KPI_B_BLOCK {
         difficulty    : Double;
         estimatedSent : Double;
         minersRevenue : Double;
+        blockSize     : Integer;
 }
 
 entity KPI_B_SPECIAL_EVT {
