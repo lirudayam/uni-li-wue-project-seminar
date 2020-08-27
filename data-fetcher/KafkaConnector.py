@@ -1,3 +1,4 @@
+from datetime import datetime
 import gc
 import json
 import logging
@@ -99,7 +100,7 @@ class KafkaConnector:
 
 
 def get_unix_timestamp():
-    return int(time.time())
+    return datetime.utcnow().timestamp()
 
 
 def catch_request_error(error, kafka_topic):

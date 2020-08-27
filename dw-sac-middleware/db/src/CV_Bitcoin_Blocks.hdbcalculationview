@@ -18,6 +18,7 @@
         <viewAttribute id="DIFFICULTY"/>
         <viewAttribute id="ESTIMATEDSENT"/>
         <viewAttribute id="MINERSREVENUE"/>
+        <viewAttribute id="BLOCKSIZE"/>
       
     </viewAttributes>
     <calculatedViewAttributes />
@@ -28,6 +29,7 @@
         <mapping xsi:type="Calculation:AttributeMapping" target="DIFFICULTY" source="DIFFICULTY"/>
         <mapping xsi:type="Calculation:AttributeMapping" target="ESTIMATEDSENT" source="ESTIMATEDSENT"/>
         <mapping xsi:type="Calculation:AttributeMapping" target="MINERSREVENUE" source="MINERSREVENUE"/>
+        <mapping xsi:type="Calculation:AttributeMapping" target="BLOCKSIZE" source="BLOCKSIZE"/>
       </input>
     </calculationView>
 </calculationViews>
@@ -58,6 +60,10 @@
     	<measure id="minersRevenue" order="6" measureType="simple">
     		<descriptions defaultDescription="MINERSREVENUE"/>
     		<measureMapping columnObjectName="Projection_1" columnName="MINERSREVENUE"/>
+    	</measure>
+      <measure id="blockSize" order="7" measureType="simple">
+    		<descriptions defaultDescription="BLOCKSIZE"/>
+    		<measureMapping columnObjectName="Projection_1" columnName="BLOCKSIZE"/>
     	</measure>
     </baseMeasures>
     <calculatedMeasures/>
