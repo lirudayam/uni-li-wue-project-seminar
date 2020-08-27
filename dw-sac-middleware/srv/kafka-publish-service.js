@@ -57,24 +57,6 @@ module.exports = async (srv) => {
     }
   });
 
-  srv.before("CREATE", "KPI_B_BLOCK", async (req) => {
-    const tx = cds.transaction(req);
-
-    const entry = await tx.run(
-      SELECT.from(KPI_B_BLOCK)
-        .orderBy({
-          timestamp: "desc",
-        })
-        .limit(1)
-    );
-    if (entry && entry.length > 0) {
-      await tx.run(
-        DELETE.from(KPI_B_BLOCK).where({
-          timestamp: entry[0].timestamp,
-        })
-      );
-    }
-  });
 
   /* Handlers for catching errors and documenting as an error */
   const aTopics = [

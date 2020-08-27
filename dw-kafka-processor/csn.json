@@ -1046,6 +1046,9 @@
         },
         "minersRevenue": {
           "type": "cds.Double"
+        },
+        "blockSize": {
+          "type": "cds.Integer"
         }
       }
     },
@@ -2339,6 +2342,9 @@
         },
         "minersRevenue": {
           "type": "cds.Double"
+        },
+        "blockSize": {
+          "type": "cds.Integer"
         }
       },
       "$syntax": "projection"
@@ -3306,6 +3312,9 @@
         },
         "minersRevenue": {
           "type": "cds.Double"
+        },
+        "blockSize": {
+          "type": "cds.Integer"
         }
       },
       "$syntax": "projection"
