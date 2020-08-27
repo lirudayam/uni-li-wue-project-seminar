@@ -14,6 +14,7 @@ while (("$#")); do
   echo "sudo docker rm ${IMGNAME}" >>all_deploy.sh
   echo "sudo docker pull uniliwuedockerepo/"${IMGNAME}"-fetcher" >>all_deploy.sh
   echo "sudo docker run -d --name ${IMGNAME} --env-file ./docker-cfg uniliwuedockerepo/"${IMGNAME}"-fetcher" >>all_deploy.sh
+  echo "sudo docker update --restart on-failure ${IMGNAME}" >>all_deploy.sh
   shift
 done
 
