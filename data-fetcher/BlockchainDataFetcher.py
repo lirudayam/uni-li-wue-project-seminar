@@ -50,12 +50,13 @@ class BlockchainDataFetcher(BaseFetcher):
         self.get_data_from_blockchain()
         try:
             KafkaConnector().send_to_kafka(self.kafka_topic, {
-                "timestamp": get_unix_timestamp(),
-                "blockTime": self.output['minutes_between_blocks'],
-                "nextRetarget": self.output['nextretarget'],
-                "difficulty": self.output['difficulty'],
-                "estimatedSent": self.output['estimated_btc_sent'],
-                "minersRevenue": self.output['miners_revenue_btc'],
+                "timestamp": float(self.output['timestamp']) / 1000,
+                "blockTime": float(self.output['minutes_between_blocks']),
+                "nextRetarget": float(self.output['nextretarget']),
+                "difficulty": float(self.output['difficulty']),
+                "estimatedSent": float(self.output['estimated_btc_sent']),
+                "minersRevenue": float(self.output['miners_revenue_btc']),
+                "blockSize": int(self.output['blocks_size'])
             })
         except Exception:
             catch_request_error({

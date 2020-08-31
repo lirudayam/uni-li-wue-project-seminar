@@ -1,3 +1,4 @@
+from datetime import datetime
 import gc
 import json
 import logging
@@ -64,7 +65,8 @@ class KafkaConnector:
                 "error": "Failed to send to Kafka"
             })
             pass
-        except (AssertionError, KafkaTimeoutError):
+        except (AssertionError, KafkaTimeoutError) as e:
+            logging.error('Error while sending to Kafka ' + str(e))
             r = Timer(10.0, self.send_async_to_kafka, (topic, dict_elm))
             r.start()
             pass
@@ -80,6 +82,7 @@ class KafkaConnector:
             })
             pass
         except (AssertionError, KafkaTimeoutError):
+            logging.error('Error while sending to Kafka ' + str(e))
             r = Timer(10.0, self.send_async_to_kafka, (topic, dict_elm))
             r.start()
             pass
@@ -97,7 +100,7 @@ class KafkaConnector:
 
 
 def get_unix_timestamp():
-    return int(time.time())
+    return datetime.utcnow().timestamp()
 
 
 def catch_request_error(error, kafka_topic):

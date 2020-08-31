@@ -33,7 +33,6 @@ const cds = require('@sap/cds');
 // get axios for batch actions
 const axios = require('axios');
 
-console.log(process.env);
 const serviceURL = process.env.destinations[0].url;
 
 // async function for consuming kafka and writing to data warehouse
@@ -221,7 +220,7 @@ const asyncInitialRunFn = async () => {
 					}
 				);
 			})
-			.catch((err) => log.error(err));
+			.catch((err) => {});
 
 		async function startKafka(socket) {
 			var myCustomSocketFactory = ({ host, port, ssl, onConnect }) => {
@@ -280,35 +279,31 @@ const asyncInitialRunFn = async () => {
 						for (const [entity, values] of Object.entries(
 							threadSafeQueueCopy
 						)) {
-							try {
-								if (values.length > 0) {
-									axios
-										.post(
-											'https://cf-dts-eim-ch-sac-blockchain-uni-li-wue-dw-cloud-srv.cfapps.eu10.hana.ondemand.com/kafka-publish' +
+							if (values.length > 0) {
+								axios
+									.post(
+										'https://cf-dts-eim-ch-sac-blockchain-uni-li-wue-dw-cloud-srv.cfapps.eu10.hana.ondemand.com/kafka-publish' +
+											'/' +
+											entity +
+											'_BI',
+										{
+											array: values.filter(
+												(item) => item !== {}
+											)
+										}
+									)
+									.then(function (response) {
+										log.info(
+											'batch complete to ' +
 												'/' +
 												entity +
-												'_BI',
-											{
-												array: values.filter(
-													(item) => item !== {}
-												)
-											}
-										)
-										.then(function (response) {
-											log.info(
-												'batch complete to ' +
-													'/' +
-													entity +
-													'_BI'
-											);
-										})
-										.catch(function (error) {
-											log.error(error);
-										});
-								}
-							} catch (e) {
-								log.error(entity);
-								log.error('Error has occurred', e);
+												'_BI'
+										);
+									})
+									.catch(function (error) {
+										log.error(entity);
+										log.error('Error has occurred', e);
+									});
 							}
 						}
 					}
@@ -339,8 +334,10 @@ const asyncInitialRunFn = async () => {
 									).entries([entry])
 								);
 							} catch (e) {
-								log.error(entry);
-								log.error('Error has occurred', e);
+								log.error(
+									'Error has occurred in speed layer',
+									entry
+								);
 							}
 						}
 						// ---------------------------------------------------
@@ -445,8 +442,10 @@ const asyncInitialRunFn = async () => {
 										break;
 								}
 							} catch (e) {
-								log.error(entry);
-								log.error('Error has occurred', e);
+								log.error(
+									'Error has occurred in batch layer',
+									entry
+								);
 							}
 						}
 						// ---------------------------------------------------
@@ -524,7 +523,7 @@ const asyncInitialRunFn = async () => {
 				}, socketAliveTime);
 			};
 
-			run().catch(console.error);
+			run().catch((err) => {});
 		}
 	};
 
