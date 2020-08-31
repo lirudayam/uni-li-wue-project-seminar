@@ -150,7 +150,6 @@ async function findAndAggregateData() {
 			return true;
 		}
 	} catch (e) {
-		console.error(e);
 		if (selectStmt) {
 			selectStmt.drop(function (err) {
 				if (err) console.error(err);
@@ -166,7 +165,7 @@ async function findAndAggregateData() {
 				if (err) console.error(err);
 			});
 		}
-		return e;
+		return true;
 	}
 }
 
