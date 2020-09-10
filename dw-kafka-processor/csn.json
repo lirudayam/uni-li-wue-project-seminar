@@ -3319,6 +3319,85 @@
       },
       "$syntax": "projection"
     },
+    "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_B_PRICES": {
+      "kind": "entity",
+      "@readonly": true,
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "uni_li_wue.dw.KPI_G_PRICES"
+            ]
+          },
+          "columns": [
+            {
+              "key": true,
+              "func": "TO_DATE",
+              "args": [
+                {
+                  "ref": [
+                    "timestamp"
+                  ]
+                }
+              ],
+              "as": "Date",
+              "cast": {
+                "type": "cds.Date"
+              }
+            },
+            {
+              "func": "AVG",
+              "args": [
+                {
+                  "ref": [
+                    "price"
+                  ]
+                }
+              ],
+              "as": "Price",
+              "cast": {
+                "type": "cds.Double"
+              }
+            }
+          ],
+          "groupBy": [
+            {
+              "func": "TO_DATE",
+              "args": [
+                {
+                  "ref": [
+                    "timestamp"
+                  ]
+                }
+              ]
+            }
+          ],
+          "where": [
+            {
+              "ref": [
+                "coin"
+              ]
+            },
+            "=",
+            {
+              "val": "BTC"
+            }
+          ]
+        }
+      },
+      "elements": {
+        "Date": {
+          "@Core.Computed": true,
+          "key": true,
+          "type": "cds.Date"
+        },
+        "Price": {
+          "@Core.Computed": true,
+          "type": "cds.Double"
+        }
+      },
+      "$syntax": "entity"
+    },
     "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_B_SPECIAL_EVT": {
       "kind": "entity",
       "@readonly": true,
@@ -3599,6 +3678,85 @@
         },
         "noOfTransactions": {
           "type": "cds.Integer"
+        }
+      },
+      "$syntax": "entity"
+    },
+    "uni_li_wue.dw.service.SACSlowLayerDataService.KPI_E_PRICES": {
+      "kind": "entity",
+      "@readonly": true,
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "uni_li_wue.dw.KPI_G_PRICES"
+            ]
+          },
+          "columns": [
+            {
+              "key": true,
+              "func": "TO_DATE",
+              "args": [
+                {
+                  "ref": [
+                    "timestamp"
+                  ]
+                }
+              ],
+              "as": "Date",
+              "cast": {
+                "type": "cds.Date"
+              }
+            },
+            {
+              "func": "AVG",
+              "args": [
+                {
+                  "ref": [
+                    "price"
+                  ]
+                }
+              ],
+              "as": "Price",
+              "cast": {
+                "type": "cds.Double"
+              }
+            }
+          ],
+          "groupBy": [
+            {
+              "func": "TO_DATE",
+              "args": [
+                {
+                  "ref": [
+                    "timestamp"
+                  ]
+                }
+              ]
+            }
+          ],
+          "where": [
+            {
+              "ref": [
+                "coin"
+              ]
+            },
+            "=",
+            {
+              "val": "ETH"
+            }
+          ]
+        }
+      },
+      "elements": {
+        "Date": {
+          "@Core.Computed": true,
+          "key": true,
+          "type": "cds.Date"
+        },
+        "Price": {
+          "@Core.Computed": true,
+          "type": "cds.Double"
         }
       },
       "$syntax": "entity"
