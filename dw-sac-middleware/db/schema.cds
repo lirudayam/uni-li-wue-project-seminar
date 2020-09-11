@@ -60,8 +60,8 @@ entity LOG_HEALTH_CHECK {
 
 entity LOG_FETCH_ERROR {
     key api       : String;
+    key timestamp : DateTime;
         message   : String;
-        timestamp : DateTime;
 }
 
 

@@ -85,8 +85,7 @@ module.exports = async (srv) => {
   aTopics.forEach((sEntity) => {
     srv.before(["CREATE", "UPDATE"], sEntity, async (req) => {
       if (sEntity !== "KPI_G_GINI") {
-        const { timestamp } = req.data;
-        if (!timestamp) {
+        if (!("timestamp" in req.data)) {
           req.data.timestamp = moment().format();
         }
       }
