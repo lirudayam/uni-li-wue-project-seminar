@@ -19,7 +19,7 @@ module.exports = async (srv) => {
         return array.length;
       }
     } catch (error) {
-      await srv.run(
+      await tx.run(
         INSERT.into(LOG_FETCH_ERROR).entries([
           {
             api: entity,
@@ -94,11 +94,11 @@ module.exports = async (srv) => {
 
   aTopics.forEach((sEntity) => {
     srv.on(["CREATE", "UPDATE"], sEntity, async (req) => {
+      const tx = cds.transaction(req);
       try {
-        const tx = cds.transaction(req);
         return await tx.run(req.query);
       } catch (error) {
-        await srv.run(
+        await tx.run(
           INSERT.into(LOG_FETCH_ERROR).entries([
             {
               api: sEntity,

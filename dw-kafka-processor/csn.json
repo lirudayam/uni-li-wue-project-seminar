@@ -1614,11 +1614,12 @@
           "key": true,
           "type": "cds.String"
         },
+        "timestamp": {
+          "key": true,
+          "type": "cds.DateTime"
+        },
         "message": {
           "type": "cds.String"
-        },
-        "timestamp": {
-          "type": "cds.DateTime"
         }
       }
     },
@@ -2276,11 +2277,12 @@
           "key": true,
           "type": "cds.String"
         },
+        "timestamp": {
+          "key": true,
+          "type": "cds.DateTime"
+        },
         "message": {
           "type": "cds.String"
-        },
-        "timestamp": {
-          "type": "cds.DateTime"
         }
       },
       "$syntax": "projection"
@@ -3136,11 +3138,12 @@
           "key": true,
           "type": "cds.String"
         },
+        "timestamp": {
+          "key": true,
+          "type": "cds.DateTime"
+        },
         "message": {
           "type": "cds.String"
-        },
-        "timestamp": {
-          "type": "cds.DateTime"
         }
       },
       "$syntax": "projection"
