@@ -1,7 +1,6 @@
 const {
   KPI_E_TOKEN,
   KPI_E_BLOCK,
-  KPI_B_BLOCK,
   KPI_G_NODE_DISTRIBUTION,
   KPI_G_N_PER_TIME,
   KPI_E_EXT_GASSTATION,
@@ -20,7 +19,16 @@ module.exports = async (srv) => {
         return array.length;
       }
     } catch (error) {
-      console.error(error);
+      await tx.run(
+        INSERT.into(LOG_FETCH_ERROR).entries([
+          {
+            api: entity,
+            timestamp: moment().format(),
+            message: "Batch insert error: " + req.query,
+          },
+        ])
+      );
+      throw error;
     }
   };
 
@@ -75,10 +83,9 @@ module.exports = async (srv) => {
   ];
 
   aTopics.forEach((sEntity) => {
-    srv.before(["CREATE", "UPDATE"], sEntity, async (req) => {
+    srv.before(["CREATE", "UPDATE"], sEntity, (req) => {
       if (sEntity !== "KPI_G_GINI") {
-        const { timestamp } = req.data;
-        if (!timestamp) {
+        if (!("timestamp" in req.data)) {
           req.data.timestamp = moment().format();
         }
       }
@@ -87,11 +94,11 @@ module.exports = async (srv) => {
 
   aTopics.forEach((sEntity) => {
     srv.on(["CREATE", "UPDATE"], sEntity, async (req) => {
+      const tx = cds.transaction(req);
       try {
-        const tx = cds.transaction(req);
         return await tx.run(req.query);
       } catch (error) {
-        await srv.run(
+        await tx.run(
           INSERT.into(LOG_FETCH_ERROR).entries([
             {
               api: sEntity,

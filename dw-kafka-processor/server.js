@@ -59,7 +59,6 @@ const asyncInitialRunFn = async () => {
 		KPI_G_PRICE_VOLA,
 		KPI_G_PRICES,
 		KPI_B_SPECIAL_EVT,
-		KPI_G_NEWS,
 		KPI_G_RECOMM,
 		KPI_G_CREDITS,
 		LOG_FETCH_ERROR,
@@ -441,6 +440,7 @@ const asyncInitialRunFn = async () => {
 										}
 										break;
 								}
+								delete entry;
 							} catch (e) {
 								log.error(
 									'Error has occurred in batch layer',

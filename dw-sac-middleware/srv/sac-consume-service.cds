@@ -61,6 +61,16 @@ entity KPI_G_PRICE_DIFF @readonly          as
 
 entity KPI_G_PRICES @readonly              as projection on dw.KPI_G_PRICES;
 
+entity KPI_B_PRICES @readonly              as select
+    key TO_DATE(timestamp) as Date : Date,
+        AVG(price) as Price : Double
+  from dw.KPI_G_PRICES where coin = 'BTC' group by TO_DATE(timestamp);
+
+entity KPI_E_PRICES @readonly              as select
+    key TO_DATE(timestamp) as Date : Date,
+        AVG(price) as Price : Double
+  from dw.KPI_G_PRICES where coin = 'ETH' group by TO_DATE(timestamp);
+
 entity KPI_E_BLOCK @readonly               as
   select
     key identifier,
